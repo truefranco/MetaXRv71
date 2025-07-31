@@ -1,0 +1,29 @@
+/*
+Copyright (c) Meta Platforms, Inc. and affiliates.
+All rights reserved.
+
+This source code is licensed under the license found in the
+LICENSE file in the root directory of this source tree.
+*/
+
+#include "OculusAnchorDelegates.h"
+
+FOculusAnchorEventDelegates::FOculusSpatialAnchorCreateCompleteDelegate FOculusAnchorEventDelegates::OculusSpatialAnchorCreateComplete;
+
+FOculusAnchorEventDelegates::FOculusSpaceSetComponentStatusCompleteDelegate FOculusAnchorEventDelegates::OculusSpaceSetComponentStatusComplete;
+
+FOculusAnchorEventDelegates::FOculusSpaceQueryResultsDelegate FOculusAnchorEventDelegates::OculusSpaceQueryResults;
+
+FOculusAnchorEventDelegates::FOculusSpaceQueryResultDelegate FOculusAnchorEventDelegates::OculusSpaceQueryResult;
+
+FOculusAnchorEventDelegates::FOculusSpaceQueryCompleteDelegate FOculusAnchorEventDelegates::OculusSpaceQueryComplete;
+
+FOculusAnchorEventDelegates::FOculusSpaceSaveCompleteDelegate FOculusAnchorEventDelegates::OculusSpaceSaveComplete;
+
+FOculusAnchorEventDelegates::FOculusSpaceListSaveCompleteDelegate FOculusAnchorEventDelegates::OculusSpaceListSaveComplete;
+
+FOculusAnchorEventDelegates::FOculusSpaceEraseCompleteDelegate FOculusAnchorEventDelegates::OculusSpaceEraseComplete;
+
+FOculusAnchorEventDelegates::FOculusSpaceShareCompleteDelegate FOculusAnchorEventDelegates::OculusSpaceShareComplete;
+
+FOculusAnchorEventDelegates::FOculusSceneCaptureCompleteDelegate FOculusAnchorEventDelegates::OculusSceneCaptureComplete;
