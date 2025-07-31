@@ -115,7 +115,7 @@ class OCULUSINTERACTIONPREBUILTS_API UIsdkControllerRigComponent : public UIsdkR
    * Pointer to the rig component used for the visuals associated with this controller rig
    */
   UPROPERTY(BlueprintGetter = GetControllerVisuals, EditAnywhere, Category = InteractionSDK)
-  TObjectPtr<UIsdkControllerVisualsRigComponent> ControllerVisualsComponent;
+  UIsdkControllerVisualsRigComponent* ControllerVisualsComponent;
 
   /**
    * Unreal Engine input binding struct used for PinchStrength. Normally nullptr on a controller.

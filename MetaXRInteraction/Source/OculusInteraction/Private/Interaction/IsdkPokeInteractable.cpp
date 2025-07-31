@@ -22,6 +22,7 @@
 
 #include "StructTypesPrivate.h"
 #include "isdk_api/isdk_api.hpp"
+#include "Templates/PimplPtr.h"
 #include "ApiImpl.h"
 #include "IsdkChecks.h"
 #include "IsdkContentAssetPaths.h"
@@ -44,16 +45,20 @@ namespace isdk
 extern TAutoConsoleVariable<bool> CVar_Meta_InteractionSDK_DebugInteractionVisuals;
 }
 
-namespace isdk::api::helper
-{
-class FPokeInteractableImpl : public FApiImpl<PokeInteractable, PokeInteractablePtr>
-{
- public:
-  explicit FPokeInteractableImpl(std::function<PokeInteractablePtr()> CreateFn)
-      : FApiImpl(std::move(CreateFn))
-  {
-  }
-};
+namespace isdk {
+	namespace api {
+		namespace helper
+		{
+			class FPokeInteractableImpl : public FApiImpl<PokeInteractable, PokeInteractablePtr>
+			{
+			public:
+				explicit FPokeInteractableImpl(std::function<PokeInteractablePtr()> CreateFn)
+					: FApiImpl(std::move(CreateFn))
+				{
+				}
+			};
+		}
+	}
 } // namespace isdk::api::helper
 
 FIsdkPokeInteractable_Config UIsdkPokeInteractableConfigDataAsset::CreateDefaultPanelConfig()
@@ -81,7 +86,7 @@ UIsdkPokeInteractable::UIsdkPokeInteractable()
   PrimaryComponentTick.bCanEverTick = false;
 #endif
 
-  PokeInteractableImpl = MakePimpl<isdk::api::helper::FPokeInteractableImpl, EPimplPtrMode::NoCopy>(
+  PokeInteractableImpl = MakePimpl<isdk::api::helper::FPokeInteractableImpl>(
       [this]() -> PokeInteractablePtr
       {
         // Surface Patch - to perform internal collision detection
@@ -304,7 +309,7 @@ void UIsdkPokeInteractable::HandlePointerEvent(const FIsdkInteractionPointerEven
   const auto DebugRadius = GetDefault<UIsdkRuntimeSettings>()->PointerEventDebugRadius;
   const auto DebugDuration = GetDefault<UIsdkRuntimeSettings>()->PointerEventDebugDuration;
   DrawDebugSphere(GetWorld(), DebugLocation, DebugRadius, 12, DebugColor, false, DebugDuration);
-  UE_VLOG_SPHERE(
+  UE_VLOG_LOCATION(
       GetOwner(), LogOculusInteraction, Log, DebugLocation, DebugRadius, DebugColor, TEXT_EMPTY);
   UE_VLOG(
       GetOwner(),

@@ -21,7 +21,6 @@
 using System.Linq;
 using System.IO;
 using UnrealBuildTool;
-using EpicGames.Core;
 
 public class IsdkDataSourcesMetaXR : ModuleRules
 {
@@ -42,7 +41,6 @@ public class IsdkDataSourcesMetaXR : ModuleRules
                 "SlateCore",
                 "UMG",
                 "OculusInteraction",
-                "XRBase"
             }
         );
     }

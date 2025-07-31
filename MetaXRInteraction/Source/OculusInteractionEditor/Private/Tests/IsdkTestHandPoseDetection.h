@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  * All rights reserved.
  *
@@ -73,7 +73,7 @@ class OCULUSINTERACTIONEDITOR_API AIsdkTestHandPoseDetectionActor : public AActo
     };
     static FStaticObjectFinders StaticObjectFinders;
     TestTrackedHandVisual->SetMaterial(0, StaticObjectFinders.HandMaterialFinder.Get());
-    TestTrackedHandVisual->SetSkinnedAsset(StaticObjectFinders.LeftHandMeshFinder.Get());
+    TestTrackedHandVisual->SetSkeletalMesh(StaticObjectFinders.LeftHandMeshFinder.Get());
     TestTrackedHandVisual->SetMappedBoneNamesAsDefault();
 
     TestFingerPinchGrabRecognizer = CreateDefaultSubobject<UIsdkHandFingerPinchGrabRecognizer>(

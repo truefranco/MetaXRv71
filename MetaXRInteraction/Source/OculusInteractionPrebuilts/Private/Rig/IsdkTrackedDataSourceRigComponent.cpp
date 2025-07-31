@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  * All rights reserved.
  *
@@ -84,7 +84,7 @@ bool UIsdkTrackedDataSourceRigComponent::TryAttachToParentMotionController(UScen
     if (IsValid(SyntheticVisual))
     {
       // This actor doesn't support cases where the MotionControllerComponent is the root component.
-      const AActor* SyntheticAttachParent = AttachedToMotionController->GetAttachParentActor();
+      const AActor* SyntheticAttachParent = AttachedToMotionController->GetOwner();
       if (ensureMsgf(
               SyntheticAttachParent != nullptr,
               TEXT("%s: Parent UMotionControllerComponent must be attached to an actor"),

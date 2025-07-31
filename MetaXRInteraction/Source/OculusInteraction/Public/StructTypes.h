@@ -4,7 +4,7 @@
 #pragma once
 
 #include "StructTypesNonGenerated.h"
-
+#include "VectorTypes.h"
 #include "StructTypes.generated.h"
 
 UENUM(BlueprintType)
@@ -471,16 +471,16 @@ struct OCULUSINTERACTION_API FIsdkAxisAlignedBox {
   FIsdkAxisAlignedBox();
 
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = InteractionSDK)
-  FVector3f LowerBound{};
+  FVector LowerBound{};
 
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = InteractionSDK)
-  FVector3f UpperBound{};
+  FVector UpperBound{};
 
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = InteractionSDK)
-  FVector3f Centroid{};
+  FVector Centroid{};
 
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = InteractionSDK)
-  FVector3f HalfSize{};
+  FVector HalfSize{};
 };
 
 USTRUCT(BlueprintType)
@@ -493,10 +493,10 @@ struct OCULUSINTERACTION_API FIsdkBoundsClipper {
   TScriptInterface<IIsdkIPose> PoseProvider{};
 
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = InteractionSDK)
-  FVector3f Position{};
+  FVector Position{};
 
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = InteractionSDK)
-  FVector3f Size{};
+  FVector Size{};
 };
 
 USTRUCT(BlueprintType)
@@ -506,10 +506,10 @@ struct OCULUSINTERACTION_API FIsdkRay {
   FIsdkRay();
 
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = InteractionSDK)
-  FVector3f Origin{};
+  FVector Origin{};
 
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = InteractionSDK)
-  FVector3f Direction{};
+  FVector Direction{};
 };
 
 USTRUCT(BlueprintType)
@@ -519,10 +519,10 @@ struct OCULUSINTERACTION_API FIsdkSurfaceHit {
   FIsdkSurfaceHit();
 
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = InteractionSDK)
-  FVector3f Point{};
+  FVector Point{};
 
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = InteractionSDK)
-  FVector3f Normal{};
+  FVector Normal{};
 
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = InteractionSDK)
   float Distance{};

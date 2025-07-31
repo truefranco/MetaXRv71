@@ -79,7 +79,7 @@ struct FIsdkGrabPointDelta
   /** @brief Determines if the current centroid offset has a valid axis */
   bool IsValidAxis() const
   {
-    return CentroidOffset.SquaredLength() > _epsilon;
+    return CentroidOffset.SizeSquared() > _epsilon;
   }
 };
 

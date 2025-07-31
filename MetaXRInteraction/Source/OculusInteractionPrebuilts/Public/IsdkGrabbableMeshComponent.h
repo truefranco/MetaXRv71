@@ -35,7 +35,6 @@
  * @addtogroup InteractionSDKPrebuilts
  */
 UCLASS(
-    Placeable,
     Blueprintable,
     ClassGroup = (InteractionSDK),
     meta = (DisplayName = "ISDK Grabbable Mesh Component", BlueprintSpawnableComponent))

@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  * All rights reserved.
  *
@@ -19,7 +19,7 @@
  */
 
 #include "HandPoseDetection/IsdkHandThumbRecognizer.h"
-
+#include "Templates/PimplPtr.h"
 #include "ApiImpl.h"
 #include "IsdkChecks.h"
 #include "isdk_api/isdk_api.hpp"
@@ -29,40 +29,44 @@ using isdk::api::DigitRecognizer;
 using isdk::api::ThumbRecognizer;
 using isdk::api::ThumbRecognizerPtr;
 
-namespace isdk::api::helper
-{
-class FThumbRecognizerImpl : public FApiImpl<ThumbRecognizer, ThumbRecognizerPtr>
-{
- public:
-  explicit FThumbRecognizerImpl(std::function<ThumbRecognizerPtr()> CreateFn)
-      : FApiImpl(std::move(CreateFn))
-  {
-  }
+namespace isdk {
+	namespace api {
+		namespace helper
+		{
+			class FThumbRecognizerImpl : public FApiImpl<ThumbRecognizer, ThumbRecognizerPtr>
+			{
+			public:
+				explicit FThumbRecognizerImpl(std::function<ThumbRecognizerPtr()> CreateFn)
+					: FApiImpl(std::move(CreateFn))
+				{
+				}
 
-  void SetExpectedRanges(
-      const isdk_ThumbRecognizer_ExpectedThumbValueRanges& Ranges,
-      EIsdkDetection_ThumbCalcType InCalcType)
-  {
-    switch (InCalcType)
-    {
-      case EIsdkDetection_ThumbCalcType::Curl:
-        ExpectedValueRange = {Ranges.curl.minValue, Ranges.curl.maxValue};
-        break;
-      case EIsdkDetection_ThumbCalcType::Flexion:
-        ExpectedValueRange = {Ranges.flexion.minValue, Ranges.flexion.maxValue};
-        break;
-      default:
-        check(false);
-    }
-  }
+				void SetExpectedRanges(
+					const isdk_ThumbRecognizer_ExpectedThumbValueRanges& Ranges,
+					EIsdkDetection_ThumbCalcType InCalcType)
+				{
+					switch (InCalcType)
+					{
+					case EIsdkDetection_ThumbCalcType::Curl:
+						ExpectedValueRange = { Ranges.curl.minValue, Ranges.curl.maxValue };
+						break;
+					case EIsdkDetection_ThumbCalcType::Flexion:
+						ExpectedValueRange = { Ranges.flexion.minValue, Ranges.flexion.maxValue };
+						break;
+					default:
+						check(false);
+					}
+				}
 
-  FVector2f ExpectedValueRange = FVector2f::Zero();
-};
+				FVector2D ExpectedValueRange = FVector2D::ZeroVector;
+			};
+		}
+	}
 } // namespace isdk::api::helper
 
 UIsdkHandThumbRecognizer::UIsdkHandThumbRecognizer()
 {
-  ThumbRecognizerImpl = MakePimpl<isdk::api::helper::FThumbRecognizerImpl, EPimplPtrMode::NoCopy>(
+  ThumbRecognizerImpl = MakePimpl<isdk::api::helper::FThumbRecognizerImpl>(
       [this]() -> ThumbRecognizerPtr
       {
         const auto* ApiHandPositionFrame = EnsureHandPositionFrame();
@@ -98,7 +102,7 @@ void UIsdkHandThumbRecognizer::BeginDestroy()
   ThumbRecognizerImpl.Reset();
 }
 
-FVector2f UIsdkHandThumbRecognizer::GetRawExpectedRange()
+FVector2D UIsdkHandThumbRecognizer::GetRawExpectedRange()
 {
   return ThumbRecognizerImpl->ExpectedValueRange;
 }

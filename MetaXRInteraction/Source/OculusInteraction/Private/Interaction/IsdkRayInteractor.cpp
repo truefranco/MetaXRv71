@@ -19,7 +19,7 @@
  */
 
 #include "Interaction/IsdkRayInteractor.h"
-
+#include "Templates/PimplPtr.h"
 #include "StructTypesPrivate.h"
 #include "isdk_api/isdk_api.hpp"
 #include "ApiImpl.h"
@@ -39,24 +39,28 @@ extern TAutoConsoleVariable<bool> CVar_Meta_InteractionSDK_DebugInteractionVisua
 extern TAutoConsoleVariable<bool> CVar_Meta_InteractionSDK_DisableDistanceDebugging;
 } // namespace isdk
 
-namespace isdk::api::helper
-{
-class FRayInteractorImpl : public FApiImpl<RayInteractor, RayInteractorPtr>
-{
- public:
-  explicit FRayInteractorImpl(std::function<RayInteractorPtr()> CreateFn)
-      : FApiImpl(std::move(CreateFn))
-  {
-  }
-};
+namespace isdk {
+	namespace api {
+		namespace helper
+		{
+			class FRayInteractorImpl : public FApiImpl<RayInteractor, RayInteractorPtr>
+			{
+			public:
+				explicit FRayInteractorImpl(std::function<RayInteractorPtr()> CreateFn)
+					: FApiImpl(std::move(CreateFn))
+				{
+				}
+			};
+		}
+	}
 } // namespace isdk::api::helper
 
 UIsdkRayInteractor::UIsdkRayInteractor()
 {
   PrimaryComponentTick.bCanEverTick = true;
 
-  SelectorImpl = MakePimpl<isdk::api::helper::FSelectorImpl, EPimplPtrMode::NoCopy>();
-  RayInteractorImpl = MakePimpl<isdk::api::helper::FRayInteractorImpl, EPimplPtrMode::NoCopy>(
+  SelectorImpl = MakePimpl<isdk::api::helper::FSelectorImpl>();
+  RayInteractorImpl = MakePimpl<isdk::api::helper::FRayInteractorImpl>(
       [this]() -> RayInteractorPtr
       {
         // Create the selector

@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  * All rights reserved.
  *
@@ -22,20 +22,23 @@
 
 #include "CoreMinimal.h"
 #include "IsdkISurface.h"
+#include "Templates/PimplPtr.h"
 #include "Components/SceneComponent.h"
 #include "Debug/IsdkHasDebugSegments.h"
 #include "Input/IsdkIPose.h"
 #include "IsdkPointableBox.generated.h"
 
 // Forward declarations of internal types
-namespace isdk::api
-{
-class PointableOrientedBox;
+namespace isdk {
+	namespace api
+	{
+		class PointableOrientedBox;
 
-namespace helper
-{
-class FPointableOrientedBoxImpl;
-}
+		namespace helper
+		{
+			class FPointableOrientedBoxImpl;
+		}
+	}
 } // namespace isdk::api
 
 /**

@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  * All rights reserved.
  *
@@ -19,7 +19,7 @@
  */
 
 #include "HandPoseDetection/IsdkHandFingerPinchGrabRecognizer.h"
-
+#include "Templates/PimplPtr.h"
 #include "ApiImpl.h"
 #include "IsdkChecks.h"
 #include "IsdkHandMeshComponent.h"
@@ -29,23 +29,27 @@
 using isdk::api::FingerPinchGrabRecognizer;
 using isdk::api::FingerPinchGrabRecognizerPtr;
 
-namespace isdk::api::helper
-{
-class FFingerPinchGrabRecognizerImpl
-    : public FApiImpl<FingerPinchGrabRecognizer, FingerPinchGrabRecognizerPtr>
-{
- public:
-  explicit FFingerPinchGrabRecognizerImpl(std::function<FingerPinchGrabRecognizerPtr()> CreateFn)
-      : FApiImpl(std::move(CreateFn))
-  {
-  }
-};
+namespace isdk {
+	namespace api {
+		namespace helper
+		{
+			class FFingerPinchGrabRecognizerImpl
+				: public FApiImpl<FingerPinchGrabRecognizer, FingerPinchGrabRecognizerPtr>
+			{
+			public:
+				explicit FFingerPinchGrabRecognizerImpl(std::function<FingerPinchGrabRecognizerPtr()> CreateFn)
+					: FApiImpl(std::move(CreateFn))
+				{
+				}
+			};
+		}
+	}
 } // namespace isdk::api::helper
 
 UIsdkHandFingerPinchGrabRecognizer::UIsdkHandFingerPinchGrabRecognizer()
 {
   FingerPinchGrabRecognizerImpl =
-      MakePimpl<isdk::api::helper::FFingerPinchGrabRecognizerImpl, EPimplPtrMode::NoCopy>(
+      MakePimpl<isdk::api::helper::FFingerPinchGrabRecognizerImpl>(
           [this]() -> FingerPinchGrabRecognizerPtr
           {
             const auto* ApiHandPositionFrame = EnsureHandPositionFrame();
@@ -89,8 +93,8 @@ void UIsdkHandFingerPinchGrabRecognizer::UpdatePinchConfidence()
     ovrpVector3f DataWristFwd;
     ovrpVector3f DataHMDFwd;
 
-    StructTypesUtils::Copy(CurrentWristForward, DataWristFwd);
-    StructTypesUtils::Copy(CurrentHMDForward, DataHMDFwd);
+    StructTypesUtils::Copy((FVector3d)CurrentWristForward, DataWristFwd);
+    StructTypesUtils::Copy((FVector3d)CurrentHMDForward, DataHMDFwd);
     bLastPinchConfidence =
         !!Recognizer->setInputTrackingConfidenceWithData(DataWristFwd, DataHMDFwd);
   }

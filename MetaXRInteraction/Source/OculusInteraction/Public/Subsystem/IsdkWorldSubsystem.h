@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  * All rights reserved.
  *
@@ -25,6 +25,7 @@
 
 #include "CoreMinimal.h"
 #include "Engine/World.h"
+#include "Templates/PimplPtr.h"
 #include "Subsystems/WorldSubsystem.h"
 #include "Interaction/IsdkIInteractorState.h"
 #include "Interaction/IsdkIInteractableState.h"
@@ -33,26 +34,29 @@
 #include "IsdkWorldSubsystem.generated.h"
 
 // Forward declarations of internal types
-namespace isdk::api
-{
-class ScaledTimeProvider;
-class IPointable;
-class IPayload;
-class InteractorPayload;
-class IInteractable;
-class IInteractor;
-class IUpdate;
-class FIsdkScaledTimeProviderImpl;
-namespace helper
-{
-class IEventQueueWrapper;
-class FUpdateEventQueueImpl;
-class FInteractableStateEventQueueImpl;
-class FInteractorStateEventQueueImpl;
-class FUpdateEventQueueImpl;
-class FPointerEventQueueImpl;
-} // namespace helper
+namespace isdk {
+	namespace api
+	{
+		class ScaledTimeProvider;
+		class IPointable;
+		class IPayload;
+		class InteractorPayload;
+		class IInteractable;
+		class IInteractor;
+		class IUpdate;
+		class FIsdkScaledTimeProviderImpl;
+		namespace helper
+		{
+			class IEventQueueWrapper;
+			class FUpdateEventQueueImpl;
+			class FInteractableStateEventQueueImpl;
+			class FInteractorStateEventQueueImpl;
+			class FUpdateEventQueueImpl;
+			class FPointerEventQueueImpl;
+		} // namespace helper
+	}
 } // namespace isdk::api
+
 typedef struct isdk_IPayload_ isdk_IPayload;
 typedef struct isdk_IInteractable_ isdk_IInteractable;
 
@@ -305,6 +309,7 @@ class OCULUSINTERACTION_API UIsdkWorldSubsystem : public UTickableWorldSubsystem
   UPROPERTY()
   TArray<UIsdkInteractableComponent*> RegisteredInteractables{};
 
+  public:
   static UIsdkInteractorComponent* LookupInteractorFromPayload(
       TWeakObjectPtr<UIsdkWorldSubsystem> InThis,
       const isdk_IPayload* InPayload);

@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  * All rights reserved.
  *
@@ -85,7 +85,7 @@ class OCULUSINTERACTION_API UIsdkTestRayFixture : public UObject
   }
 
   UPROPERTY()
-  TObjectPtr<UIsdkMockInteractable> MockInteractable;
+  UIsdkMockInteractable* MockInteractable;
 
   isdk::api::PointablePlanePtr PanelPlane = nullptr;
   isdk::api::RayInteractorPtr RayInteractor = nullptr;

@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  * All rights reserved.
  *
@@ -38,7 +38,7 @@ class FOculusInteractionEditor : public IOculusInteractionEditor
   virtual void ShutdownModule() override;
   void HandleIsdkDownloadClicked() const;
   void HandleMetaXrDownloadClicked() const;
-  void HandleEditorInitialized(double) const;
+  void HandleEditorInitialized() const;
 };
 
 #define LOCTEXT_NAMESPACE "FOculusInteractionEditorModule"
@@ -72,8 +72,8 @@ void FOculusInteractionEditor::StartupModule()
 
   // Wait for editor to be initialized before performing version check logic to avoid any potential
   // module load timing issues
-  FEditorDelegates::OnEditorInitialized.AddRaw(
-      this, &FOculusInteractionEditor::HandleEditorInitialized);
+  FCoreDelegates::OnPostEngineInit.AddRaw(
+	  this, &FOculusInteractionEditor::HandleEditorInitialized);
 
   if (GUnrealEd)
   {
@@ -105,20 +105,20 @@ void FOculusInteractionEditor::ShutdownModule()
   }
 }
 
-void FOculusInteractionEditor::HandleEditorInitialized(double) const
+void FOculusInteractionEditor::HandleEditorInitialized() const
 {
   // Validate whether oculus xr plugin is enabled
   IPluginManager& PluginManager = IPluginManager::Get();
 
   // OculusInteraction plugin should be enabled if this module is starting up
-  const auto OculusInteractionPlugin = PluginManager.FindEnabledPlugin("OculusInteraction");
+  const auto OculusInteractionPlugin = PluginManager.FindPlugin("OculusInteraction");
   if (!ensure(OculusInteractionPlugin))
   {
     return;
   }
 
   // If OculusXR is not enabled, this is totally fine, no checks necessary
-  const auto OculusXrPlugin = PluginManager.FindEnabledPlugin("OculusXR");
+  const auto OculusXrPlugin = PluginManager.FindPlugin("OculusVR");
   if (!OculusXrPlugin)
   {
     return;
@@ -153,7 +153,7 @@ void FOculusInteractionEditor::HandleEditorInitialized(double) const
     UE_LOG(
         LogOculusInteractionEditor,
         Warning,
-        TEXT("Found plugin \"OculusXR\" but could not determine version from VersionName"));
+        TEXT("Found plugin \"OculusVR\" but could not determine version from VersionName"));
     return;
   }
 
@@ -170,7 +170,7 @@ void FOculusInteractionEditor::HandleEditorInitialized(double) const
     UE_LOG(
         LogOculusInteractionEditor,
         Log,
-        TEXT("OculusInteraction Version \"%s\" matches OculusXR Version \"%s\""),
+        TEXT("OculusInteraction Version \"%s\" matches OculusVR Version \"%s\""),
         *IsdkVersionName,
         *OculusXrVersionName);
     return;

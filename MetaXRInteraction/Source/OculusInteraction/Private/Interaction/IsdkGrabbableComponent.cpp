@@ -198,7 +198,7 @@ void UIsdkGrabbableComponent::TickComponent(
 
   FBox BoundsBox = GetGrabCollider()->Bounds.GetBox();
   DrawDebugBox(GetWorld(), BoundsBox.GetCenter(), BoundsBox.GetExtent(), DebugColor, false);
-  UE_VLOG_WIREBOX(GetOwner(), LogOculusInteraction, Verbose, BoundsBox, DebugColor, TEXT_EMPTY);
+  UE_VLOG_BOX(GetOwner(), LogOculusInteraction, Verbose, BoundsBox, DebugColor, TEXT_EMPTY);
 }
 
 void UIsdkGrabbableComponent::GetInteractableStateRelationships(
@@ -400,7 +400,7 @@ void UIsdkGrabbableComponent::HandlePointerEvent(const FIsdkInteractionPointerEv
   const auto DebugRadius = GetDefault<UIsdkRuntimeSettings>()->PointerEventDebugRadius;
   const auto DebugDuration = GetDefault<UIsdkRuntimeSettings>()->PointerEventDebugDuration;
   DrawDebugSphere(GetWorld(), DebugLocation, DebugRadius, 12, DebugColor, false, DebugDuration);
-  UE_VLOG_SPHERE(
+  UE_VLOG_LOCATION(
       GetOwner(), LogOculusInteraction, Log, DebugLocation, DebugRadius, DebugColor, TEXT_EMPTY);
   UE_VLOG(
       GetOwner(),

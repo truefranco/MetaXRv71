@@ -19,7 +19,7 @@
  */
 
 #include "DataSources/IsdkSyntheticHand.h"
-
+#include "Templates/PimplPtr.h"
 #include "StructTypesPrivate.h"
 #include "ApiImpl.h"
 #include "IsdkChecks.h"
@@ -29,42 +29,46 @@ using isdk::api::IHandDataSource;
 using isdk::api::SyntheticHand;
 using isdk::api::SyntheticHandPtr;
 
-namespace isdk::api::helper
-{
-class FSyntheticHandImpl : public FApiImpl<SyntheticHand, SyntheticHandPtr>
-{
- public:
-  explicit FSyntheticHandImpl(std::function<SyntheticHandPtr()> CreateFn)
-      : FApiImpl(std::move(CreateFn))
-  {
-  }
-};
+namespace isdk {
+	namespace api {
+		namespace helper
+		{
+			class FSyntheticHandImpl : public FApiImpl<SyntheticHand, SyntheticHandPtr>
+			{
+			public:
+				explicit FSyntheticHandImpl(std::function<SyntheticHandPtr()> CreateFn)
+					: FApiImpl(std::move(CreateFn))
+				{
+				}
+			};
 
-TOptional<isdk_SyntheticHand_WristLockMode> Convert(EIsdkRootPoseLockMode LockMode)
-{
-  TOptional<isdk_SyntheticHand_WristLockMode> WristLockMode{};
-  switch (LockMode)
-  {
-    case EIsdkRootPoseLockMode::Position:
-      WristLockMode = isdk_SyntheticHand_WristLockMode_Position;
-      break;
-    case EIsdkRootPoseLockMode::Rotation:
-      WristLockMode = isdk_SyntheticHand_WristLockMode_Rotation;
-      break;
-    case EIsdkRootPoseLockMode::Full:
-      WristLockMode = isdk_SyntheticHand_WristLockMode_Full;
-      break;
-    default:
-      // Do nothing. If the intent is to unlock, user must call FreeRootTransform explicitly.
-      break;
-  }
-  return WristLockMode;
-}
+			TOptional<isdk_SyntheticHand_WristLockMode> Convert(EIsdkRootPoseLockMode LockMode)
+			{
+				TOptional<isdk_SyntheticHand_WristLockMode> WristLockMode{};
+				switch (LockMode)
+				{
+				case EIsdkRootPoseLockMode::Position:
+					WristLockMode = isdk_SyntheticHand_WristLockMode_Position;
+					break;
+				case EIsdkRootPoseLockMode::Rotation:
+					WristLockMode = isdk_SyntheticHand_WristLockMode_Rotation;
+					break;
+				case EIsdkRootPoseLockMode::Full:
+					WristLockMode = isdk_SyntheticHand_WristLockMode_Full;
+					break;
+				default:
+					// Do nothing. If the intent is to unlock, user must call FreeRootTransform explicitly.
+					break;
+				}
+				return WristLockMode;
+			}
+		}
+	}
 } // namespace isdk::api::helper
 
 UIsdkSyntheticHand::UIsdkSyntheticHand()
 {
-  SyntheticHandImpl = MakePimpl<isdk::api::helper::FSyntheticHandImpl, EPimplPtrMode::NoCopy>(
+  SyntheticHandImpl = MakePimpl<isdk::api::helper::FSyntheticHandImpl>(
       [this]() -> SyntheticHandPtr
       {
         FIsdkSyntheticHand_Config Config{};
@@ -139,7 +143,7 @@ void UIsdkSyntheticHand::LockRootLocation_Implementation(
     const float OverrideFactor,
     bool bSkipAnimation)
 {
-  const ovrpVector3f ApiPosition = StructTypesUtils::Convert(Position);
+  const ovrpVector3f ApiPosition = StructTypesUtils::Convert((FVector3d)Position);
   SyntheticHandImpl->GetOrCreateInstance()->lockWristPosition(
       &ApiPosition, OverrideFactor, bSkipAnimation ? 1 : 0);
 }
@@ -149,7 +153,7 @@ void UIsdkSyntheticHand::LockRootRotation_Implementation(
     const float OverrideFactor,
     bool bSkipAnimation)
 {
-  const ovrpQuatf ApiRotation = StructTypesUtils::Convert(Rotation);
+  const ovrpQuatf ApiRotation = StructTypesUtils::Convert((FQuat4d)Rotation);
   SyntheticHandImpl->GetOrCreateInstance()->lockWristRotation(
       &ApiRotation, OverrideFactor, bSkipAnimation ? 1 : 0);
 }

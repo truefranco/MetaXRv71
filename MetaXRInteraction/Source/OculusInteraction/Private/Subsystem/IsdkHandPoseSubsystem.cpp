@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  * All rights reserved.
  *
@@ -103,7 +103,7 @@ void UIsdkHandPoseSubsystem::Tick(float InDeltaTime)
       AActor* ThisActor = *Itr;
       if (IsValid(ThisActor) && ThisActor->HasActorBegunPlay())
       {
-        const FName ActorClassName = FTopLevelAssetPath(ThisActor->GetClass()).GetPackageName();
+		  const FName ActorClassName = FName(*ThisActor->GetClass()->GetPackage()->GetName());
         // We only debug actors we have cached poses for
 
         if (ActorPoseCacheMap.Contains(ActorClassName))
@@ -163,7 +163,7 @@ TStatId UIsdkHandPoseSubsystem::GetStatId() const
   RETURN_QUICK_DECLARE_CYCLE_STAT(IsdkHandPoseSubsystem, STATGROUP_Tickables);
 }
 
-USkinnedAsset* UIsdkHandPoseSubsystem::GetHandMesh(EIsdkHandedness& Handedness)
+USkeletalMesh* UIsdkHandPoseSubsystem::GetHandMesh(EIsdkHandedness& Handedness)
 {
   if (Handedness == EIsdkHandedness::Left)
   {
@@ -190,7 +190,7 @@ FName UIsdkHandPoseSubsystem::GetActorClassNameFromComponent(USceneComponent* Co
         TEXT("UIsdkHandPoseSubsystem::GetActorClassNameFromComponent - ComponentIn was invalid!"));
     return NAME_None;
   }
-  AActor* OwningActor = ComponentIn->GetAttachParentActor();
+  AActor* OwningActor = ComponentIn->GetOwner();
   if (!IsValid(OwningActor))
   {
     UE_LOG(
@@ -199,8 +199,8 @@ FName UIsdkHandPoseSubsystem::GetActorClassNameFromComponent(USceneComponent* Co
         TEXT("UIsdkHandPoseSubsystem::GetActorClassNameFromComponent - OwningActor was invalid!"));
     return NAME_None;
   }
-
-  return FTopLevelAssetPath(OwningActor->GetClass()).GetPackageName();
+  
+  return FName(*OwningActor->GetClass()->GetPackage()->GetName());
 }
 
 void UIsdkHandPoseSubsystem::RegisterHandPoseData(
@@ -216,7 +216,7 @@ void UIsdkHandPoseSubsystem::RegisterHandPoseData(
     return;
   }
 
-  AActor* OwningActor = HandGrabPoseIn->GetAttachParentActor();
+  AActor* OwningActor = HandGrabPoseIn->GetOwner();
   if (!IsValid(OwningActor))
   {
     UE_LOG(
@@ -250,7 +250,7 @@ void UIsdkHandPoseSubsystem::RegisterHandPoseData(
     else
     {
       // If not, let's make a new variation and cache it
-      UIsdkHandPoseData* OriginalHandPoseData = HandGrabPoseIn->HandPoseData.Get();
+      UIsdkHandPoseData* OriginalHandPoseData = HandGrabPoseIn->HandPoseData;
       if (!UIsdkChecks::ValidateDependency(
               OriginalHandPoseData,
               HandGrabPoseIn,
@@ -425,7 +425,7 @@ bool UIsdkHandPoseSubsystem::CheckForHandPose(
   EIsdkHandedness IncomingHandedness;
   InteractingHandIn->GetHandednessFromDataSource(IncomingHandedness);
 
-  AActor* OuterActor = InteractableIn->GetAttachParentActor();
+  AActor* OuterActor = InteractableIn->GetOwner();
   if (!IsValid(OuterActor))
   {
     return false;
@@ -447,7 +447,7 @@ bool UIsdkHandPoseSubsystem::CheckForHandPose(
         int32 CurrentWinningIdx = -1;
         float LastWinningLocationRotationDelta = FLT_MAX;
         const FTransform ActorTransform =
-            InteractableIn->GetAttachParentActor()->GetActorTransform();
+            InteractableIn->GetOwner()->GetActorTransform();
         const FTransform HandTransform = InteractingHandIn->GetComponentTransform();
         const FTransform HandWorldTransform = InteractingHandIn->GetComponentToWorld();
         const FIsdkHandPoseDataCache PoseDataCache = ActorPoseDataCache.PoseDataCache;
@@ -501,7 +501,7 @@ bool UIsdkHandPoseSubsystem::CheckForHandPose(
           const float RotationDelta = FMath::Abs(RotationDeltaRotator.Yaw) +
               FMath::Abs(RotationDeltaRotator.Pitch) + FMath::Abs(RotationDeltaRotator.Roll);
 
-          const float FinalDelta = LocationDeltaVector.SquaredLength() + RotationDelta;
+          const float FinalDelta = LocationDeltaVector.SizeSquared() + RotationDelta;
 
           if (FinalDelta < LastWinningLocationRotationDelta)
           {
@@ -665,7 +665,7 @@ bool UIsdkHandPoseSubsystem::ShouldCreateNewActorPoseVariation(
   {
     return true;
   }
-  AActor* OwningActor = HandGrabPoseIn->GetAttachParentActor();
+  AActor* OwningActor = HandGrabPoseIn->GetOwner();
   if (!IsValid(OwningActor))
   {
     return true;

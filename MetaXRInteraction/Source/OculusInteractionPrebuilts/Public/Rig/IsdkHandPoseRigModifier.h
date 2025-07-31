@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  * All rights reserved.
  *
@@ -52,13 +52,13 @@ class OCULUSINTERACTIONPREBUILTS_API UIsdkHandPoseRigModifier : public UIsdkRigM
   void HandleInteractorStateEvent(const FIsdkInteractorStateEvent& StateEvent);
 
   UPROPERTY()
-  TObjectPtr<UIsdkHandMeshComponent> HandMeshComponent;
+  UIsdkHandMeshComponent* HandMeshComponent;
 
   UPROPERTY()
-  TObjectPtr<UIsdkHandMeshComponent> SyntheticHandMeshComponent;
+  UIsdkHandMeshComponent* SyntheticHandMeshComponent;
 
   UPROPERTY()
-  TObjectPtr<UIsdkHandPoseSubsystem> HandPoseSubsystem;
+  UIsdkHandPoseSubsystem* HandPoseSubsystem;
 
   UPROPERTY()
   EIsdkHandedness Handedness = EIsdkHandedness::Left;

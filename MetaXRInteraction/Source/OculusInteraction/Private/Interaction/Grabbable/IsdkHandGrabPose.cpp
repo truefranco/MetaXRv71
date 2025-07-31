@@ -104,8 +104,8 @@ bool UIsdkHandGrabPose::InitializeDebugVisual()
   DebugHandVisual->SetJointsDataSource(VisualHandPoseData);
   DebugHandVisual->SetMappedBoneNamesFromJointSourceHandedness();
 
-  DebugHandVisual->SetSkinnedAsset(HandPoseSubsystem->GetHandMesh(Handedness));
-  if (!IsValid(DebugHandVisual->GetSkinnedAsset()))
+  DebugHandVisual->SetSkeletalMesh(HandPoseSubsystem->GetHandMesh(Handedness));
+  if (!IsValid(DebugHandVisual->SkeletalMesh))
   {
     UE_LOG(
         LogOculusInteraction,

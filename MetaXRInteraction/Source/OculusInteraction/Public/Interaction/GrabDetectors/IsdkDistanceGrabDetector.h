@@ -45,7 +45,7 @@ class OCULUSINTERACTION_API UIsdkDistanceGrabDetector : public UIsdkGrabDetector
   virtual void Deinitialize() override {}
   virtual void Tick(float DeltaTime) override;
 
-  const TSet<TObjectPtr<UIsdkGrabbableComponent>>& GetHoveredGrabbables() const;
+  const TSet<UIsdkGrabbableComponent*>& GetHoveredGrabbables() const;
   virtual UIsdkGrabbableComponent* GetGrabCandidate(EIsdkGrabInputMethod InputMethod) override;
   void DrawDebugVisuals() const;
   virtual EIsdkGrabDetectorType GetGrabDetectorType() const override;
@@ -83,13 +83,13 @@ class OCULUSINTERACTION_API UIsdkDistanceGrabDetector : public UIsdkGrabDetector
    * distance grab detector
    */
   UPROPERTY(BlueprintReadOnly, Category = InteractionSDK)
-  TSet<TObjectPtr<UIsdkGrabbableComponent>> HoveredGrabbables;
+  TSet<UIsdkGrabbableComponent*> HoveredGrabbables;
 
   /**
    * CandidateGrabbable is the grabbable which will be grabbed if a grab is initiated.
    */
   UPROPERTY(BlueprintReadOnly, Category = InteractionSDK)
-  TObjectPtr<UIsdkGrabbableComponent> CandidateGrabbable;
+  UIsdkGrabbableComponent* CandidateGrabbable;
 
   /**
    * DistanceGrabCollider is the sphere collider used to detect all potential distance grab targets.
@@ -97,5 +97,5 @@ class OCULUSINTERACTION_API UIsdkDistanceGrabDetector : public UIsdkGrabDetector
    * and the nearest point on the grabbable's bounding box to the pointer.
    */
   UPROPERTY(BlueprintReadOnly, Category = InteractionSDK)
-  TObjectPtr<USphereComponent> DistanceGrabCollider;
+  USphereComponent* DistanceGrabCollider;
 };

@@ -231,7 +231,7 @@ float UIsdkGrabFreeTransformer::GetDeltaScale() const
     if (Delta.IsValidAxis())
     {
       const float Factor = FMath::Sqrt(
-          Delta.CentroidOffset.SquaredLength() / Delta.PrevCentroidOffset.SquaredLength());
+          Delta.CentroidOffset.SizeSquared() / Delta.PrevCentroidOffset.SizeSquared());
       ScaleDelta += Factor * Fraction;
     }
     else

@@ -27,9 +27,11 @@
 #include "IsdkIPointable.generated.h"
 
 // Forward declarations of internal types
-namespace isdk::api
-{
-class IPointable;
+namespace isdk {
+	namespace api
+	{
+		class IPointable;
+	}
 }
 
 // This class does not need to be modified.

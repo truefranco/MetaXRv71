@@ -124,7 +124,7 @@ class OCULUSINTERACTION_API UIsdkWidget : public UObject
 #pragma region Helper Methods
   // Widget Path for last local hit position
   static FWidgetPath GetWidgetPath(
-      TObjectPtr<UWidgetComponent> AttachedWidget,
+      UWidgetComponent* AttachedWidget,
       const FIsdkWidgetVirtualUserState& State)
   {
     return FWidgetPath(AttachedWidget->GetHitWidgetPath(State.CurrentLocalHitLocation, false));
@@ -165,7 +165,7 @@ class OCULUSINTERACTION_API UIsdkWidget : public UObject
         FModifierKeysState());
   }
   static void UpdateLocalHitLocation(
-      TObjectPtr<UWidgetComponent> AttachedWidget,
+      UWidgetComponent* AttachedWidget,
       FIsdkWidgetVirtualUserState& State)
   {
     State.LastLocalHitLocation = State.CurrentLocalHitLocation;
@@ -175,7 +175,7 @@ class OCULUSINTERACTION_API UIsdkWidget : public UObject
 
 #pragma region Routing
   static FReply RouteTouchDownPointerEvent(
-      TObjectPtr<UWidgetComponent> AttachedWidget,
+      UWidgetComponent* AttachedWidget,
       FIsdkWidgetVirtualUserState& State)
   {
     const FWidgetPath WidgetPath = GetWidgetPath(AttachedWidget, State);
@@ -189,7 +189,7 @@ class OCULUSINTERACTION_API UIsdkWidget : public UObject
     return Reply;
   }
   static void RouteTouchMovePointerEvent(
-      TObjectPtr<UWidgetComponent> AttachedWidget,
+      UWidgetComponent* AttachedWidget,
       FIsdkWidgetVirtualUserState& State)
   {
     const FPointerEvent TouchEvent = GenerateTouchEvent(State);
@@ -202,7 +202,7 @@ class OCULUSINTERACTION_API UIsdkWidget : public UObject
     AttachedWidget->RequestRedraw();
   }
   static FReply RouteTouchUpPointerEvent(
-      TObjectPtr<UWidgetComponent> AttachedWidget,
+      UWidgetComponent* AttachedWidget,
       FIsdkWidgetVirtualUserState& State)
   {
     const FWidgetPath WidgetPath = State.WidgetPathOnPointerDown.IsValid()
@@ -217,7 +217,7 @@ class OCULUSINTERACTION_API UIsdkWidget : public UObject
   }
 
   static void RouteMouseHoverPointerEvent(
-      TObjectPtr<UWidgetComponent> AttachedWidget,
+      UWidgetComponent* AttachedWidget,
       FIsdkWidgetVirtualUserState& State)
   {
     FWidgetPath WidgetPath = GetWidgetPath(AttachedWidget, State);
@@ -230,7 +230,7 @@ class OCULUSINTERACTION_API UIsdkWidget : public UObject
 #pragma region Virtual User Pointer Event Handling
   static void HandleVirtualUserPointerEvent(
       FIsdkVirtualUserPointerEvent VirtualUserPointerEvent,
-      TObjectPtr<UWidgetComponent> AttachedWidget,
+      UWidgetComponent* AttachedWidget,
       FIsdkWidgetEventDelegate WidgetEventDelegate,
       UIsdkWidgetSubsystem& WidgetSubsystem,
       float MinMoveTravelDistance = 0.1f,

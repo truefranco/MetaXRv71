@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  * All rights reserved.
  *
@@ -19,7 +19,7 @@
  */
 
 #include "HandPoseDetection/IsdkHandFingerRecognizer.h"
-
+#include "Templates/PimplPtr.h"
 #include "ApiImpl.h"
 #include "IsdkChecks.h"
 #include "isdk_api/isdk_api.hpp"
@@ -29,63 +29,67 @@ using isdk::api::DigitRecognizer;
 using isdk::api::FingerRecognizer;
 using isdk::api::FingerRecognizerPtr;
 
-namespace isdk::api::helper
-{
-class FFingerRecognizerImpl : public FApiImpl<FingerRecognizer, FingerRecognizerPtr>
-{
- public:
-  explicit FFingerRecognizerImpl(std::function<FingerRecognizerPtr()> CreateFn)
-      : FApiImpl(std::move(CreateFn))
-  {
-  }
+namespace isdk {
+	namespace api {
+		namespace helper
+		{
+			class FFingerRecognizerImpl : public FApiImpl<FingerRecognizer, FingerRecognizerPtr>
+			{
+			public:
+				explicit FFingerRecognizerImpl(std::function<FingerRecognizerPtr()> CreateFn)
+					: FApiImpl(std::move(CreateFn))
+				{
+				}
 
-  void SetExpectedRanges(
-      const isdk_FingerRecognizer_ExpectedFingerValueRanges& Ranges,
-      EIsdkDetection_FingerCalcType InCalcType)
-  {
-    switch (InCalcType)
-    {
-      case EIsdkDetection_FingerCalcType::Curl:
-        ExpectedValueRange = {Ranges.curl.minValue, Ranges.curl.maxValue};
-        break;
-      case EIsdkDetection_FingerCalcType::Flexion:
-        ExpectedValueRange = {Ranges.flexion.minValue, Ranges.flexion.maxValue};
-        break;
-      case EIsdkDetection_FingerCalcType::Abduction:
-        ExpectedValueRange = {Ranges.abduction.minValue, Ranges.abduction.maxValue};
-        break;
-      case EIsdkDetection_FingerCalcType::Opposition:
-        ExpectedValueRange = {Ranges.opposition.minValue, Ranges.opposition.maxValue};
-        break;
-      case EIsdkDetection_FingerCalcType::Grab:
-        ExpectedValueRange = {Ranges.grab.minValue, Ranges.grab.maxValue};
-        break;
-      case EIsdkDetection_FingerCalcType::OppositionTangentPlane:
-        ExpectedValueRange = {
-            Ranges.oppositionTangentPlane.minValue, Ranges.oppositionTangentPlane.maxValue};
-        break;
-      case EIsdkDetection_FingerCalcType::OppositionNormal:
-        ExpectedValueRange = {Ranges.oppositionNormal.minValue, Ranges.oppositionNormal.maxValue};
-        break;
-      case EIsdkDetection_FingerCalcType::OppositionTopTwo:
-        ExpectedValueRange = {Ranges.oppositionTopTwo.minValue, Ranges.oppositionTopTwo.maxValue};
-        break;
-      case EIsdkDetection_FingerCalcType::OppositionTopThree:
-        ExpectedValueRange = {
-            Ranges.oppositionTopThree.minValue, Ranges.oppositionTopThree.maxValue};
-        break;
-      default:
-        check(false);
-    }
-  }
+				void SetExpectedRanges(
+					const isdk_FingerRecognizer_ExpectedFingerValueRanges& Ranges,
+					EIsdkDetection_FingerCalcType InCalcType)
+				{
+					switch (InCalcType)
+					{
+					case EIsdkDetection_FingerCalcType::Curl:
+						ExpectedValueRange = { Ranges.curl.minValue, Ranges.curl.maxValue };
+						break;
+					case EIsdkDetection_FingerCalcType::Flexion:
+						ExpectedValueRange = { Ranges.flexion.minValue, Ranges.flexion.maxValue };
+						break;
+					case EIsdkDetection_FingerCalcType::Abduction:
+						ExpectedValueRange = { Ranges.abduction.minValue, Ranges.abduction.maxValue };
+						break;
+					case EIsdkDetection_FingerCalcType::Opposition:
+						ExpectedValueRange = { Ranges.opposition.minValue, Ranges.opposition.maxValue };
+						break;
+					case EIsdkDetection_FingerCalcType::Grab:
+						ExpectedValueRange = { Ranges.grab.minValue, Ranges.grab.maxValue };
+						break;
+					case EIsdkDetection_FingerCalcType::OppositionTangentPlane:
+						ExpectedValueRange = {
+							Ranges.oppositionTangentPlane.minValue, Ranges.oppositionTangentPlane.maxValue };
+						break;
+					case EIsdkDetection_FingerCalcType::OppositionNormal:
+						ExpectedValueRange = { Ranges.oppositionNormal.minValue, Ranges.oppositionNormal.maxValue };
+						break;
+					case EIsdkDetection_FingerCalcType::OppositionTopTwo:
+						ExpectedValueRange = { Ranges.oppositionTopTwo.minValue, Ranges.oppositionTopTwo.maxValue };
+						break;
+					case EIsdkDetection_FingerCalcType::OppositionTopThree:
+						ExpectedValueRange = {
+							Ranges.oppositionTopThree.minValue, Ranges.oppositionTopThree.maxValue };
+						break;
+					default:
+						check(false);
+					}
+				}
 
-  FVector2f ExpectedValueRange = FVector2f::Zero();
-};
+				FVector2D ExpectedValueRange = FVector2D::ZeroVector;
+			};
+		}
+	}
 } // namespace isdk::api::helper
 
 UIsdkHandFingerRecognizer::UIsdkHandFingerRecognizer()
 {
-  FingerRecognizerImpl = MakePimpl<isdk::api::helper::FFingerRecognizerImpl, EPimplPtrMode::NoCopy>(
+  FingerRecognizerImpl = MakePimpl<isdk::api::helper::FFingerRecognizerImpl>(
       [this]() -> FingerRecognizerPtr
       {
         const auto* ApiHandPositionFrame = EnsureHandPositionFrame();
@@ -125,7 +129,7 @@ void UIsdkHandFingerRecognizer::BeginDestroy()
   FingerRecognizerImpl.Reset();
 }
 
-FVector2f UIsdkHandFingerRecognizer::GetRawExpectedRange()
+FVector2D UIsdkHandFingerRecognizer::GetRawExpectedRange()
 {
   return FingerRecognizerImpl->ExpectedValueRange;
 }

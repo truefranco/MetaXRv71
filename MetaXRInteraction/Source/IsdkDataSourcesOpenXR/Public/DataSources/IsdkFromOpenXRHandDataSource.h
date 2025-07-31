@@ -29,9 +29,11 @@
 #include "IsdkFromOpenXRHandDataSource.generated.h"
 
 // Forward declarations of internal types
-namespace isdk::api
-{
-class ExternalHandSource;
+namespace isdk {
+	namespace api
+	{
+		class ExternalHandSource;
+	}
 }
 
 /**

@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  * All rights reserved.
  *
@@ -127,17 +127,17 @@ class OCULUSINTERACTIONPREBUILTS_API UIsdkControllerVisualsRigComponent
  protected:
   // A skeletal mesh used to represent the game controller
   UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = InteractionSDK)
-  TObjectPtr<UIsdkControllerMeshComponent> ControllerMeshComponent;
+  UIsdkControllerMeshComponent* ControllerMeshComponent;
 
   // A skeletal mesh used to represent hands while holding a controller.  This mesh is driven
   // by an animations configured in-editor.
   UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = InteractionSDK)
-  TObjectPtr<USkeletalMeshComponent> AnimatedHandMeshComponent;
+  USkeletalMeshComponent* AnimatedHandMeshComponent;
 
   // A skeletal mesh used to represent hands while holding a controller.  This mesh is driven by
   // runtime-generated hand pose data.
   UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = InteractionSDK)
-  TObjectPtr<UIsdkHandMeshComponent> PoseableHandMeshComponent;
+  UIsdkHandMeshComponent* PoseableHandMeshComponent;
 
   /**
    * @brief Returns the transform of the current Synthetic Visual

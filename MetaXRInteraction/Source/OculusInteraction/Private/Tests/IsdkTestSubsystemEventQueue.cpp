@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  * All rights reserved.
  *
@@ -112,7 +112,7 @@ bool FIsdkSubsystemEventQueueImplTest::RunTest(const FString& Parameters)
 
   // Cleanup
   RayTest->TearDown();
-  RayTest->MarkAsGarbage();
+  delete RayTest;
 
   return bPassed;
 }
@@ -170,10 +170,10 @@ bool FIsdkSubsystemTickTest::RunTest(const FString& Parameters)
 
   TestSubsystemCollection.Deinitialize();
   RayTest->TearDown();
-  RayTest->MarkAsGarbage();
+  delete RayTest;
 
   World->DestroyWorld(false);
-  World->MarkAsGarbage();
+  delete RayTest;
 
   return bPassed;
 }

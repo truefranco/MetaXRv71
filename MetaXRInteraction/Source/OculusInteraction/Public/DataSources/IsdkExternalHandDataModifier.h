@@ -89,7 +89,7 @@ class OCULUSINTERACTION_API UIsdkExternalHandDataModifier : public UIsdkExternal
   void SetInputDataSource(UIsdkHandDataSource* InInputDataSource);
 
   /* Delegate broadcast during Tick, if all data sources are valid */
-  DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnHandDataModified, UIsdkHandDataSource*, HandData);
+  DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnHandDataModified, UIsdkHandDataSource*, InHandData);
   UPROPERTY(BlueprintAssignable)
   FOnHandDataModified OnHandDataModified;
 

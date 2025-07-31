@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  * All rights reserved.
  *
@@ -22,20 +22,23 @@
 
 #include "CoreMinimal.h"
 #include "IsdkISurface.h"
+#include "Templates/PimplPtr.h"
 #include "Components/SceneComponent.h"
 #include "Debug/IsdkHasDebugSegments.h"
 #include "Input/IsdkIPose.h"
 #include "IsdkPointablePlane.generated.h"
 
 // Forward declarations of internal types
-namespace isdk::api
-{
-class PointablePlane;
+namespace isdk {
+	namespace api
+	{
+		class PointablePlane;
 
-namespace helper
-{
-class FPointablePlaneImpl;
-}
+		namespace helper
+		{
+			class FPointablePlaneImpl;
+		}
+	}
 } // namespace isdk::api
 
 /**

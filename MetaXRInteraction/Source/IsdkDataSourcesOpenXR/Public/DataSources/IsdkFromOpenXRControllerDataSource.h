@@ -29,9 +29,11 @@
 #include "DataSources/IsdkIRootPose.h"
 #include "IsdkFromOpenXRControllerDataSource.generated.h"
 
-namespace isdk::api
-{
-class ExternalHandSource;
+namespace isdk {
+	namespace api
+	{
+		class ExternalHandSource;
+	}
 }
 
 /**
@@ -173,7 +175,7 @@ class ISDKDATASOURCESOPENXR_API UIsdkFromOpenXRControllerDataSource
       BlueprintGetter = GetMotionController,
       Category = InteractionSDK,
       meta = (ExposeOnSpawn = true))
-  TObjectPtr<UMotionControllerComponent> MotionController;
+  UMotionControllerComponent* MotionController;
 
   void ReadControllerData();
 
@@ -191,10 +193,10 @@ class ISDKDATASOURCESOPENXR_API UIsdkFromOpenXRControllerDataSource
   bool bIsLastGoodPointerPoseValid = false;
 
   UPROPERTY()
-  TObjectPtr<UIsdkConditionalBool> IsRootPoseConnected;
+  UIsdkConditionalBool* IsRootPoseConnected;
 
   UPROPERTY()
-  TObjectPtr<UIsdkConditionalBool> IsRootPoseHighConfidence;
+  UIsdkConditionalBool* IsRootPoseHighConfidence;
 
   bool IsHandTrackingEnabled();
   bool GetGripPose(FTransform& OutGripPose);

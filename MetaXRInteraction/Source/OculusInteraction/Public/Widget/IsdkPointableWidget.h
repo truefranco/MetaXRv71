@@ -41,7 +41,7 @@ class OCULUSINTERACTION_API UIsdkPointableWidget : public UActorComponent
   UIsdkPointableWidget();
 
   UPROPERTY(Transient, BlueprintReadWrite, Category = "InteractionSDK")
-  TObjectPtr<UWidgetComponent> AttachedWidget;
+  UWidgetComponent* AttachedWidget;
 
   // Event Delegates
   UPROPERTY(BlueprintAssignable, Category = InteractionSDK)

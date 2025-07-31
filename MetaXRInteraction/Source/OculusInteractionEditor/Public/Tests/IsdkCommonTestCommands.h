@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  * All rights reserved.
  *
@@ -40,25 +40,27 @@ DEFINE_LATENT_AUTOMATION_COMMAND_FOUR_PARAMETER(
     FString,
     TestStepName);
 
-namespace isdk::test
-{
-constexpr float OneFrameDelay = 0.05f;
+namespace isdk {
+	namespace test
+	{
+		constexpr float OneFrameDelay = 0.05f;
 
-inline void AddInitPieTestSteps(FAutomationTestBase* TestBase)
-{
-  const auto TestMapPath = FPaths::Combine(
-      FPaths::ProjectPluginsDir(),
-      TEXT("OculusInteraction"),
-      TEXT("Content"),
-      TEXT("AutomationTests"),
-      TEXT("Maps"),
-      TEXT("IsdkTestEmptyMap"));
-  ADD_LATENT_AUTOMATION_COMMAND(FEditorLoadMap(TestMapPath));
-  ADD_LATENT_AUTOMATION_COMMAND(FWaitLatentCommand(OneFrameDelay));
-  ADD_LATENT_AUTOMATION_COMMAND(
-      FEditorAutomationLogCommand(FString::Printf(TEXT("LoadMap-End: %s"), *TestMapPath)));
-  ADD_LATENT_AUTOMATION_COMMAND(FStartPIECommand(true));
-  ADD_LATENT_AUTOMATION_COMMAND(FWaitLatentCommand(OneFrameDelay));
-  ADD_LATENT_AUTOMATION_COMMAND(FEditorAutomationLogCommand(TEXT("StartPIE-End")));
-}
+		inline void AddInitPieTestSteps(FAutomationTestBase* TestBase)
+		{
+			const auto TestMapPath = FPaths::Combine(
+				FPaths::ProjectPluginsDir(),
+				TEXT("OculusInteraction"),
+				TEXT("Content"),
+				TEXT("AutomationTests"),
+				TEXT("Maps"),
+				TEXT("IsdkTestEmptyMap"));
+			ADD_LATENT_AUTOMATION_COMMAND(FEditorLoadMap(TestMapPath));
+			ADD_LATENT_AUTOMATION_COMMAND(FWaitLatentCommand(OneFrameDelay));
+			ADD_LATENT_AUTOMATION_COMMAND(
+				FEditorAutomationLogCommand(FString::Printf(TEXT("LoadMap-End: %s"), *TestMapPath)));
+			ADD_LATENT_AUTOMATION_COMMAND(FStartPIECommand(true));
+			ADD_LATENT_AUTOMATION_COMMAND(FWaitLatentCommand(OneFrameDelay));
+			ADD_LATENT_AUTOMATION_COMMAND(FEditorAutomationLogCommand(TEXT("StartPIE-End")));
+		}
+	}
 }; // namespace isdk::test

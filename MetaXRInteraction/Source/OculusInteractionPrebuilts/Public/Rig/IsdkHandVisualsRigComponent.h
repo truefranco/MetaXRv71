@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  * All rights reserved.
  *
@@ -95,16 +95,16 @@ class OCULUSINTERACTIONPREBUILTS_API UIsdkHandVisualsRigComponent
   // A synthetic hand, which follows the tracked hand, but for which the positioning and posing may
   // be altered by interaction
   UPROPERTY(BlueprintReadOnly, Category = InteractionSDK)
-  TObjectPtr<UIsdkSyntheticHand> SyntheticHand;
+  UIsdkSyntheticHand* SyntheticHand;
 
   // Visuals corresponding directly to the user's hand
   UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = InteractionSDK)
-  TObjectPtr<UIsdkHandMeshComponent> TrackedHandVisual;
+  UIsdkHandMeshComponent* TrackedHandVisual;
 
   // Visuals corresponding to the user's hand, for which the positioning and posing may be altered
   // by interaction
   UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = InteractionSDK)
-  TObjectPtr<UIsdkHandMeshComponent> SyntheticHandVisual;
+  UIsdkHandMeshComponent* SyntheticHandVisual;
 
  protected:
   virtual void OnDataSourcesCreated() override;

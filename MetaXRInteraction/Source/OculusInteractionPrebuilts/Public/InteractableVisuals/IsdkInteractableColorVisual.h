@@ -37,7 +37,7 @@ struct FIsdkColorState
   FLinearColor Color = FLinearColor::Black;
 
   UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = InteractionSDK)
-  TObjectPtr<UCurveFloat> TransitionCurve;
+  UCurveFloat* TransitionCurve = nullptr;
 
   UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = InteractionSDK)
   float TransitionDuration = 0.1f;
@@ -69,7 +69,7 @@ struct FIsdkColorTransition
     Timer += DeltaTime;
     float NormalizedTimer =
         TargetState.TransitionDuration < 0.001 ? 1.0 : (Timer / TargetState.TransitionDuration);
-    NormalizedTimer = FMath::Clamp(NormalizedTimer, 0.0, 1.0);
+    NormalizedTimer = FMath::Clamp(NormalizedTimer, 0.0f, 1.0f);
     float Parameter = IsValid(TargetState.TransitionCurve)
         ? TargetState.TransitionCurve->GetFloatValue(NormalizedTimer)
         : NormalizedTimer;

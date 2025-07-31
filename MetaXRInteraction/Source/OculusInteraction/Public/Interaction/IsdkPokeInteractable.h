@@ -23,6 +23,7 @@
 #include "CoreMinimal.h"
 
 #include "Engine/DataAsset.h"
+#include "Templates/PimplPtr.h"
 #include "StructTypes.h"
 #include "IsdkInteractableComponent.h"
 #include "IsdkISurfacePatch.h"
@@ -31,14 +32,16 @@
 #include "IsdkPokeInteractable.generated.h"
 
 // Forward declarations of internal types
-namespace isdk::api
-{
-class PokeInteractable;
+namespace isdk {
+	namespace api
+	{
+		class PokeInteractable;
 
-namespace helper
-{
-class FPokeInteractableImpl;
-}
+		namespace helper
+		{
+			class FPokeInteractableImpl;
+		}
+	}
 } // namespace isdk::api
 
 USTRUCT(BlueprintType, Category = InteractionSDK)

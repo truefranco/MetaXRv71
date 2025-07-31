@@ -20,6 +20,7 @@
 
 #include "DataSources/IsdkFromOpenXRControllerDataSource.h"
 #include "IHandTracker.h"
+#include "XRMotionControllerBase.h"
 #include "IsdkDataSourcesOpenXRLog.h"
 #include "IXRTrackingSystem.h"
 #include "DataSources/IsdkOpenXRHelper.h"
@@ -74,9 +75,9 @@ UIsdkFromOpenXRControllerDataSource::MakeOpenXrControllerDataSource(
   DataSourceComponent->RegisterComponent();
 
   const bool bLeftHandMismatch = InHandedness == EIsdkHandedness::Left &&
-      SourceMotionController->GetTrackingMotionSource() != IMotionController::LeftHandSourceId;
+      SourceMotionController->MotionSource != FXRMotionControllerBase::LeftHandSourceId;
   const bool bRightHandMismatch = InHandedness == EIsdkHandedness::Right &&
-      SourceMotionController->GetTrackingMotionSource() != IMotionController::RightHandSourceId;
+      SourceMotionController->MotionSource != FXRMotionControllerBase::RightHandSourceId;
   if (bLeftHandMismatch || bRightHandMismatch)
   {
     UE_LOG(
@@ -85,7 +86,7 @@ UIsdkFromOpenXRControllerDataSource::MakeOpenXrControllerDataSource(
         TEXT(
             "UIsdkFromOpenXRControllerDataSource created with mismatching Handedness \"%s\" and MotionController MotionSource \"%s\""),
         *StaticEnum<EIsdkHandedness>()->GetValueAsString(EIsdkHandedness::Left),
-        *SourceMotionController->GetTrackingMotionSource().ToString())
+        *SourceMotionController->MotionSource.ToString())
   }
 
   return DataSourceComponent;
@@ -148,8 +149,8 @@ void UIsdkFromOpenXRControllerDataSource::ReadControllerData()
 
 bool UIsdkFromOpenXRControllerDataSource::IsHandTrackingEnabled()
 {
-  if (auto& ModularFeatures = IModularFeatures::Get();
-      ModularFeatures.IsModularFeatureAvailable(IHandTracker::GetModularFeatureName()))
+	auto& ModularFeatures = IModularFeatures::Get();
+  if (ModularFeatures.IsModularFeatureAvailable(IHandTracker::GetModularFeatureName()))
   {
     const auto& HandTracker =
         ModularFeatures.GetModularFeature<IHandTracker>(IHandTracker::GetModularFeatureName());
@@ -198,15 +199,10 @@ void UIsdkFromOpenXRControllerDataSource::TickComponent(
     OutRotations.Empty();
     OutRadii.Empty();
 
-#if (ENGINE_MAJOR_VERSION >= 5 && ENGINE_MINOR_VERSION >= 5)
-    bool bIsTracked = false;
+
     bIsHandDataValid =
-        HandTracker.GetAllKeypointStates(Hand, OutPositions, OutRotations, OutRadii, bIsTracked);
-    bIsHandDataValid &= bIsTracked;
-#else
-    bool bIsHandDataValid =
         HandTracker.GetAllKeypointStates(Hand, OutPositions, OutRotations, OutRadii);
-#endif
+
   }
 
   // Update root pose connection
@@ -225,7 +221,7 @@ void UIsdkFromOpenXRControllerDataSource::TickComponent(
     {
       DesiredSourceName = Handedness == EIsdkHandedness::Left ? IsdkXRUtils::LeftAimSourceName
                                                               : IsdkXRUtils::RightAimSourceName;
-      if (MotionController->GetTrackingMotionSource() != DesiredSourceName)
+      if (MotionController->MotionSource != DesiredSourceName)
       {
         MotionController->SetTrackingMotionSource(DesiredSourceName);
       }
@@ -236,7 +232,7 @@ void UIsdkFromOpenXRControllerDataSource::TickComponent(
   {
     DesiredSourceName = Handedness == EIsdkHandedness::Left ? IsdkXRUtils::LeftSourceName
                                                             : IsdkXRUtils::RightSourceName;
-    if (MotionController->GetTrackingMotionSource() != DesiredSourceName)
+    if (MotionController->MotionSource != DesiredSourceName)
     {
       MotionController->SetTrackingMotionSource(DesiredSourceName);
     }

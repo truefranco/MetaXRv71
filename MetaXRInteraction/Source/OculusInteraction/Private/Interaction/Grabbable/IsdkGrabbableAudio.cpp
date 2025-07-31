@@ -36,7 +36,7 @@ void UIsdkGrabbableAudio::SetGrabTransformer(UIsdkGrabTransformerComponent* InGr
   GrabTransformer = InGrabTransformer;
   if (IsValid(GrabTransformer))
   {
-    GrabTransformerName = GrabTransformer.GetFName();
+    GrabTransformerName = GrabTransformer->GetFName();
     GrabTransformer->GetGrabTransformerEventDelegate()->AddUniqueDynamic(
         this, &UIsdkGrabbableAudio::HandleGrabTransformerEvent);
   }

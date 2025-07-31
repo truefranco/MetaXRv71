@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  * All rights reserved.
  *
@@ -27,10 +27,12 @@
 #include "IsdkHandDigitRecognizer.generated.h"
 
 // Forward declarations of internal types
-namespace isdk::api
-{
-class IHandPositionFrame;
-class DigitRecognizer;
+namespace isdk {
+	namespace api
+	{
+		class IHandPositionFrame;
+		class DigitRecognizer;
+	}
 } // namespace isdk::api
 typedef struct isdk_DigitRecognizer_ isdk_DigitRecognizer;
 
@@ -75,8 +77,8 @@ class OCULUSINTERACTION_API UIsdkHandDigitRecognizer : public UObject
 
   /* Returns the expected range of the recognizer, represented by min/max */
   UFUNCTION(BlueprintCallable, Category = InteractionSDK)
-  virtual FVector2f GetRawExpectedRange()
-      PURE_VIRTUAL(UIsdkDigitRecognizer::CreateDigitRecognizer, return FVector2f::Zero(););
+  virtual FVector2D GetRawExpectedRange()
+      PURE_VIRTUAL(UIsdkDigitRecognizer::CreateDigitRecognizer, return FVector2D::ZeroVector;);
 
  protected:
   isdk::api::IHandPositionFrame* EnsureHandPositionFrame() const;

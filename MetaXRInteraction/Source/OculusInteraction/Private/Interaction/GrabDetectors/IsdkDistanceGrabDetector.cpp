@@ -123,7 +123,7 @@ void UIsdkDistanceGrabDetector::Tick(float DeltaTime)
   }
 }
 
-const TSet<TObjectPtr<UIsdkGrabbableComponent>>& UIsdkDistanceGrabDetector::GetHoveredGrabbables()
+const TSet<UIsdkGrabbableComponent*>& UIsdkDistanceGrabDetector::GetHoveredGrabbables()
     const
 {
   return HoveredGrabbables;
@@ -170,7 +170,7 @@ void UIsdkDistanceGrabDetector::DrawDebugVisuals() const
       FMath::DegreesToRadians(FrustumAngle / 2.f),
       32,
       DebugColor);
-  UE_VLOG_WIRECONE(
+  UE_VLOG_CONE(
       GrabberComponent->GetOwner(),
       LogOculusInteraction,
       Verbose,

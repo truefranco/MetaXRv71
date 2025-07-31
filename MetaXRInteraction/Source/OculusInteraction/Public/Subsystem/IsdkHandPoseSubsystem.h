@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  * All rights reserved.
  *
@@ -26,7 +26,6 @@
 #include "IsdkContentAssetPaths.h"
 #include "UObject/ConstructorHelpers.h"
 #include "Materials/Material.h"
-#include "Engine/SkinnedAsset.h"
 #include "Engine/SkeletalMesh.h"
 #include "IsdkHandData.h"
 #include "IsdkHandPoseData.h"
@@ -183,7 +182,7 @@ class OCULUSINTERACTION_API UIsdkHandPoseSubsystem : public UTickableWorldSubsys
       UIsdkHandPoseData*& MirroredHandData);
 
   // TODO: Set Hand Mesh/Material (as overrides)
-  USkinnedAsset* GetHandMesh(EIsdkHandedness& Handedness);
+  USkeletalMesh* GetHandMesh(EIsdkHandedness& Handedness);
   UMaterial* GetHandMeshMaterial();
 
  private:
@@ -211,15 +210,15 @@ class OCULUSINTERACTION_API UIsdkHandPoseSubsystem : public UTickableWorldSubsys
   bool ShouldCreateNewActorPoseVariation(UIsdkHandGrabPose* HandPoseIn, int32& VariationMatched);
 
   UPROPERTY()
-  TObjectPtr<UMaterial> HandMeshMaterial;
+  UMaterial* HandMeshMaterial;
   UPROPERTY()
-  TObjectPtr<USkinnedAsset> HandMeshRight;
+  USkeletalMesh* HandMeshRight;
   UPROPERTY()
-  TObjectPtr<USkinnedAsset> HandMeshLeft;
+  USkeletalMesh* HandMeshLeft;
   UPROPERTY()
   TMap<FName, FIsdkHandPoseDataActorCache> ActorPoseCacheMap;
   UPROPERTY()
-  TArray<TObjectPtr<USceneComponent>> HandGrabPoseDestroyQueue;
+  TArray<USceneComponent*> HandGrabPoseDestroyQueue;
 
   int LastHandPoseMirroredSuffix = 1;
 };

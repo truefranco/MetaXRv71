@@ -34,7 +34,7 @@ TArray<FIsdkBoundsClipper> UIsdkFunctionLibrary::MakeBoundsClippersFromPose(
   TArray<FIsdkBoundsClipper> BoundsClippers;
   FIsdkBoundsClipper BoundsClipper;
   BoundsClipper.PoseProvider = InPose;
-  BoundsClipper.Size = FVector3f(0.01f, Size.X, Size.Y);
+  BoundsClipper.Size = FVector(0.01f, Size.X, Size.Y);
   BoundsClippers.Add(BoundsClipper);
   return BoundsClippers;
 }
@@ -78,7 +78,7 @@ TScriptInterface<IIsdkITrackingDataSubsystem> UIsdkFunctionLibrary::FindTracking
 TArray<FIsdkExternalHandPositionFrame_ThumbJointMapping>
 UIsdkFunctionLibrary::GetDefaultOpenXRThumbMapping()
 {
-  const TArray ThumbJointMappings{
+  const TArray<FIsdkExternalHandPositionFrame_ThumbJointMapping> ThumbJointMappings{
       MapXrThumbJoint(EIsdkThumbJoint::Metacarpal, 2), // Thumb_1
       MapXrThumbJoint(EIsdkThumbJoint::Proximal, 3), // Thumb_2
       MapXrThumbJoint(EIsdkThumbJoint::Distal, 4), // Thumb_3
@@ -89,7 +89,7 @@ UIsdkFunctionLibrary::GetDefaultOpenXRThumbMapping()
 TArray<FIsdkExternalHandPositionFrame_FingerJointMapping>
 UIsdkFunctionLibrary::GetDefaultOpenXRFingerMapping()
 {
-  const TArray FingerJointMappings{
+  const TArray<FIsdkExternalHandPositionFrame_FingerJointMapping> FingerJointMappings{
       // Index Finger
       MapXrFingerJoint(EIsdkFingerType::Index, EIsdkFingerJoint::Metacarpal, 6), // Index_0
       MapXrFingerJoint(EIsdkFingerType::Index, EIsdkFingerJoint::Proximal, 7), // Index_1
@@ -171,7 +171,7 @@ TArray<float> UIsdkFunctionLibrary::GetDefaultJointRadii()
       0.5425984669f, /// XR_HAND_JOINT_LITTLE_TIP_EXT
   };
   TArray<float> JointRadii = TArray<float>();
-  JointRadii.Append(OculusJointRadii);
+  JointRadii.Append(OculusJointRadii, UE_ARRAY_COUNT(OculusJointRadii));
   return JointRadii;
 }
 

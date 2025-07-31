@@ -46,13 +46,13 @@ bool FIsdkThrowableTest::RunTest(const FString& Parameters)
 
   const FVector ReleaseVelocity = MockThrowable->GetVelocity();
   // Check if the release velocity is close to the expected value
-  TestEqual("Release Velocity X", ReleaseVelocity.X, 2.0, 0.001);
-  TestEqual("Release Velocity Y", ReleaseVelocity.Y, 0.0, 0.001);
-  TestEqual("Release Velocity Z", ReleaseVelocity.Z, 0.0, 0.001);
+  TestEqual("Release Velocity X", ReleaseVelocity.X, 2.0f, 0.001f);
+  TestEqual("Release Velocity Y", ReleaseVelocity.Y, 0.0f, 0.001f);
+  TestEqual("Release Velocity Z", ReleaseVelocity.Z, 0.0f, 0.001f);
 
   const FQuat ReleaseAngularVelocity = MockThrowable->GetAngularVelocity();
   // Check if the release angular velocity is close to the expected value
-  TestEqual("Release Angular Velocity Z", ReleaseAngularVelocity.W, 1.0, 0.001);
+  TestEqual("Release Angular Velocity Z", ReleaseAngularVelocity.W, 1.0f, 0.001f);
 
   return true;
 }

@@ -70,7 +70,7 @@ class FIsdkHandPoseVisualizer : public FComponentVisualizer
   {
     return false;
   }
-  virtual bool ShouldShowForSelectedSubcomponents(const UActorComponent* Component) override
+  virtual bool ShouldShowForSelectedSubcomponents(const UActorComponent* Component)
   {
     return IsValid(Cast<UIsdkHandGrabPose>(Component));
   }
@@ -104,8 +104,8 @@ class FIsdkHandPoseVisualizer : public FComponentVisualizer
   virtual bool GetWidgetLocation(const FEditorViewportClient* ViewportClient, FVector& OutLocation)
       const override;
   virtual bool HasFocusOnSelectionBoundingBox(FBox& OutBoundingBox) override;
-  virtual void TrackingStarted(FEditorViewportClient* InViewportClient) override {}
-  virtual void TrackingStopped(FEditorViewportClient* InViewportClient, bool bInDidMove) override {}
+  virtual void TrackingStarted(FEditorViewportClient* InViewportClient)  {}
+  virtual void TrackingStopped(FEditorViewportClient* InViewportClient, bool bInDidMove)  {}
   bool IsSelectingBone() const
   {
     UIsdkHandGrabPose* SelectedHandGrabPose = GetHandGrabPoseComponent();

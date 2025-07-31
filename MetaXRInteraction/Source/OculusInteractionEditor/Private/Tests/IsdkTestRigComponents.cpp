@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  * All rights reserved.
  *
@@ -49,11 +49,10 @@ DEFINE_LATENT_AUTOMATION_COMMAND_TWO_PARAMETER(
 bool FIsdkTestRigLambda::Update()
 {
   AIsdkTestRigActor* TestActor{};
-  if (Test->AddErrorIfFalse(
-          AIsdkTestRigActor::TryGetChecked(TestActor),
-          TEXT("AIsdkTestRigActor was not in the test scene.")))
+  if(!AIsdkTestRigActor::TryGetChecked(TestActor))
   {
-    TestCallback(Test, *TestActor);
+	  Test->AddErrorIfFalse(false, TEXT("AIsdkTestRigActor was not in the test scene."));
+      TestCallback(Test, *TestActor);
   }
   return true;
 }
@@ -131,7 +130,7 @@ bool FIsdkTestControllerVisualsInit::Update()
   Test->TestEqual(
       TEXT(
           "TryAttachToParentMotionController should be able to attach a provided motion controller component"),
-      TestActor->ControllerVisuals->AttachedToMotionController.Get(),
+      TestActor->ControllerVisuals->AttachedToMotionController,
       TestActor->LeftHandMotionController);
 
   return true;
@@ -216,7 +215,7 @@ bool FIsdkTestHandVisualsInit::Update()
   Test->TestEqual(
       TEXT(
           "TryAttachToParentMotionController should be able to attach a provided motion controller component"),
-      TestActor->HandVisuals->AttachedToMotionController.Get(),
+      TestActor->HandVisuals->AttachedToMotionController,
       TestActor->LeftHandMotionController);
 
   return true;
@@ -393,16 +392,16 @@ bool IsdkRigInteractionGroupSelectedTests::RunTest(const FString& Parameters)
 
   ADD_LATENT_AUTOMATION_COMMAND(FIsdkTestSpawnComponents(this));
 
-  FIsdkInteractionGroupMemberBehavior Behavior1{
-      .bDisableOnOtherSelect{true},
-      .bDisableOnOtherNearFieldHover{false},
-      .bIsNearField{false},
-  };
-  FIsdkInteractionGroupMemberBehavior Behavior2{
-      .bDisableOnOtherSelect{false},
-      .bDisableOnOtherNearFieldHover{false},
-      .bIsNearField{false},
-  };
+  FIsdkInteractionGroupMemberBehavior Behavior1{};
+  Behavior1.bDisableOnOtherSelect = true;
+  Behavior1.bDisableOnOtherNearFieldHover = false;
+  Behavior1.bIsNearField = false;
+  
+  FIsdkInteractionGroupMemberBehavior Behavior2{};
+  Behavior2.bDisableOnOtherSelect = false;
+  Behavior2.bDisableOnOtherNearFieldHover = false;
+  Behavior2.bIsNearField = false;
+  
   ADD_LATENT_AUTOMATION_COMMAND(FIsdkTestRigLambda(
       this,
       AIsdkTestRigActor::InitGroupMembersFn(
@@ -448,23 +447,14 @@ bool IsdkRigInteractionGroupNearFieldHoverTests::RunTest(const FString& Paramete
   ADD_LATENT_AUTOMATION_COMMAND(FIsdkTestSpawnComponents(this));
 
   // Poke-like behavior
-  constexpr FIsdkInteractionGroupMemberBehavior Behavior1{
-      .bDisableOnOtherSelect{true},
-      .bDisableOnOtherNearFieldHover{false},
-      .bIsNearField{true},
-  };
+  const FIsdkInteractionGroupMemberBehavior Behavior1 = { true, false, true };
+
   // Ray-like behavior
-  constexpr FIsdkInteractionGroupMemberBehavior Behavior2{
-      .bDisableOnOtherSelect{true},
-      .bDisableOnOtherNearFieldHover{true},
-      .bIsNearField{false},
-  };
+  const FIsdkInteractionGroupMemberBehavior Behavior2 = { true, true, false };
+
   // Grab-like behavior
-  constexpr FIsdkInteractionGroupMemberBehavior Behavior3{
-      .bDisableOnOtherSelect{true},
-      .bDisableOnOtherNearFieldHover{true},
-      .bIsNearField{true},
-  };
+  const FIsdkInteractionGroupMemberBehavior Behavior3 = { true, true, true };
+
   ADD_LATENT_AUTOMATION_COMMAND(FIsdkTestRigLambda(
       this,
       AIsdkTestRigActor::InitGroupMembersFn(
@@ -514,20 +504,18 @@ bool IsdkRigInteractionGroupNonBlockingSelectTests::RunTest(const FString& Param
 
   ADD_LATENT_AUTOMATION_COMMAND(FIsdkTestSpawnComponents(this));
 
-  constexpr FIsdkInteractionGroupMemberBehavior Behavior{
-      .bDisableOnOtherSelect{true},
-      .bDisableOnOtherNearFieldHover{false},
-      .bIsNearField{false},
-  };
+  const FIsdkInteractionGroupMemberBehavior Behavior{true, false, false};
+   
 
   const FIsdkInteractorGroupMember::CalculateStateFn CalculateStateFn =
-      [](const FIsdkInteractorStateEvent& Event)
-  {
-    return FIsdkInteractionGroupMemberState{
-        // FakeInteractor1 is "Blocking", FakeInteractor2 is not.
-        .bIsSelectStateBlocking =
-            Event.Interactor.GetObject()->GetName() == TEXT("FakeInteractor1")};
-  };
+	  [](const FIsdkInteractorStateEvent& Event)
+	  {
+		  FIsdkInteractionGroupMemberState State{};
+		  // FakeInteractor1 is "Blocking", FakeInteractor2 is not.
+		  State.bIsSelectStateBlocking = (Event.Interactor.GetObject()->GetName() == TEXT("FakeInteractor1"));
+		  return State;
+	  };
+
   ADD_LATENT_AUTOMATION_COMMAND(FIsdkTestRigLambda(
       this, AIsdkTestRigActor::InitGroupMembersFn(Behavior, Behavior, CalculateStateFn)));
 
@@ -564,20 +552,17 @@ bool IsdkRigInteractionGroupDeletedInteractorTests::RunTest(const FString& Param
 
   ADD_LATENT_AUTOMATION_COMMAND(FIsdkTestSpawnComponents(this));
 
-  constexpr FIsdkInteractionGroupMemberBehavior Behavior{
-      .bDisableOnOtherSelect{true},
-      .bDisableOnOtherNearFieldHover{false},
-      .bIsNearField{false},
-  };
-
+  const FIsdkInteractionGroupMemberBehavior Behavior{ true, false, false };
+      
   const FIsdkInteractorGroupMember::CalculateStateFn CalculateStateFn =
-      [](const FIsdkInteractorStateEvent& Event)
-  {
-    return FIsdkInteractionGroupMemberState{
-        // FakeInteractor1 is "Blocking", FakeInteractor2 is not.
-        .bIsSelectStateBlocking =
-            Event.Interactor.GetObject()->GetName() == TEXT("FakeInteractor1")};
-  };
+	  [](const FIsdkInteractorStateEvent& Event)
+	  {
+		  FIsdkInteractionGroupMemberState State{};
+		  // FakeInteractor1 is "Blocking", FakeInteractor2 is not.
+		  State.bIsSelectStateBlocking = (Event.Interactor.GetObject()->GetName() == TEXT("FakeInteractor1"));
+		  return State;
+	  };
+
   ADD_LATENT_AUTOMATION_COMMAND(FIsdkTestRigLambda(
       this, AIsdkTestRigActor::InitGroupMembersFn(Behavior, Behavior, CalculateStateFn)));
 

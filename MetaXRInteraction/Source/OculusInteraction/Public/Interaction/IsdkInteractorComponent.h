@@ -24,7 +24,7 @@
 #include "CoreMinimal.h"
 #include "GameplayTagContainer.h"
 #include "IsdkInteractionEvents.h"
-
+#include "Templates/PimplPtr.h"
 #include "StructTypes.h"
 #include "Interaction/IsdkIInteractorState.h"
 #include "Core/IsdkIGameplayTagContainer.h"
@@ -32,17 +32,19 @@
 #include "IsdkInteractorComponent.generated.h"
 
 // Forward declarations of internal types
-namespace isdk::api
-{
-class IInteractor;
-class InteractorPayload;
-class IActiveState;
+namespace isdk {
+	namespace api
+	{
+		class IInteractor;
+		class InteractorPayload;
+		class IActiveState;
 
-namespace helper
-{
-class FInteractorPayloadImpl;
-class FInteractorActiveStateImpl;
-} // namespace helper
+		namespace helper
+		{
+			class FInteractorPayloadImpl;
+			class FInteractorActiveStateImpl;
+		} // namespace helper
+	}
 } // namespace isdk::api
 
 /**

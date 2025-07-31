@@ -19,6 +19,7 @@
  */
 
 #include "IsdkHandMeshComponent.h"
+#include "Templates/PimplPtr.h"
 #include "DrawDebugHelpers.h"
 #include "OculusInteractionLog.h"
 #include "StructTypesPrivate.h"
@@ -53,19 +54,23 @@ TAutoConsoleVariable<bool> CVar_Meta_InteractionSDK_DebugHandVisuals(
     TEXT("Draws debug visuals for hands at runtime.  Also draws to visual logger."));
 }
 
-namespace isdk::api::helper
-{
-class FExternalHandPositionFrameImpl
-    : public FApiImpl<ExternalHandPositionFrame, ExternalHandPositionFramePtr>
-{
- public:
-  explicit FExternalHandPositionFrameImpl(std::function<ExternalHandPositionFramePtr()> CreateFn)
-      : FApiImpl(std::move(CreateFn))
-  {
-  }
+namespace isdk {
+	namespace api {
+		namespace helper
+		{
+			class FExternalHandPositionFrameImpl
+				: public FApiImpl<ExternalHandPositionFrame, ExternalHandPositionFramePtr>
+			{
+			public:
+				explicit FExternalHandPositionFrameImpl(std::function<ExternalHandPositionFramePtr()> CreateFn)
+					: FApiImpl(std::move(CreateFn))
+				{
+				}
 
-  std::array<ovrpVector3f, UIsdkHandMeshComponent::MappedBoneCount> WristSpaceJointLocations{};
-};
+				std::array<ovrpVector3f, UIsdkHandMeshComponent::MappedBoneCount> WristSpaceJointLocations{};
+			};
+		}
+	}
 } // namespace isdk::api::helper
 
 UIsdkHandMeshComponent::UIsdkHandMeshComponent()
@@ -81,7 +86,7 @@ UIsdkHandMeshComponent::UIsdkHandMeshComponent()
   MappedBoneNames.Init(NAME_None, MappedBoneCount);
 
   ExternalHandPositionFrameImpl =
-      MakePimpl<isdk::api::helper::FExternalHandPositionFrameImpl, EPimplPtrMode::NoCopy>(
+      MakePimpl<isdk::api::helper::FExternalHandPositionFrameImpl>(
           [this]() -> ExternalHandPositionFramePtr
           {
             if (!ensureMsgf(
@@ -484,7 +489,7 @@ void UIsdkHandMeshComponent::UpdateApiHandPositionFrame(
     ExternalHandPositionFrame& ApiHandPositionFrame) const
 {
   // Set Wrist Position
-  const auto ApiWristPosition = StructTypesUtils::Convert(GetComponentLocation());
+  const auto ApiWristPosition = StructTypesUtils::Convert((FVector3f)GetComponentLocation());
   ApiHandPositionFrame.setWristData(&ApiWristPosition);
 
   // Set Joint Positions
@@ -497,7 +502,7 @@ void UIsdkHandMeshComponent::UpdateApiHandPositionFrame(
     const int BoneIndex = MappedBoneIndices[BoneId];
     const auto WristSpaceTransform = CSPose.GetComponentSpaceTransform(BoneIndex);
 
-    ApiJointLocations[BoneId] = StructTypesUtils::Convert(WristSpaceTransform.GetLocation());
+    ApiJointLocations[BoneId] = StructTypesUtils::Convert((FVector3d)WristSpaceTransform.GetLocation());
   }
 
   ApiHandPositionFrame.setJointData(ApiJointLocations.data(), ApiJointLocations.size());
@@ -588,32 +593,31 @@ void UIsdkHandMeshComponent::DrawDebugSkeleton() const
 
     // In addition to drawing axes, we'll draw connecting lines from the wrist through the
     // fingertips
-    TArray<TPair<int, int>> Segments = {
-        {WristIndex, Thumb(Metacarpal)},
-        {Thumb(Metacarpal), Thumb(Proximal)},
-        {Thumb(Proximal), Thumb(Distal)},
-        {Thumb(Distal), Thumb(Tip)},
-        {WristIndex, Finger(Index, Metacarpal)},
-        {Finger(Index, Metacarpal), Finger(Index, Proximal)},
-        {Finger(Index, Proximal), Finger(Index, Intermediate)},
-        {Finger(Index, Intermediate), Finger(Index, Distal)},
-        {Finger(Index, Distal), Finger(Index, Tip)},
-        {WristIndex, Finger(Middle, Metacarpal)},
-        {Finger(Middle, Metacarpal), Finger(Middle, Proximal)},
-        {Finger(Middle, Proximal), Finger(Middle, Intermediate)},
-        {Finger(Middle, Intermediate), Finger(Middle, Distal)},
-        {Finger(Middle, Distal), Finger(Middle, Tip)},
-        {WristIndex, Finger(Ring, Metacarpal)},
-        {Finger(Ring, Metacarpal), Finger(Ring, Proximal)},
-        {Finger(Ring, Proximal), Finger(Ring, Intermediate)},
-        {Finger(Ring, Intermediate), Finger(Ring, Distal)},
-        {Finger(Ring, Distal), Finger(Ring, Tip)},
-        {WristIndex, Finger(Pinky, Metacarpal)},
-        {Finger(Pinky, Metacarpal), Finger(Pinky, Proximal)},
-        {Finger(Pinky, Proximal), Finger(Pinky, Intermediate)},
-        {Finger(Pinky, Intermediate), Finger(Pinky, Distal)},
-        {Finger(Pinky, Distal), Finger(Pinky, Tip)},
-    };
+	TArray<TPair<int, int>> Segments;
+	Segments.Emplace(WristIndex, Thumb(Metacarpal));
+	Segments.Emplace(Thumb(Metacarpal), Thumb(Proximal));
+	Segments.Emplace(Thumb(Proximal), Thumb(Distal));
+	Segments.Emplace(Thumb(Distal), Thumb(Tip));
+	Segments.Emplace(WristIndex, Finger(Index, Metacarpal));
+	Segments.Emplace(Finger(Index, Metacarpal), Finger(Index, Proximal));
+	Segments.Emplace(Finger(Index, Proximal), Finger(Index, Intermediate));
+	Segments.Emplace(Finger(Index, Intermediate), Finger(Index, Distal));
+	Segments.Emplace(Finger(Index, Distal), Finger(Index, Tip));
+	Segments.Emplace(WristIndex, Finger(Middle, Metacarpal));
+	Segments.Emplace(Finger(Middle, Metacarpal), Finger(Middle, Proximal));
+	Segments.Emplace(Finger(Middle, Proximal), Finger(Middle, Intermediate));
+	Segments.Emplace(Finger(Middle, Intermediate), Finger(Middle, Distal));
+	Segments.Emplace(Finger(Middle, Distal), Finger(Middle, Tip));
+	Segments.Emplace(WristIndex, Finger(Ring, Metacarpal));
+	Segments.Emplace(Finger(Ring, Metacarpal), Finger(Ring, Proximal));
+	Segments.Emplace(Finger(Ring, Proximal), Finger(Ring, Intermediate));
+	Segments.Emplace(Finger(Ring, Intermediate), Finger(Ring, Distal));
+	Segments.Emplace(Finger(Ring, Distal), Finger(Ring, Tip));
+	Segments.Emplace(WristIndex, Finger(Pinky, Metacarpal));
+	Segments.Emplace(Finger(Pinky, Metacarpal), Finger(Pinky, Proximal));
+	Segments.Emplace(Finger(Pinky, Proximal), Finger(Pinky, Intermediate));
+	Segments.Emplace(Finger(Pinky, Intermediate), Finger(Pinky, Distal));
+	Segments.Emplace(Finger(Pinky, Distal), Finger(Pinky, Tip));
 
     const auto RuntimeSettings = GetDefault<UIsdkRuntimeSettings>();
     for (const auto& Pair : Segments)

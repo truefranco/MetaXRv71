@@ -19,7 +19,7 @@
  */
 
 #include "DataSources/IsdkFromMetaXRHandDataSource.h"
-
+#include "XRMotionControllerBase.h"
 #include "DrawDebugHelpers.h"
 #include "IsdkDataSourcesMetaXR.h"
 #include "IsdkDataSourcesMetaXRLog.h"
@@ -86,7 +86,7 @@ UIsdkFromMetaXRHandDataSource* UIsdkFromMetaXRHandDataSource::MakeMetaXRHandData
   // information plus transform from joint local space to wrist space ourselves, but this is
   // mostly taken care of by using this component.
   const auto ComponentClass =
-      TSubclassOf<UActorComponent>(FindFirstObjectSafe<UClass>(TEXT("OculusXRHandComponent")));
+      TSubclassOf<UActorComponent>(FindObjectSafe<UClass>(ANY_PACKAGE, TEXT("OculusHandComponent")));
   if (ComponentClass)
   {
     auto* OculusHandComponent = Cast<UPoseableMeshComponent>(
@@ -103,13 +103,13 @@ UIsdkFromMetaXRHandDataSource* UIsdkFromMetaXRHandDataSource::MakeMetaXRHandData
   {
     ensureMsgf(
         ComponentClass,
-        TEXT("OculusXRHandComponent must be defined, or hand tracking will not work"));
+        TEXT("OculusHandComponent must be defined, or hand tracking will not work"));
   }
 
   const bool bLeftHandMismatch = InHandedness == EIsdkHandedness::Left &&
-      SourceMotionController->GetTrackingMotionSource() != IMotionController::LeftHandSourceId;
+      SourceMotionController->MotionSource != FXRMotionControllerBase::LeftHandSourceId;
   const bool bRightHandMismatch = InHandedness == EIsdkHandedness::Right &&
-      SourceMotionController->GetTrackingMotionSource() != IMotionController::RightHandSourceId;
+      SourceMotionController->MotionSource != FXRMotionControllerBase::RightHandSourceId;
   if (bLeftHandMismatch || bRightHandMismatch)
   {
     UE_LOG(
@@ -118,7 +118,7 @@ UIsdkFromMetaXRHandDataSource* UIsdkFromMetaXRHandDataSource::MakeMetaXRHandData
         TEXT(
             "UIsdkFromMetaXRHandDataSource created with mismatching Handedness \"%s\" and MotionController MotionSource \"%s\""),
         *StaticEnum<EIsdkHandedness>()->GetValueAsString(EIsdkHandedness::Left),
-        *SourceMotionController->GetTrackingMotionSource().ToString())
+        *SourceMotionController->MotionSource.ToString())
   }
 
   return DataSourceComponent;

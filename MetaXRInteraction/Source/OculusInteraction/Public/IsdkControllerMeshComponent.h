@@ -73,5 +73,5 @@ class OCULUSINTERACTION_API UIsdkControllerMeshComponent : public USkeletalMeshC
   TScriptInterface<IIsdkIRootPose> RootPoseDataSource;
 
   UPROPERTY(BlueprintGetter = GetPointerPoseComponent, Category = InteractionSDK)
-  TObjectPtr<USceneComponent> PointerPoseComponent;
+  USceneComponent* PointerPoseComponent;
 };

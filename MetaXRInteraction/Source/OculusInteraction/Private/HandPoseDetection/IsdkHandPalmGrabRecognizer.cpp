@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  * All rights reserved.
  *
@@ -19,7 +19,7 @@
  */
 
 #include "HandPoseDetection/IsdkHandPalmGrabRecognizer.h"
-
+#include "Templates/PimplPtr.h"
 #include "ApiImpl.h"
 #include "IsdkChecks.h"
 #include "IsdkHandMeshComponent.h"
@@ -40,7 +40,7 @@ class UIsdkHandPalmGrabRecognizer::FPalmGrabRecognizerImpl
 
 UIsdkHandPalmGrabRecognizer::UIsdkHandPalmGrabRecognizer()
 {
-  PalmGrabRecognizerImpl = MakePimpl<FPalmGrabRecognizerImpl, EPimplPtrMode::NoCopy>(
+  PalmGrabRecognizerImpl = MakePimpl<FPalmGrabRecognizerImpl>(
       [this]() -> PalmGrabRecognizerPtr
       {
         const auto* ApiHandPositionFrame = EnsureHandPositionFrame();

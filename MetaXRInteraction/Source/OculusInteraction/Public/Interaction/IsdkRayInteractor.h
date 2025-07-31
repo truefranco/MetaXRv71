@@ -21,21 +21,24 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Templates/PimplPtr.h"
 #include "IsdkInteractorComponent.h"
 #include "StructTypes.h"
 #include "DataSources/IsdkIHandPointerPose.h"
 #include "IsdkRayInteractor.generated.h"
 
 // Forward declarations of internal types
-namespace isdk::api
-{
-class RayInteractor;
+namespace isdk {
+	namespace api
+	{
+		class RayInteractor;
 
-namespace helper
-{
-class FSelectorImpl;
-class FRayInteractorImpl;
-} // namespace helper
+		namespace helper
+		{
+			class FSelectorImpl;
+			class FRayInteractorImpl;
+		} // namespace helper
+	}
 } // namespace isdk::api
 
 /**

@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  * All rights reserved.
  *
@@ -25,9 +25,11 @@
 #include "IsdkISurface.generated.h"
 
 // Forward declarations of internal types
-namespace isdk::api
-{
-class ISurface;
+namespace isdk {
+	namespace api
+	{
+		class ISurface;
+	}
 }
 
 // This class does not need to be modified.

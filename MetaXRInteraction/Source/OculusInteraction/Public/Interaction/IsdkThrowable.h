@@ -30,18 +30,9 @@
 UENUM(BlueprintType)
 enum class EIsdkVelocityEstimationMethod : uint8
 {
-  VE_LeastSquares UMETA(
-      DisplayName = "Least Squares",
-      Tooltip =
-          "A simple and efficient method that assumes a linear relationship. Gives more deterministic results when the tracking data is free of outliers. Note: Outliers are already being filtered out based on the Z-Score threshold."),
-  VE_RANSAC UMETA(
-      DisplayName = "RANSAC",
-      Tooltip =
-          "A robust method that can handle a significant amount of outlier data. Best used when the tracking data contains a large number of outliers."),
-  VE_KalmanFilter UMETA(
-      DisplayName = "Kalman Filter",
-      Tooltip =
-          "[EXPERIMENTAL] An advanced method that uses a statistical approach to estimate the velocity. The Kalman filter takes into account the uncertainty in the position and time data to provide a more accurate estimate of the velocity.")
+	VE_LeastSquares		UMETA(DisplayName = "Least Squares"),
+	VE_RANSAC			UMETA(DisplayName = "RANSAC"),
+	VE_KalmanFilter		UMETA(DisplayName = "Kalman Filter")
 };
 
 USTRUCT(BlueprintType, Category = "ISDK Throwable")
@@ -127,7 +118,7 @@ class OCULUSINTERACTION_API UIsdkThrowable : public USceneComponent
 
   /* The scene component that this throwing component is tracking */
   UPROPERTY(BlueprintReadOnly, Category = "ISDK Throwable")
-  TObjectPtr<USceneComponent> TrackedComponent;
+  USceneComponent* TrackedComponent;
 
   /* The settings for the throwable component */
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ISDK Throwable")

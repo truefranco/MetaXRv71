@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  * All rights reserved.
  *
@@ -20,7 +20,7 @@
 
 #include "Interaction/IsdkPokeButtonVisual.h"
 #include "Interaction/IsdkPokeInteractable.h"
-
+#include "Templates/PimplPtr.h"
 #include "ApiImpl.h"
 #include "Math/UnrealMathUtility.h"
 #include "IsdkChecks.h"
@@ -31,16 +31,20 @@ using isdk::api::IInteractable;
 using isdk::api::PokeButtonVisual;
 using isdk::api::PokeButtonVisualPtr;
 
-namespace isdk::api::helper
-{
-class FPokeButtonVisualImpl : public FApiImpl<PokeButtonVisual, PokeButtonVisualPtr>
-{
- public:
-  explicit FPokeButtonVisualImpl(std::function<PokeButtonVisualPtr()> CreateFn)
-      : FApiImpl(std::move(CreateFn))
-  {
-  }
-};
+namespace isdk {
+	namespace api {
+		namespace helper
+		{
+			class FPokeButtonVisualImpl : public FApiImpl<PokeButtonVisual, PokeButtonVisualPtr>
+			{
+			public:
+				explicit FPokeButtonVisualImpl(std::function<PokeButtonVisualPtr()> CreateFn)
+					: FApiImpl(std::move(CreateFn))
+				{
+				}
+			};
+		}
+	}
 } // namespace isdk::api::helper
 
 UIsdkPokeButtonVisual::UIsdkPokeButtonVisual()
@@ -50,7 +54,7 @@ UIsdkPokeButtonVisual::UIsdkPokeButtonVisual()
   bWantsOnUpdateTransform = true;
   PrimaryComponentTick.TickGroup = ETickingGroup::TG_PostPhysics;
 
-  PokeButtonVisualImpl = MakePimpl<isdk::api::helper::FPokeButtonVisualImpl, EPimplPtrMode::NoCopy>(
+  PokeButtonVisualImpl = MakePimpl<isdk::api::helper::FPokeButtonVisualImpl>(
       [this]() -> PokeButtonVisualPtr
       {
         // Check Dependencies
@@ -188,7 +192,7 @@ void UIsdkPokeButtonVisual::SetWorldLocationFromInstance()
 
       FVector3d WorldLocation;
       StructTypesUtils::Copy(CurrentPose.Position, WorldLocation);
-      SetWorldLocation(WorldLocation, false, nullptr, ETeleportType::None);
+      SetWorldLocation((FVector)WorldLocation, false, nullptr, ETeleportType::None);
     }
   }
 }

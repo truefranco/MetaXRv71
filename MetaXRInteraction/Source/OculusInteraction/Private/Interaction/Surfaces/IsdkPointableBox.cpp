@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  * All rights reserved.
  *
@@ -19,7 +19,7 @@
  */
 
 #include "Interaction/Surfaces/IsdkPointableBox.h"
-
+#include "Templates/PimplPtr.h"
 #include "StructTypesPrivate.h"
 #include "isdk_api/isdk_api.hpp"
 #include "ApiImpl.h"
@@ -29,16 +29,20 @@ using isdk::api::IPose;
 using isdk::api::PointableOrientedBox;
 using isdk::api::PointableOrientedBoxPtr;
 
-namespace isdk::api::helper
-{
-class FPointableOrientedBoxImpl : public FApiImpl<PointableOrientedBox, PointableOrientedBoxPtr>
-{
- public:
-  explicit FPointableOrientedBoxImpl(std::function<PointableOrientedBoxPtr()> CreateFn)
-      : FApiImpl(std::move(CreateFn))
-  {
-  }
-};
+namespace isdk {
+	namespace api {
+		namespace helper
+		{
+			class FPointableOrientedBoxImpl : public FApiImpl<PointableOrientedBox, PointableOrientedBoxPtr>
+			{
+			public:
+				explicit FPointableOrientedBoxImpl(std::function<PointableOrientedBoxPtr()> CreateFn)
+					: FApiImpl(std::move(CreateFn))
+				{
+				}
+			};
+		}
+	}
 } // namespace isdk::api::helper
 
 UIsdkPointableBox::UIsdkPointableBox()
@@ -46,14 +50,14 @@ UIsdkPointableBox::UIsdkPointableBox()
   PrimaryComponentTick.bCanEverTick = false;
   bWantsOnUpdateTransform = true;
 
-  PointableBoxImpl = MakePimpl<isdk::api::helper::FPointableOrientedBoxImpl, EPimplPtrMode::NoCopy>(
+  PointableBoxImpl = MakePimpl<isdk::api::helper::FPointableOrientedBoxImpl>(
       [this]() -> PointableOrientedBoxPtr
       {
         ovrpPosef BoxOriginPose;
         StructTypesUtils::Copy(GetComponentTransform(), BoxOriginPose);
 
         // Create backing surface
-        const ovrpVector3f ApiSize = StructTypesUtils::Convert(Size);
+        const ovrpVector3f ApiSize = StructTypesUtils::Convert((FVector3d)Size);
         UIsdkChecks::WarnIfApiSizeInvalid(Size, this, TEXT("Size"));
 
         auto Instance = PointableOrientedBox::createWithPose(&BoxOriginPose, &ApiSize);
@@ -117,7 +121,7 @@ void UIsdkPointableBox::SetSize(FVector InSize)
   Size = InSize;
   if (PointableBoxImpl->IsInstanceValid())
   {
-    const ovrpVector3f ApiSize = StructTypesUtils::Convert(Size);
+    const ovrpVector3f ApiSize = StructTypesUtils::Convert((FVector3d)Size);
     UIsdkChecks::WarnIfApiSizeInvalid(Size, this, TEXT("Size"));
 
     PointableBoxImpl->GetOrCreateInstance()->setSize(&ApiSize);

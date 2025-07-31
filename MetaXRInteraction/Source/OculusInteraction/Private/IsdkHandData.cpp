@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  * All rights reserved.
  *
@@ -40,7 +40,9 @@ void UIsdkHandData::SetJoints(const isdk_HandData& HandData)
       int32* BoneIdx = InboundBoneMapping.Find(i);
       if (BoneIdx != nullptr)
       {
-        StructTypesUtils::Copy(HandData.joints[*BoneIdx], NewRotation);
+		  FQuat4d tempRotation;
+        StructTypesUtils::Copy(HandData.joints[*BoneIdx], tempRotation);
+		NewRotation = (FQuat)tempRotation;
         JointPoses[i].SetRotation(NewRotation);
       }
       else
@@ -84,11 +86,11 @@ void UIsdkHandData::ReadJoints(isdk_HandData& HandData)
       int32* BoneIdx = OutboundBoneMapping.Find(i);
       if (BoneIdx != nullptr)
       {
-        StructTypesUtils::Copy(JointPoses[*BoneIdx].GetRotation(), HandData.joints[i]);
+        StructTypesUtils::Copy((FQuat4d)JointPoses[*BoneIdx].GetRotation(), HandData.joints[i]);
       }
       else
       {
-        StructTypesUtils::Copy(FQuat::Identity, HandData.joints[i]);
+        StructTypesUtils::Copy(FQuat4d::Identity(), HandData.joints[i]);
       }
     }
   }

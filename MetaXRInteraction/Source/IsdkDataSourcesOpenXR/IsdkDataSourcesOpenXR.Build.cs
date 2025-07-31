@@ -36,7 +36,6 @@ public class IsdkDataSourcesOpenXR : ModuleRules
                 "OculusInteraction",
                 "HeadMountedDisplay",
                 "InputCore",
-                "XRBase",
                 "OpenXRHandTracking"
             }
         );

@@ -215,7 +215,7 @@ void UIsdkGrabberComponent::TickInteractors(float DeltaTime)
 
 void UIsdkGrabberComponent::UpdateHoveredGrabbables()
 {
-  TSet<TObjectPtr<UIsdkGrabbableComponent>> CurrentHoveredGrabbables;
+  TSet<UIsdkGrabbableComponent*> CurrentHoveredGrabbables;
   if (IsGrabDetectionTypeAllowed(EIsdkGrabDetectorType::HandGrab))
   {
     CurrentHoveredGrabbables.Append(HandGrabDetector->GetHoveredGrabbables());
@@ -332,11 +332,11 @@ void UIsdkGrabberComponent::UpdateRayGrabVisuals()
   // Update niagara system parameters so that the system can display itself correctly
   FTransform PointerTransform = FTransform::Identity;
   GetPointerTransform(PointerTransform);
-  RayGrabNiagaraComponent->SetVariablePosition(
+  RayGrabNiagaraComponent->SetVectorParameter(
       FName("User.PointerLocation"), PointerTransform.GetLocation());
   RayGrabNiagaraComponent->SetVectorParameter(
       FName("User.PointerVector"), PointerTransform.GetRotation().GetForwardVector());
-  RayGrabNiagaraComponent->SetVariablePosition(FName("User.HitLocation"), RayHit.Location);
+  RayGrabNiagaraComponent->SetVectorParameter(FName("User.HitLocation"), RayHit.Location);
   RayGrabNiagaraComponent->SetVectorParameter(FName("User.HitNormal"), RayHit.Normal);
   RayGrabNiagaraComponent->SetFloatParameter(FName("User.PinchStrength"), PinchStrength);
 }
@@ -414,15 +414,15 @@ void UIsdkGrabberComponent::UpdateDistanceGrabVisuals()
   }
 
   // Update niagara system parameters so that the system can display itself correctly
-  DistanceGrabNiagaraComponent->SetVariablePosition(
+  DistanceGrabNiagaraComponent->SetVectorParameter(
       FName("User.GrabLocation"), PointerTransform.GetLocation());
   DistanceGrabNiagaraComponent->SetVectorParameter(
       FName("User.GrabVector"), PointerTransform.GetRotation().GetForwardVector());
-  DistanceGrabNiagaraComponent->SetVariablePosition(
+  DistanceGrabNiagaraComponent->SetVectorParameter(
       FName("User.GrabTargetLocation"), GrabTargetLocation);
   DistanceGrabNiagaraComponent->SetVectorParameter(
       FName("User.GrabTargetVector"), GrabTargetVector);
-  DistanceGrabNiagaraComponent->SetVariablePosition(
+  DistanceGrabNiagaraComponent->SetVectorParameter(
       FName("User.GrabbableLocation"), Grabbable->GetComponentLocation());
   DistanceGrabNiagaraComponent->SetVectorParameter(FName("User.GrabbableVector"), GrabbableVector);
   DistanceGrabNiagaraComponent->SetBoolParameter(FName("User.IsGrabbing"), IsGrabbing());
@@ -761,7 +761,7 @@ void UIsdkGrabberComponent::PostEvent(EIsdkPointerEventType Type, UIsdkGrabbable
   FIsdkInteractionPointerEvent Evt;
   Evt.Type = Type;
   Evt.Pose.Orientation = GrabTransform.GetRotation();
-  Evt.Pose.Position = static_cast<FVector3f>(GrabTransform.GetLocation());
+  Evt.Pose.Position = static_cast<FVector>(GrabTransform.GetLocation());
   Evt.Interactor = this;
   Evt.Interactable = Dest;
   Evt.Identifier = GetID();

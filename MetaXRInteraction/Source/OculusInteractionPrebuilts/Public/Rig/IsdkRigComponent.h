@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  * All rights reserved.
  *
@@ -379,35 +379,35 @@ class OCULUSINTERACTIONPREBUILTS_API UIsdkRigComponent : public USceneComponent
    * hand and controller input to ray interactions
    */
   UPROPERTY(BlueprintGetter = GetRayInteraction, EditAnywhere, Category = InteractionSDK)
-  TObjectPtr<UIsdkRayInteractionRigComponent> RayInteraction;
+  UIsdkRayInteractionRigComponent* RayInteraction;
 
   /**
    * PokeInteraction is a reference to this rig component's PokeInteractionRigComponent, which binds
    * hand and controller input to poke interactions
    */
   UPROPERTY(BlueprintGetter = GetPokeInteraction, EditAnywhere, Category = InteractionSDK)
-  TObjectPtr<UIsdkPokeInteractionRigComponent> PokeInteraction;
+  UIsdkPokeInteractionRigComponent* PokeInteraction;
 
   /**
    * GrabInteraction is a reference to this rig component's GrabInteractionRigComponent, which binds
    * hand and controller input to grab interactions
    */
   UPROPERTY(BlueprintGetter = GetGrabInteraction, EditAnywhere, Category = InteractionSDK)
-  TObjectPtr<UIsdkGrabInteractionRigComponent> GrabInteraction;
+  UIsdkGrabInteractionRigComponent* GrabInteraction;
 
   /**
    * InputActions is a reference to this rig component's InputActionsRigComponent, which is used
    * to store input actions used for interaction
    */
   UPROPERTY(BlueprintGetter = GetInputActions, EditAnywhere, Category = InteractionSDK)
-  TObjectPtr<UIsdkInputActionsRigComponent> InputActions;
+  UIsdkInputActionsRigComponent* InputActions;
 
   /**
    * InteractionGroup is a reference to this rig component's InteractionGroupComponent, which is
    * used to help drive which interactors are enabled and disabled.
    */
   UPROPERTY(BlueprintGetter = GetInteractionGroup, EditAnywhere, Category = InteractionSDK)
-  TObjectPtr<UIsdkInteractionGroupRigComponent> InteractionGroup;
+  UIsdkInteractionGroupRigComponent* InteractionGroup;
 
   /**
    * WidgetVirtualUser is used with UI interactions to determine which hand is interacting with

@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  * All rights reserved.
  *
@@ -26,14 +26,16 @@
 #include "IsdkPokeButtonVisual.generated.h"
 
 // Forward declarations of internal types
-namespace isdk::api
-{
-class PokeButtonVisual;
+namespace isdk {
+	namespace api
+	{
+		class PokeButtonVisual;
 
-namespace helper
-{
-class FPokeButtonVisualImpl;
-}
+		namespace helper
+		{
+			class FPokeButtonVisualImpl;
+		}
+	}
 } // namespace isdk::api
 
 class UIsdkPokeInteractable;

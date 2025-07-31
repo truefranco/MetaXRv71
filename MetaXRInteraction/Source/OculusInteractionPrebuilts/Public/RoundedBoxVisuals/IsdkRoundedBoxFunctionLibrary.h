@@ -39,7 +39,7 @@ struct FIsdkRoundedBoxProperties
   UPROPERTY(BlueprintReadWrite, Category = InteractionSDK)
   FVector2D Size = FVector2D::ZeroVector;
   UPROPERTY(BlueprintReadWrite, Category = InteractionSDK)
-  FVector4 CornerRadius = FVector4::Zero();
+  FVector4 CornerRadius = FVector4(0.0f, 0.0f, 0.0f, 0.0f);
   UPROPERTY(BlueprintReadWrite, Category = InteractionSDK)
   FLinearColor FillColor = FLinearColor::Black;
   UPROPERTY(BlueprintReadWrite, Category = InteractionSDK)
@@ -83,7 +83,7 @@ class OCULUSINTERACTIONPREBUILTS_API UIsdkRoundedBoxFunctionLibrary final
       FVector2D Size,
       float OuterBorderRadius)
   {
-    auto SizeOffset = FVector2D(FMath::Max(OuterBorderRadius, 0.0) * 2.0);
+    auto SizeOffset = FVector2D(FMath::Max(OuterBorderRadius, 0.0f) * 2.0);
     auto BoxSize =
         (Size + SizeOffset) / 100.0f; // Required because the default plane size is 100 units
     BoxSize = FVector2D::Max(FVector2D(0.001, 0.001), BoxSize);
@@ -98,8 +98,8 @@ class OCULUSINTERACTIONPREBUILTS_API UIsdkRoundedBoxFunctionLibrary final
       float OuterBorderRadius)
   {
     auto Dimensions = FVector4(
-        Size, FVector2D(FMath::Max(InnerBorderRadius, 0.0), FMath::Max(OuterBorderRadius, 0.0)));
-    RoundedBoxMaterial->SetVectorParameterValue("Dimensions", Dimensions);
+        Size, FVector2D(FMath::Max(InnerBorderRadius, 0.0f), FMath::Max(OuterBorderRadius, 0.0f)));
+    RoundedBoxMaterial->SetVectorParameterValue("Dimensions", FLinearColor(Dimensions));
   }
 
   UFUNCTION(BlueprintCallable, Category = InteractionSDK)
@@ -123,6 +123,6 @@ class OCULUSINTERACTIONPREBUILTS_API UIsdkRoundedBoxFunctionLibrary final
       UMaterialInstanceDynamic* RoundedBoxMaterial,
       FVector4 Radii)
   {
-    RoundedBoxMaterial->SetVectorParameterValue("Radii", Radii);
+    RoundedBoxMaterial->SetVectorParameterValue("Radii", FLinearColor(Radii));
   }
 };

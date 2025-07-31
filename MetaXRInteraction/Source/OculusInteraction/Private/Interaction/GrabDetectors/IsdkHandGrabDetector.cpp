@@ -19,7 +19,8 @@
  */
 
 #include "Interaction/GrabDetectors/IsdkHandGrabDetector.h"
-
+#include "VectorTypes.h"
+#include "Quaternion.h"
 #include "IsdkFunctionLibrary.h"
 #include "OculusInteractionLog.h"
 #include "Components/BoxComponent.h"
@@ -76,7 +77,7 @@ void UIsdkHandGrabDetector::Tick(float DeltaTime)
   ComputeGrabCandidates();
 }
 
-const TSet<TObjectPtr<UIsdkGrabbableComponent>>& UIsdkHandGrabDetector::GetHoveredGrabbables() const
+const TSet<UIsdkGrabbableComponent*>& UIsdkHandGrabDetector::GetHoveredGrabbables() const
 {
   return HoveredGrabbables;
 }
@@ -234,7 +235,7 @@ void UIsdkHandGrabDetector::DrawDebugCollider(
         ColliderAsSphere->GetScaledSphereRadius(),
         12,
         FinalDebugColor);
-    UE_VLOG_WIRESPHERE(
+    UE_VLOG_MESH(
         GrabberComponent->GetOwner(),
         LogOculusInteraction,
         Verbose,
@@ -255,12 +256,13 @@ void UIsdkHandGrabDetector::DrawDebugCollider(
         ColliderAsBox->GetScaledBoxExtent(),
         ColliderAsBox->GetComponentQuat(),
         FinalDebugColor);
-    UE_VLOG_WIREOBOX(
+
+    UE_VLOG_OBOX(
         GrabberComponent->GetOwner(),
         LogOculusInteraction,
         Verbose,
         Box,
-        ColliderAsBox->GetComponentQuat().ToMatrix(),
+		FRotationMatrix(ColliderAsBox->GetComponentQuat().Rotator()),
         FinalDebugColor,
         TEXT_EMPTY);
   }
@@ -268,14 +270,14 @@ void UIsdkHandGrabDetector::DrawDebugCollider(
   {
     // Draw a bounding box otherwise
     const auto BoxLocation = GrabCollider->GetComponentLocation();
-    const auto BoxExtent = GrabCollider->GetLocalBounds().BoxExtent;
+	const auto BoxExtent = GrabCollider->CalcBounds(FTransform::Identity).BoxExtent;
     const auto Box = FBox(BoxLocation - BoxExtent, BoxLocation + BoxExtent);
     DrawDebugBox(
         GetWorld(),
-        ColliderAsBox->GetComponentLocation(),
-        ColliderAsBox->GetScaledBoxExtent(),
+		BoxLocation,
+		BoxExtent,
         FinalDebugColor);
-    UE_VLOG_WIREBOX(
+    UE_VLOG_BOX(
         GrabberComponent->GetOwner(),
         LogOculusInteraction,
         Verbose,
@@ -474,8 +476,12 @@ void UIsdkHandGrabDetector::UpdatePinchCollidersAttachment(
     PinchCollider->AttachToComponent(
         GrabberComponent, FAttachmentTransformRules::KeepRelativeTransform);
 
-    const FTransform ThumbTipPosition = InPinchAttachMesh->GetBoneTransform(InThumbTipSocketName);
-    PinchCollider->SetWorldTransform(ThumbTipPosition);
+	const int32 ThumbTipBoneIndex = InPinchAttachMesh->GetBoneIndex(InThumbTipSocketName);
+	if (ThumbTipBoneIndex != INDEX_NONE)
+	{
+		const FTransform ThumbTipPosition = InPinchAttachMesh->GetBoneTransform(ThumbTipBoneIndex);
+		PinchCollider->SetWorldTransform(ThumbTipPosition);
+	}
   }
   else
   {

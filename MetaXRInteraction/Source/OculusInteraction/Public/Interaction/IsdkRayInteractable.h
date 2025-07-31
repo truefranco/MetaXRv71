@@ -21,6 +21,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Templates/PimplPtr.h"
 #include "IsdkInteractableComponent.h"
 #include "Pointable/IsdkIPointable.h"
 #include "Surfaces/IsdkISurface.h"
@@ -28,15 +29,17 @@
 #include "IsdkRayInteractable.generated.h"
 
 // Forward declarations of internal types
-namespace isdk::api
-{
-class RayInteractable;
+namespace isdk {
+	namespace api
+	{
+		class RayInteractable;
 
-namespace helper
-{
-class FPointerEventQueueImpl;
-class FRayInteractableImpl;
-} // namespace helper
+		namespace helper
+		{
+			class FPointerEventQueueImpl;
+			class FRayInteractableImpl;
+		} // namespace helper
+	}
 } // namespace isdk::api
 
 /**

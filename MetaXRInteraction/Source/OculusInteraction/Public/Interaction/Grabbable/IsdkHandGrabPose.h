@@ -74,7 +74,7 @@ class OCULUSINTERACTION_API UIsdkHandGrabPose : public USceneComponent
 
   /* Hand Pose Data asset to use for this Grab Pose */
   UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "InteractionSDK")
-  TObjectPtr<UIsdkHandPoseData> HandPoseData;
+  UIsdkHandPoseData* HandPoseData;
 
   /* Generates a new debug hand visual (UIsdkHandMeshComponent), utilizing the set hand grab data.
    * Destroys the previous visual if it exists */
@@ -119,7 +119,7 @@ class OCULUSINTERACTION_API UIsdkHandGrabPose : public USceneComponent
 
  private:
   UPROPERTY()
-  TObjectPtr<UIsdkHandMeshComponent> DebugHandVisual;
+  UIsdkHandMeshComponent* DebugHandVisual;
 
   UPROPERTY()
   EIsdkHandedness Handedness = EIsdkHandedness::Left;
@@ -127,7 +127,7 @@ class OCULUSINTERACTION_API UIsdkHandGrabPose : public USceneComponent
   bool bVisualMirrored = false;
 
   UPROPERTY()
-  TObjectPtr<UIsdkHandPoseData> MirrorHandPoseData;
+  UIsdkHandPoseData* MirrorHandPoseData;
   UPROPERTY()
-  TObjectPtr<UIsdkHandGrabPose> ManualMirroredGrabPose;
+  UIsdkHandGrabPose* ManualMirroredGrabPose;
 };

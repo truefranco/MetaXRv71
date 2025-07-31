@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  * All rights reserved.
  *
@@ -495,7 +495,7 @@ UIsdkControllerVisualsRigComponentLeft::UIsdkControllerVisualsRigComponentLeft()
   AnimatedHandMeshComponent->SetAnimInstanceClass(LeftControllerHandAnimBlueprintFinder.Class);
 
   // Update procedural hand mesh defaults
-  PoseableHandMeshComponent->SetSkinnedAsset(LeftHandMeshFinder.Object);
+  PoseableHandMeshComponent->SetSkeletalMesh(LeftHandMeshFinder.Object);
 }
 
 UIsdkControllerVisualsRigComponentRight::UIsdkControllerVisualsRigComponentRight()
@@ -520,5 +520,5 @@ UIsdkControllerVisualsRigComponentRight::UIsdkControllerVisualsRigComponentRight
   AnimatedHandMeshComponent->SetAnimInstanceClass(RightControllerHandAnimBlueprintFinder.Class);
 
   // Update procedural hand mesh defaults
-  PoseableHandMeshComponent->SetSkinnedAsset(RightHandMeshFinder.Object);
+  PoseableHandMeshComponent->SetSkeletalMesh(RightHandMeshFinder.Object);
 }

@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  * All rights reserved.
  *
@@ -21,20 +21,23 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Templates/PimplPtr.h"
 #include "Components/ActorComponent.h"
 #include "Interaction/IsdkISurfacePatch.h"
 #include "IsdkBlankComponent.generated.h"
 
 // Forward declarations of internal types, so they can be returned from GetApiXYZ functions.
-namespace isdk::api
-{
-class BlankComponent;
+namespace isdk {
+	namespace api
+	{
+		class BlankComponent;
 
-namespace helper
-{
-class FIsdkBlankComponentImpl;
-}
-} // namespace isdk::api
+		namespace helper
+		{
+			class FIsdkBlankComponentImpl;
+		}
+	}
+}// namespace isdk::api
 
 /**
  * This is example component that derives from UActorComponent.

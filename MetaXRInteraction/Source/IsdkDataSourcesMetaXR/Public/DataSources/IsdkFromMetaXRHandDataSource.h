@@ -31,9 +31,11 @@
 #include "IsdkFromMetaXRHandDataSource.generated.h"
 
 // Forward declarations of internal types
-namespace isdk::api
-{
-class ExternalHandSource;
+namespace isdk {
+	namespace api
+	{
+		class ExternalHandSource;
+	}
 }
 
 USTRUCT()
@@ -252,19 +254,19 @@ class ISDKDATASOURCESMETAXR_API UIsdkFromMetaXRHandDataSource : public UIsdkExte
       BlueprintGetter = GetMotionController,
       Category = InteractionSDK,
       meta = (ExposeOnSpawn = true))
-  TObjectPtr<UMotionControllerComponent> MotionController;
+  UMotionControllerComponent* MotionController;
 
   FTransform LastGoodRootPose = FTransform::Identity;
 
   UPROPERTY()
-  TObjectPtr<UIsdkConditionalBool> IsRootPoseConnected;
+  UIsdkConditionalBool* IsRootPoseConnected;
 
   UPROPERTY()
-  TObjectPtr<UIsdkConditionalBool> IsRootPoseHighConfidence;
+  UIsdkConditionalBool* IsRootPoseHighConfidence;
 
   // Required to generate the "OpenXR" Data
   UPROPERTY()
-  TObjectPtr<UPoseableMeshComponent> OculusXrHandComponent;
+  UPoseableMeshComponent* OculusXrHandComponent;
 
   static void SetUintEnumProperty(UObject* Target, FName InName, uint8 EnumValue);
   void GenerateBoneMap();

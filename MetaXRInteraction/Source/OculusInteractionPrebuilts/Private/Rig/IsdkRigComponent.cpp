@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  * All rights reserved.
  *
@@ -353,8 +353,10 @@ USkinnedMeshComponent* UIsdkRigComponent::GetPinchAttachMesh() const
 
 void UIsdkRigComponent::CreateInteractionGroupConditionals()
 {
-  constexpr auto PokeInteractorGroupBehavior = FIsdkInteractionGroupMemberBehavior{
-      .bDisableOnOtherSelect = true, .bDisableOnOtherNearFieldHover = false, .bIsNearField = true};
+	FIsdkInteractionGroupMemberBehavior PokeInteractorGroupBehavior{};
+	PokeInteractorGroupBehavior.bDisableOnOtherSelect = true;
+	PokeInteractorGroupBehavior.bDisableOnOtherNearFieldHover = false;
+	PokeInteractorGroupBehavior.bIsNearField = true;
   auto CalculateInteractorGroupMemberState = [](const FIsdkInteractorStateEvent& Event)
   {
     FIsdkInteractionGroupMemberState State{};
@@ -371,21 +373,22 @@ void UIsdkRigComponent::CreateInteractionGroupConditionals()
       CalculateInteractorGroupMemberState,
       PokeInteractorGroupBehavior));
 
-  constexpr auto RayInteractorGroupBehavior = FIsdkInteractionGroupMemberBehavior{
-      .bDisableOnOtherSelect = true,
-      .bDisableOnOtherNearFieldHover = true,
-      .bIsNearField = false // false here means a ray wont prevent near-field interactors hovering.
-  };
+  FIsdkInteractionGroupMemberBehavior RayInteractorGroupBehavior{};
+  RayInteractorGroupBehavior.bDisableOnOtherSelect = true;
+  RayInteractorGroupBehavior.bDisableOnOtherNearFieldHover = true;
+  RayInteractorGroupBehavior.bIsNearField = false; // false here means a ray wont prevent near-field interactors hovering.
+
   RayInteraction->GetEnabledConditional()->AddConditional(InteractionGroup->AddInteractor(
       RayInteraction->RayInteractor,
       *RayInteraction->RayInteractor->GetInteractorStateChangedDelegate(),
       CalculateInteractorGroupMemberState,
       RayInteractorGroupBehavior));
 
-  constexpr auto GrabInteractorGroupBehavior = FIsdkInteractionGroupMemberBehavior{
-      .bDisableOnOtherSelect = true,
-      .bDisableOnOtherNearFieldHover = true, // disable grab when poke is hovering
-      .bIsNearField = true};
+  FIsdkInteractionGroupMemberBehavior GrabInteractorGroupBehavior{};
+  GrabInteractorGroupBehavior.bDisableOnOtherSelect = true;
+  GrabInteractorGroupBehavior.bDisableOnOtherNearFieldHover = true; // disable grab when poke is hovering
+  GrabInteractorGroupBehavior.bIsNearField = true;
+
   GrabInteraction->GetEnabledConditional()->AddConditional(InteractionGroup->AddInteractor(
       GrabInteraction->Grabber,
       *GrabInteraction->Grabber->GetInteractorStateChangedDelegate(),
@@ -401,7 +404,7 @@ void UIsdkRigComponent::InitializeHmdDataSource()
     return;
   }
 
-  AActor* OwningActor = this->GetAttachParentActor();
+  AActor* OwningActor = this->GetOwner();
   if (!ensureMsgf(
           IsValid(OwningActor),
           TEXT("UIsdkRigComponent::InitializeHmdDataSource() - OwningActor isn't valid!")))
@@ -410,7 +413,7 @@ void UIsdkRigComponent::InitializeHmdDataSource()
   }
 
   TArray<UIsdkRigComponent*> ActorRigComponents;
-  OwningActor->GetComponents(UIsdkRigComponent::StaticClass(), ActorRigComponents);
+  OwningActor->GetComponents(ActorRigComponents);
 
   // Check every other RigComponent on this actor and if any of them already have an HMD Data
   // Source, grab a reference to that

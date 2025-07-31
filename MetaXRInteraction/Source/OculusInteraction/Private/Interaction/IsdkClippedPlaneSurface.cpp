@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  * All rights reserved.
  *
@@ -23,7 +23,7 @@
 #include "StructTypes.h"
 #include "StructTypesPrivate.h"
 #include "isdk_api/isdk_api.hpp"
-
+#include "Templates/PimplPtr.h"
 #include <vector>
 #include "ApiImpl.h"
 #include "IsdkChecks.h"
@@ -32,82 +32,86 @@ using isdk::api::ClippedPlaneSurface;
 using isdk::api::ClippedPlaneSurfacePtr;
 using isdk::api::IPose;
 
-namespace isdk::api::helper
-{
-class FClippedPlaneSurfaceImpl : public FApiImpl<ClippedPlaneSurface, ClippedPlaneSurfacePtr>
-{
- public:
-  explicit FClippedPlaneSurfaceImpl(std::function<ClippedPlaneSurfacePtr()> CreateFn)
-      : FApiImpl(std::move(CreateFn))
-  {
-  }
-  static std::vector<isdk_BoundsClipper> GenerateNativeBoundsClippers(
-      const TArray<FIsdkBoundsClipper>& BoundsClippers,
-      UIsdkPointablePlane* const PointablePlane,
-      const FString& ComponentName)
-  {
-    std::vector<isdk_BoundsClipper> IsdkBoundsClippers;
-    if (BoundsClippers.Num() > 0)
-    {
-      IsdkBoundsClippers.reserve(BoundsClippers.Num());
-      ovrpVector3f BoundsClipperPosition{};
-      ovrpVector3f BoundsClipperSize{};
-      for (size_t Idx = 0; Idx < BoundsClippers.Num(); ++Idx)
-      {
-        FIsdkBoundsClipper Clipper = BoundsClippers[Idx];
-        auto PoseProvider = Clipper.PoseProvider;
+namespace isdk {
+	namespace api {
+		namespace helper
+		{
+			class FClippedPlaneSurfaceImpl : public FApiImpl<ClippedPlaneSurface, ClippedPlaneSurfacePtr>
+			{
+			public:
+				explicit FClippedPlaneSurfaceImpl(std::function<ClippedPlaneSurfacePtr()> CreateFn)
+					: FApiImpl(std::move(CreateFn))
+				{
+				}
+				static std::vector<isdk_BoundsClipper> GenerateNativeBoundsClippers(
+					const TArray<FIsdkBoundsClipper>& BoundsClippers,
+					UIsdkPointablePlane* const PointablePlane,
+					const FString& ComponentName)
+				{
+					std::vector<isdk_BoundsClipper> IsdkBoundsClippers;
+					if (BoundsClippers.Num() > 0)
+					{
+						IsdkBoundsClippers.reserve(BoundsClippers.Num());
+						ovrpVector3f BoundsClipperPosition{};
+						ovrpVector3f BoundsClipperSize{};
+						for (size_t Idx = 0; Idx < BoundsClippers.Num(); ++Idx)
+						{
+							FIsdkBoundsClipper Clipper = BoundsClippers[Idx];
+							auto PoseProvider = Clipper.PoseProvider;
 
-        if (!UIsdkChecks::ValidateUObjectDependency(
-                PointablePlane,
-                nullptr,
-                TEXT("PointablePlane"),
-                ANSI_TO_TCHAR(__FUNCTION__),
-                nullptr))
-        {
-          break;
-        }
+							if (!UIsdkChecks::ValidateUObjectDependency(
+								PointablePlane,
+								nullptr,
+								TEXT("PointablePlane"),
+								ANSI_TO_TCHAR(__FUNCTION__),
+								nullptr))
+							{
+								break;
+							}
 
-        if (!UIsdkChecks::ValidateUObjectDependency(
-                PoseProvider.GetObject(),
-                Clipper.StaticStruct(),
-                TEXT("PoseProvider"),
-                ANSI_TO_TCHAR(__FUNCTION__),
-                PointablePlane->GetAttachParentActor()))
-        {
-          break;
-        }
+							if (!UIsdkChecks::ValidateUObjectDependency(
+								PoseProvider.GetObject(),
+								Clipper.StaticStruct(),
+								TEXT("PoseProvider"),
+								ANSI_TO_TCHAR(__FUNCTION__),
+								PointablePlane->GetOwner()))
+							{
+								break;
+							}
 
-        IPose* ApiIPose = PoseProvider.GetInterface()->GetApiIPose();
+							IPose* ApiIPose = PoseProvider.GetInterface()->GetApiIPose();
 
-        if (!UIsdkChecks::ValidateDependency(
-                ApiIPose,
-                Clipper.StaticStruct(),
-                TEXT("ApiIPose"),
-                ANSI_TO_TCHAR(__FUNCTION__),
-                PointablePlane->GetAttachParentActor()))
-        {
-          break;
-        }
+							if (!UIsdkChecks::ValidateDependency(
+								ApiIPose,
+								Clipper.StaticStruct(),
+								TEXT("ApiIPose"),
+								ANSI_TO_TCHAR(__FUNCTION__),
+								PointablePlane->GetOwner()))
+							{
+								break;
+							}
 
-        FVector LocalScale = FVector(Clipper.Size);
-        FVector LocalPosition = FVector(Clipper.Position);
-        if (IsValid(PointablePlane))
-        {
-          FTransform PlaneTransform = PointablePlane->GetComponentTransform();
-          LocalPosition *= PlaneTransform.GetScale3D();
-          LocalScale *= PlaneTransform.GetScale3D();
-        }
+							FVector LocalScale = FVector(Clipper.Size);
+							FVector LocalPosition = FVector(Clipper.Position);
+							if (IsValid(PointablePlane))
+							{
+								FTransform PlaneTransform = PointablePlane->GetComponentTransform();
+								LocalPosition *= PlaneTransform.GetScale3D();
+								LocalScale *= PlaneTransform.GetScale3D();
+							}
 
-        StructTypesUtils::Copy(LocalPosition, BoundsClipperPosition);
-        StructTypesUtils::Copy(LocalScale, BoundsClipperSize);
-        IsdkBoundsClippers.push_back(
-            {ApiIPose->getIPoseHandle(), BoundsClipperPosition, BoundsClipperSize});
-      }
-      return IsdkBoundsClippers;
-    }
-    return IsdkBoundsClippers;
-  }
-};
+							StructTypesUtils::Copy((FVector3d)LocalPosition, BoundsClipperPosition);
+							StructTypesUtils::Copy((FVector3d)LocalScale, BoundsClipperSize);
+							IsdkBoundsClippers.push_back(
+								{ ApiIPose->getIPoseHandle(), BoundsClipperPosition, BoundsClipperSize });
+						}
+						return IsdkBoundsClippers;
+					}
+					return IsdkBoundsClippers;
+				}
+			};
+		}
+	}
 } // namespace isdk::api::helper
 
 UIsdkClippedPlaneSurface::UIsdkClippedPlaneSurface()
@@ -115,7 +119,7 @@ UIsdkClippedPlaneSurface::UIsdkClippedPlaneSurface()
   PrimaryComponentTick.bCanEverTick = true;
   TransformUpdatedDelegateHandle = FDelegateHandle();
   ClippedPlaneSurfaceImpl =
-      MakePimpl<isdk::api::helper::FClippedPlaneSurfaceImpl, EPimplPtrMode::NoCopy>(
+      MakePimpl<isdk::api::helper::FClippedPlaneSurfaceImpl>(
           [this]() -> ClippedPlaneSurfacePtr
           {
             // Check Dependencies

@@ -27,20 +27,24 @@
 
 using isdk::api::IHandDataSource;
 
-namespace isdk::api::helper
-{
-class FDataSourceImpl
-{
- public:
-  isdk_HandData HandData{};
-};
+namespace isdk {
+	namespace api {
+		namespace helper
+		{
+			class FDataSourceImpl
+			{
+			public:
+				isdk_HandData HandData{};
+			};
+		}
+	}
 } // namespace isdk::api::helper
 
 UIsdkHandDataSource::UIsdkHandDataSource()
 {
   PrimaryComponentTick.bCanEverTick = true;
 
-  DataSourceImpl = MakePimpl<isdk::api::helper::FDataSourceImpl, EPimplPtrMode::NoCopy>();
+  DataSourceImpl = MakePimpl<isdk::api::helper::FDataSourceImpl>();
   HandData = CreateDefaultSubobject<UIsdkHandData>("HandData");
 }
 

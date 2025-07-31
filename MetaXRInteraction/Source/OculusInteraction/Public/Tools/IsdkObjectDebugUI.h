@@ -22,6 +22,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "GameFramework/PlayerController.h"
 #include "Engine/World.h"
 #include "Components/SceneComponent.h"
 #include "Components/TextRenderComponent.h"

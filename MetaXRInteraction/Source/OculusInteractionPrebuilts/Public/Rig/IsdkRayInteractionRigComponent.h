@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  * All rights reserved.
  *
@@ -98,7 +98,7 @@ class OCULUSINTERACTIONPREBUILTS_API UIsdkRayInteractionRigComponent : public UA
    * from to other related components
    */
   UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = InteractionSDK)
-  TObjectPtr<UIsdkRayInteractor> RayInteractor;
+  UIsdkRayInteractor* RayInteractor;
 
   /**
    * @brief Retrieves the Conditional Group for if this component is enabled.
@@ -116,7 +116,7 @@ class OCULUSINTERACTIONPREBUILTS_API UIsdkRayInteractionRigComponent : public UA
    * PinchArrow subcomponents
    */
   UPROPERTY(BlueprintReadOnly, Category = InteractionSDK)
-  TObjectPtr<UIsdkRayVisualComponent> RayVisual;
+  UIsdkRayVisualComponent* RayVisual;
 
   /**
    * @brief Subclass utilized to spawn the Ray Visual Component, may be derived class or Unreal
@@ -137,7 +137,7 @@ class OCULUSINTERACTIONPREBUILTS_API UIsdkRayInteractionRigComponent : public UA
    * @brief Reference to the parent RigComponent
    */
   UPROPERTY()
-  TObjectPtr<UIsdkRigComponent> RigComponent;
+  UIsdkRigComponent* RigComponent;
 
  private:
   void CreateRayVisual(AActor* AttachParent);
@@ -145,10 +145,10 @@ class OCULUSINTERACTIONPREBUILTS_API UIsdkRayInteractionRigComponent : public UA
   void HandleIsEnabledConditionalChanged(bool bIsEnabled);
 
   UPROPERTY(BlueprintGetter = GetEnabledConditional, Category = InteractionSDK)
-  TObjectPtr<UIsdkConditionalGroupAll> EnabledConditionalGroup;
+  UIsdkConditionalGroupAll* EnabledConditionalGroup;
 
   UPROPERTY()
-  TObjectPtr<UIsdkConditionalComponentIsActive> IsActiveConditional;
+  UIsdkConditionalComponentIsActive* IsActiveConditional;
 
   UFUNCTION()
   void HandleRigPinchSelect(UIsdkRigComponent* IsdkRigComponent);

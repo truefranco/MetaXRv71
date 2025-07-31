@@ -317,11 +317,11 @@ void UIsdkInteractableWidgetComponent::SetRoundedMaterialProperties()
 
   DynamicMaterial->SetVectorParameterValue(
       FName("Dimensions"),
-      HasBegunPlay() ? FVector4(PreviousDrawSize.X, PreviousDrawSize.Y, 0.0, 0.0)
-                     : FVector4(DrawSize.X, DrawSize.Y, 0.0, 0.0));
+      HasBegunPlay() ? FLinearColor(FVector4(PreviousDrawSize.X, PreviousDrawSize.Y, 0.0, 0.0))
+                     : FLinearColor(FVector4(DrawSize.X, DrawSize.Y, 0.0, 0.0)));
 
   DynamicMaterial->SetVectorParameterValue(
-      FName("Radii"), EditingSize ? FVector4::Zero() : CornerRadius);
+	  FName("Radii"), EditingSize ? FLinearColor(FVector4(0.0f,0.0f,0.0f,0.0f)) : FLinearColor(CornerRadius));
   Widget->SetBackgroundColor(BackgroundColor);
   Widget->UpdateMaterialInstanceParameters();
   DynamicMaterial->SetVectorParameterValue(FName("BackColor"), BackgroundColor);

@@ -111,7 +111,7 @@ void UIsdkThrowable::TickComponent(
   {
     const auto Position = LastNPositions[i].Key;
     const auto Coefficient = (1.f - i) / static_cast<float>(LastNPositions.Num());
-    UE_VLOG_SPHERE(
+    UE_VLOG_LOCATION(
         GetOwner(),
         LogOculusInteraction,
         Log,
@@ -202,7 +202,7 @@ FVector UIsdkThrowable::GetVelocity() const
     {
       const auto Position = FilteredPositions[i].Key;
       const auto Coefficient = (1.f - i) / static_cast<float>(LastNPositions.Num());
-      UE_VLOG_SPHERE(
+      UE_VLOG_LOCATION(
           GetOwner(),
           LogOculusInteraction,
           Log,
@@ -260,10 +260,10 @@ FQuat UIsdkThrowable::GetAngularVelocity() const
     SumAngularVelocity += AngularVelocity;
   }
 
-  const FVector AverageAngularVelocity = SumAngularVelocity / (LastNRotations.Num() - 1);
-  FMath::Clamp(AverageAngularVelocity.X, -MaxAngularSpeed, MaxAngularSpeed);
-  FMath::Clamp(AverageAngularVelocity.Y, -MaxAngularSpeed, MaxAngularSpeed);
-  FMath::Clamp(AverageAngularVelocity.Z, -MaxAngularSpeed, MaxAngularSpeed);
+  FVector AverageAngularVelocity = SumAngularVelocity / (LastNRotations.Num() - 1);
+  AverageAngularVelocity.X = FMath::Clamp(AverageAngularVelocity.X, -MaxAngularSpeed, MaxAngularSpeed);
+  AverageAngularVelocity.Y = FMath::Clamp(AverageAngularVelocity.Y, -MaxAngularSpeed, MaxAngularSpeed);
+  AverageAngularVelocity.Z = FMath::Clamp(AverageAngularVelocity.Z, -MaxAngularSpeed, MaxAngularSpeed);
   const FQuat AverageAngularVelocityQuat =
       FQuat::MakeFromEuler(AverageAngularVelocity * Settings.AngularVelocityScale);
   return AverageAngularVelocityQuat;

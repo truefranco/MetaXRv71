@@ -19,7 +19,7 @@
  */
 
 #include "Interaction/IsdkRayInteractable.h"
-
+#include "Templates/PimplPtr.h"
 #include "isdk_api/isdk_api.hpp"
 #include "ApiImpl.h"
 #include "IsdkChecks.h"
@@ -41,16 +41,20 @@ namespace isdk
 extern TAutoConsoleVariable<bool> CVar_Meta_InteractionSDK_DebugInteractionVisuals;
 }
 
-namespace isdk::api::helper
-{
-class FRayInteractableImpl : public FApiImpl<RayInteractable, RayInteractablePtr>
-{
- public:
-  explicit FRayInteractableImpl(std::function<RayInteractablePtr()> CreateFn)
-      : FApiImpl(std::move(CreateFn))
-  {
-  }
-};
+namespace isdk {
+	namespace api {
+		namespace helper
+		{
+			class FRayInteractableImpl : public FApiImpl<RayInteractable, RayInteractablePtr>
+			{
+			public:
+				explicit FRayInteractableImpl(std::function<RayInteractablePtr()> CreateFn)
+					: FApiImpl(std::move(CreateFn))
+				{
+				}
+			};
+		}
+	}
 } // namespace isdk::api::helper
 
 UIsdkRayInteractable::UIsdkRayInteractable()
@@ -62,7 +66,7 @@ UIsdkRayInteractable::UIsdkRayInteractable()
   PrimaryComponentTick.bCanEverTick = false;
 #endif
 
-  RayInteractableImpl = MakePimpl<isdk::api::helper::FRayInteractableImpl, EPimplPtrMode::NoCopy>(
+  RayInteractableImpl = MakePimpl<isdk::api::helper::FRayInteractableImpl>(
       [this]() -> RayInteractablePtr
       {
         // Surface Patch - to perform internal collision detection
@@ -242,7 +246,7 @@ void UIsdkRayInteractable::HandlePointerEvent(const FIsdkInteractionPointerEvent
   const auto DebugRadius = GetDefault<UIsdkRuntimeSettings>()->PointerEventDebugRadius;
   const auto DebugDuration = GetDefault<UIsdkRuntimeSettings>()->PointerEventDebugDuration;
   DrawDebugSphere(GetWorld(), DebugLocation, DebugRadius, 12, DebugColor, false, DebugDuration);
-  UE_VLOG_SPHERE(
+  UE_VLOG_LOCATION(
       GetOwner(), LogOculusInteraction, Log, DebugLocation, DebugRadius, DebugColor, TEXT_EMPTY);
   UE_VLOG(
       GetOwner(),

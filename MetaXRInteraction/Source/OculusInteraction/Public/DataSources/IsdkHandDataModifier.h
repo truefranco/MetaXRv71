@@ -27,9 +27,11 @@
 #include "IsdkHandDataModifier.generated.h"
 
 // Forward declarations of internal types
-namespace isdk::api
-{
-class IHandDataModifier;
+namespace isdk {
+	namespace api
+	{
+		class IHandDataModifier;
+	}
 }
 typedef struct isdk_IHandDataSource_ isdk_IHandDataSource;
 

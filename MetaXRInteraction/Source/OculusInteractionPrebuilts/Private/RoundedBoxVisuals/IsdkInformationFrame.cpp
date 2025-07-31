@@ -55,7 +55,7 @@ void AIsdkInformationFrame::Initialize()
   Properties.FillColor.A = 0.0;
   Properties.InnerBorderRadius = OutlineWidth;
   Properties.CornerRadius =
-      FVector4d(OutlineCornerRadius, OutlineCornerRadius, OutlineCornerRadius, OutlineCornerRadius);
+      FVector4(OutlineCornerRadius, OutlineCornerRadius, OutlineCornerRadius, OutlineCornerRadius);
   Properties.Size = OutlineSize;
   UMaterialInstanceDynamic* FloorOutlineMaterial;
   UIsdkRoundedBoxFunctionLibrary::SetupRoundedBox(
@@ -86,7 +86,7 @@ void AIsdkInformationFrame::Initialize()
   BackgroundProperties.FillColor = BackgroundColor;
   BackgroundProperties.OutlineColor = BackgroundColor;
   BackgroundProperties.OutlineColor.A = 0.0;
-  BackgroundProperties.CornerRadius = FVector4d(
+  BackgroundProperties.CornerRadius = FVector4(
       BackgroundCornerRadius,
       BackgroundCornerRadius,
       BackgroundCornerRadius,

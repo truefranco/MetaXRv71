@@ -104,8 +104,8 @@ void UIsdkRoundedBoxFunctionLibrary::SetRoundedBoxMaterialParameters(
   auto Dimensions = FVector4(
       Properties.Size,
       FVector2D(
-          FMath::Max(Properties.InnerBorderRadius, 0.0),
-          FMath::Max(Properties.OuterBorderRadius, 0.0)));
+          FMath::Max(Properties.InnerBorderRadius, 0.0f),
+          FMath::Max(Properties.OuterBorderRadius, 0.0f)));
   SetRoundedBoxDimensions(
       RoundedBoxMaterial,
       Properties.Size,

@@ -235,7 +235,7 @@ class OCULUSINTERACTION_API UIsdkGrabTransformerComponent : public UActorCompone
   FIsdkTargetTransform TargetInitialTransform;
 
   UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = InteractionSDK)
-  TObjectPtr<UIsdkGrabMotion> DistanceGrabMotion;
+  UIsdkGrabMotion* DistanceGrabMotion;
 
   /**
    * If specified, TransformTargetName is used to search all the components on this actor.
@@ -273,7 +273,7 @@ class OCULUSINTERACTION_API UIsdkGrabTransformerComponent : public UActorCompone
    * The transformer responsible for handling single-grabber behavior
    */
   UPROPERTY(EditAnywhere, Category = InteractionSDK)
-  TObjectPtr<UIsdkTransformer> SingleGrabTransformerObject;
+  UIsdkTransformer* SingleGrabTransformerObject;
 
   /**
    * The transformer responsible for handling multiple-grabber behavior
@@ -284,7 +284,7 @@ class OCULUSINTERACTION_API UIsdkGrabTransformerComponent : public UActorCompone
       meta =
           (EditCondition = "MultiGrabBehavior == EIsdkMultiGrabBehavior::MultiGrab",
            EditConditionHides))
-  TObjectPtr<UIsdkTransformer> MultiGrabTransformerObject;
+  UIsdkTransformer* MultiGrabTransformerObject;
 
  private:
   /**
@@ -327,7 +327,7 @@ class OCULUSINTERACTION_API UIsdkGrabTransformerComponent : public UActorCompone
       BlueprintGetter = GetTransformTarget,
       meta = (ExposeOnSpawn = true),
       Category = "InteractionSDK")
-  TObjectPtr<USceneComponent> TransformTarget;
+  USceneComponent* TransformTarget;
 
   /**
    * A collection of information about current grabs
@@ -347,7 +347,7 @@ class OCULUSINTERACTION_API UIsdkGrabTransformerComponent : public UActorCompone
   FIsdkThrowableSettings ThrowSettings;
 
   UPROPERTY()
-  TObjectPtr<UIsdkThrowable> ThrowableComponent;
+  UIsdkThrowable* ThrowableComponent;
 
   bool bWasSimulatingPhysics = false;
   bool bHadGravity = false;

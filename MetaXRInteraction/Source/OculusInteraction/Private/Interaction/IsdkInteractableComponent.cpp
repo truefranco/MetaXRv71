@@ -134,12 +134,12 @@ void UIsdkInteractableComponent::GetInteractableStateRelationships(
     isdk_IInteractor_castToIInteractorView(ApiInteractor, &ApiInteractorView);
     isdk_IInteractorView_getPayload(ApiInteractorView, &ApiPayload);
 
-    const TObjectPtr<UIsdkInteractorComponent> Interactor =
+    const UIsdkInteractorComponent* Interactor =
         UIsdkWorldSubsystem::Get(GetWorld()).LookupInteractorFromPayload(ApiPayload);
 
     if (Interactor->GetInteractorState() == RequiredState)
     {
-      OutInteractors.Add(Interactor);
+      OutInteractors.Add(const_cast<UIsdkInteractorComponent*>(Interactor));
     }
   }
 }

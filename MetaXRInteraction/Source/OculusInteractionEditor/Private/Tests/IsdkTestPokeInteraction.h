@@ -121,33 +121,33 @@ class OCULUSINTERACTIONEDITOR_API AIsdkTestPokeInteractableActor : public AActor
     return *Instance;
   }
 
-  void SetTwoClippers(FVector3f Center, float Size, float Offset)
+  void SetTwoClippers(FVector Center, float Size, float Offset)
   {
     TArray<FIsdkBoundsClipper> Clippers = TArray<FIsdkBoundsClipper>();
 
     auto ClipperA = FIsdkBoundsClipper();
     ClipperA.PoseProvider = TestPointablePlane;
-    ClipperA.Position = Center + FVector3f(0.0, Offset, 0.0);
-    ClipperA.Size = FVector3f(0.1, Size, Size);
+    ClipperA.Position = Center + FVector(0.0f, Offset, 0.0f);
+    ClipperA.Size = FVector(0.1, Size, Size);
     Clippers.Add(ClipperA);
 
     auto ClipperB = FIsdkBoundsClipper();
     ClipperB.PoseProvider = TestPointablePlane;
-    ClipperB.Position = Center + FVector3f(0.0, -Offset, 0.0);
-    ClipperB.Size = FVector3f(0.1, Size, Size);
+    ClipperB.Position = Center + FVector(0.0, -Offset, 0.0);
+    ClipperB.Size = FVector(0.1, Size, Size);
     Clippers.Add(ClipperB);
 
     TestClippedPlaneSurface->SetBoundsClippers(Clippers);
   }
 
-  void SetSingleClipper(FVector3f Center, float Size)
+  void SetSingleClipper(FVector Center, float Size)
   {
     TArray<FIsdkBoundsClipper> Clippers = TArray<FIsdkBoundsClipper>();
 
     auto ClipperA = FIsdkBoundsClipper();
     ClipperA.PoseProvider = TestPointablePlane;
     ClipperA.Position = Center;
-    ClipperA.Size = FVector3f(0.1, Size, Size);
+    ClipperA.Size = FVector(0.1, Size, Size);
     Clippers.Add(ClipperA);
 
     TestClippedPlaneSurface->SetBoundsClippers(Clippers);

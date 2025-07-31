@@ -74,7 +74,7 @@ struct OCULUSINTERACTION_API FIsdkPosef
   FQuat Orientation = FQuat::Identity;
 
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = InteractionSDK)
-  FVector3f Position = FVector3f::ZeroVector;
+  FVector Position = FVector::ZeroVector;
 
   FTransform ToTransform() const
   {
@@ -84,7 +84,7 @@ struct OCULUSINTERACTION_API FIsdkPosef
   void FromTransform(FTransform transform)
   {
     Orientation = transform.GetRotation();
-    Position = (FVector3f)transform.GetLocation();
+    Position = (FVector)transform.GetLocation();
   }
 };
 
@@ -244,7 +244,7 @@ struct FIsdkHandGrabPoseProperties
  * @brief EIsdkGrabDetectorType represents a method of detection for grabs.
  */
 UENUM(meta = (Bitflags, UseEnumValuesAsMaskValuesInEditor = "true"))
-enum class EIsdkGrabDetectorType : uint32
+enum class EIsdkGrabDetectorType : uint8
 {
   None = 0 UMETA(Hidden),
   HandGrab = 1 << 0,

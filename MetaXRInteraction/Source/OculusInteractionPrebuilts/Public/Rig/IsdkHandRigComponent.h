@@ -66,7 +66,7 @@ class OCULUSINTERACTIONPREBUILTS_API UIsdkHandRigComponent : public UIsdkRigComp
  protected:
   // Properties for access of attached components.
   UPROPERTY(BlueprintGetter = GetHandVisuals, EditAnywhere, Category = InteractionSDK)
-  TObjectPtr<UIsdkHandVisualsRigComponent> HandVisualsComponent;
+  UIsdkHandVisualsRigComponent* HandVisualsComponent;
 
   virtual FName GetThumbTipSocketName() const override;
 
@@ -75,14 +75,14 @@ class OCULUSINTERACTIONPREBUILTS_API UIsdkHandRigComponent : public UIsdkRigComp
    * pinch grab behavior in the grabber.
    */
   UPROPERTY(BlueprintReadOnly, Category = InteractionSDK)
-  TObjectPtr<UIsdkHandFingerPinchGrabRecognizer> PinchGrabRecognizer;
+  UIsdkHandFingerPinchGrabRecognizer* PinchGrabRecognizer;
 
   /*
    * PalmGrabRecognizer recognizes palm grab motions in the user's hands, which we use to drive
    * palm grab behavior in the grabber.
    */
   UPROPERTY(BlueprintReadOnly, Category = InteractionSDK)
-  TObjectPtr<UIsdkHandPalmGrabRecognizer> PalmGrabRecognizer;
+  UIsdkHandPalmGrabRecognizer* PalmGrabRecognizer;
 
   FEnhancedInputActionValueBinding* PinchStrength = nullptr;
 

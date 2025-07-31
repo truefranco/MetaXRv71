@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  * All rights reserved.
  *
@@ -19,22 +19,40 @@
  */
 
 #include "Subsystem/IsdkWorldSubsystem.h"
+#include "Templates/PimplPtr.h"
 #include "Interaction/IsdkInteractorComponent.h"
 #include "IsdkChecks.h"
 #include "IsdkEventQueueImpl.h"
 #include "StructTypesPrivate.h"
 
-namespace isdk::api
-{
-class FIsdkScaledTimeProviderImpl : public FApiImpl<ScaledTimeProvider, ScaledTimeProviderPtr>
-{
- public:
-  explicit FIsdkScaledTimeProviderImpl(std::function<ScaledTimeProviderPtr()> CreateFn)
-      : FApiImpl(MoveTemp(CreateFn))
-  {
-  }
-};
+namespace isdk {
+	namespace api
+	{
+		class FIsdkScaledTimeProviderImpl : public FApiImpl<ScaledTimeProvider, ScaledTimeProviderPtr>
+		{
+		public:
+			explicit FIsdkScaledTimeProviderImpl(std::function<ScaledTimeProviderPtr()> CreateFn)
+				: FApiImpl(MoveTemp(CreateFn))
+			{
+			}
+		};
+	}
 } // namespace isdk::api
+
+struct FInteractorPayloadLookupFunctor
+{
+	TWeakObjectPtr<UIsdkWorldSubsystem> WkThis;
+
+	FInteractorPayloadLookupFunctor(UIsdkWorldSubsystem* InSubsystem)
+		: WkThis(InSubsystem)
+	{
+	}
+
+	UIsdkInteractorComponent* operator()(const isdk_IPayload* InPayload) const
+	{
+		return UIsdkWorldSubsystem::LookupInteractorFromPayload(WkThis, InPayload);
+	}
+};
 
 UIsdkWorldSubsystem::UIsdkWorldSubsystem()
 {
@@ -115,18 +133,19 @@ TStatId UIsdkWorldSubsystem::GetStatId() const
 }
 
 UIsdkWorldSubsystem::EventHandlerToken UIsdkWorldSubsystem::RegisterPointerEventHandler(
-    ApiPointerEventTargetFn&& InApiPointerEventTargetFn,
-    const FIsdkInteractionPointerEventDelegate& PointerEventDelegate,
-    UIsdkInteractableComponent* SrcInteractable)
+	ApiPointerEventTargetFn&& InApiPointerEventTargetFn,
+	const FIsdkInteractionPointerEventDelegate& PointerEventDelegate,
+	UIsdkInteractableComponent* SrcInteractable)
 {
-  auto Lookup = [WkThis = TWeakObjectPtr<UIsdkWorldSubsystem>(this)](const isdk_IPayload* InPayload)
-  { return LookupInteractorFromPayload(WkThis, InPayload); };
-  auto EventQueue = MakePimpl<isdk::api::helper::FPointerEventQueueImpl>(
-      MoveTemp(InApiPointerEventTargetFn),
-      &isdk::api::IPointable::getIPointableHandle,
-      isdk::api::helper::CreatePointerEventConverter(SrcInteractable, MoveTemp(Lookup)),
-      PointerEventDelegate);
-  return PointerEventSubscriptions.RegisterEventHandler(MoveTemp(EventQueue));
+	FInteractorPayloadLookupFunctor LookupFunctor(this);
+
+	auto EventQueue = MakePimpl<isdk::api::helper::FPointerEventQueueImpl>(
+		MoveTemp(InApiPointerEventTargetFn),
+		&isdk::api::IPointable::getIPointableHandle,
+		isdk::api::helper::CreatePointerEventConverter(SrcInteractable, MoveTemp(LookupFunctor)),
+		PointerEventDelegate);
+
+	return PointerEventSubscriptions.RegisterEventHandler(MoveTemp(EventQueue));
 }
 
 void UIsdkWorldSubsystem::UnregisterPointerEventHandler(EventHandlerToken Token)

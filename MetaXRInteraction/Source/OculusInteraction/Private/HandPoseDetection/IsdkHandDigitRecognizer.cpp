@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  * All rights reserved.
  *
@@ -67,7 +67,7 @@ float UIsdkHandDigitRecognizer::GetNormalizedRawValue()
 float UIsdkHandDigitRecognizer::GetRawValue()
 {
   const float NormalizedRawValue = GetNormalizedRawValue();
-  const FVector2f RawExpectedRange = GetRawExpectedRange();
+  const FVector2D RawExpectedRange = GetRawExpectedRange();
   return FMath::Lerp(RawExpectedRange.X, RawExpectedRange.Y, NormalizedRawValue);
 }
 

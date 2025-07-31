@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  * All rights reserved.
  *
@@ -222,7 +222,7 @@ class OCULUSINTERACTIONEDITOR_API AIsdkTestRayInteractableActor : public AActor
     return bIsValid;
   }
 
-  static inline const FVector2d PlaneSize{100, 100};
+  static inline const FVector2D PlaneSize{100, 100};
   static inline const FVector BoxSize{100, 100, 100};
 
   UPROPERTY()

@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  * All rights reserved.
  *
@@ -19,7 +19,7 @@
  */
 
 #include "Interaction/Surfaces/IsdkPointablePlane.h"
-
+#include "Templates/PimplPtr.h"
 #include "StructTypesPrivate.h"
 #include "isdk_api/isdk_api.hpp"
 #include "ApiImpl.h"
@@ -29,16 +29,20 @@ using isdk::api::IPose;
 using isdk::api::PointablePlane;
 using isdk::api::PointablePlanePtr;
 
-namespace isdk::api::helper
-{
-class FPointablePlaneImpl : public FApiImpl<PointablePlane, PointablePlanePtr>
-{
- public:
-  explicit FPointablePlaneImpl(std::function<PointablePlanePtr()> CreateFn)
-      : FApiImpl(std::move(CreateFn))
-  {
-  }
-};
+namespace isdk {
+	namespace api {
+		namespace helper
+		{
+			class FPointablePlaneImpl : public FApiImpl<PointablePlane, PointablePlanePtr>
+			{
+			public:
+				explicit FPointablePlaneImpl(std::function<PointablePlanePtr()> CreateFn)
+					: FApiImpl(std::move(CreateFn))
+				{
+				}
+			};
+		}
+	}
 } // namespace isdk::api::helper
 
 UIsdkPointablePlane::UIsdkPointablePlane()
@@ -48,14 +52,14 @@ UIsdkPointablePlane::UIsdkPointablePlane()
   bWantsOnUpdateTransform = true;
   Size = FVector2D(1.0, 1.0);
 
-  PointablePlaneImpl = MakePimpl<isdk::api::helper::FPointablePlaneImpl, EPimplPtrMode::NoCopy>(
+  PointablePlaneImpl = MakePimpl<isdk::api::helper::FPointablePlaneImpl>(
       [this]() -> PointablePlanePtr
       {
         ovrpPosef PlaneOriginPose;
         StructTypesUtils::Copy(GetComponentTransform(), PlaneOriginPose);
 
         // Create backing surface
-        const ovrpVector2f ApiSize = StructTypesUtils::Convert(Size);
+        const ovrpVector2f ApiSize = StructTypesUtils::Convert((FVector2f)Size);
         UIsdkChecks::WarnIfApiSizeInvalid(Size, this, TEXT("Size"));
 
         auto Instance = PointablePlane::createWithPose(&PlaneOriginPose, &ApiSize);
@@ -124,7 +128,7 @@ void UIsdkPointablePlane::SetSize(FVector2D InSize)
   Size = InSize;
   if (PointablePlaneImpl->IsInstanceValid())
   {
-    const ovrpVector2f ApiSize = StructTypesUtils::Convert(Size);
+    const ovrpVector2f ApiSize = StructTypesUtils::Convert((FVector2f)Size);
     UIsdkChecks::WarnIfApiSizeInvalid(Size, this, TEXT("Size"));
 
     PointablePlaneImpl->GetOrCreateInstance()->setSize(&ApiSize);

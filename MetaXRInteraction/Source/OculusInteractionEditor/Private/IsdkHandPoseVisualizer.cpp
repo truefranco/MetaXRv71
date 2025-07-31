@@ -91,7 +91,7 @@ void FIsdkHandPoseVisualizer::DrawBoneChain(
   {
     return;
   }
-  AActor* SelectedParentActor = HandGrabPose->GetAttachParentActor();
+  AActor* SelectedParentActor = HandGrabPose->GetOwner();
   if (!IsValid(SelectedParentActor))
   {
     return;
@@ -156,7 +156,7 @@ bool FIsdkHandPoseVisualizer::VisProxyHandleClick(
           Cast<const UIsdkHandGrabPose>(VisProxy->Component);
       UIsdkHandGrabPose* SelectedHandGrabPose = (UIsdkHandGrabPose*)ThisHandGrabPose;
       GrabPosePropertyPath = FComponentPropertyPath(SelectedHandGrabPose);
-      AActor* SelectedParentActor = SelectedHandGrabPose->GetAttachParentActor();
+      AActor* SelectedParentActor = SelectedHandGrabPose->GetOwner();
       if (IsValid(SelectedHandGrabPose) && SelectedHandGrabPose->IsDebugVisualActive())
       {
         SelectedHandGrabPose->GetDebugVisual()->SetPauseSkeletonUpdates(true);
@@ -195,7 +195,7 @@ bool FIsdkHandPoseVisualizer::HandleInputDelta(
 {
   if (IsSelectingBone())
   {
-    if (ViewportClient->GetWidgetMode() == UE::Widget::WM_Rotate)
+    if (ViewportClient->GetWidgetMode() == FWidget::WM_Rotate)
     {
       UIsdkHandGrabPose* SelectedHandGrabPose = GetHandGrabPoseComponent();
       AccumulatedWidgetRotation.SetRotation(
@@ -233,7 +233,7 @@ bool FIsdkHandPoseVisualizer::GetWidgetLocation(
   {
     OutLocation = CachedSelectedBoneTransform.GetLocation();
 
-    if (ViewportClient->GetWidgetMode() != UE::Widget::WM_Rotate)
+    if (ViewportClient->GetWidgetMode() != FWidget::WM_Rotate)
     {
       OutLocation += FVector(1000.0, 1000.0, 1000.0);
     }

@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  * All rights reserved.
  *
@@ -653,7 +653,7 @@ class UIsdkFakeTrackedDataSourceRigComponent : public UIsdkTrackedDataSourceRigC
   }
 
   UPROPERTY()
-  TObjectPtr<USkeletalMeshComponent> FakeMeshComponent;
+  USkeletalMeshComponent* FakeMeshComponent;
 };
 
 /// Test implementation of abstract UIsdkRigComponent, so that we can test base class functionality.

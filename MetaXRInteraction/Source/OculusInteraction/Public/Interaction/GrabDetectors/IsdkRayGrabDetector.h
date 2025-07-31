@@ -22,7 +22,7 @@
 
 #include "CoreMinimal.h"
 #include "IsdkGrabDetector.h"
-#include "Engine/HitResult.h"
+#include "Engine/EngineTypes.h"
 #include "IsdkRayGrabDetector.generated.h"
 
 struct FHitResult;
@@ -64,7 +64,7 @@ class OCULUSINTERACTION_API UIsdkRayGrabDetector : public UIsdkGrabDetector
   float RayLength = 1000.f;
 
   UPROPERTY(BlueprintReadOnly, Category = InteractionSDK)
-  TObjectPtr<UIsdkGrabbableComponent> HoveredGrabbable;
+  UIsdkGrabbableComponent* HoveredGrabbable;
 
   // The object types ray grab uses to detect grabbables.  If empty, will detect all object types.
   UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = InteractionSDK)

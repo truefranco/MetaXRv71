@@ -27,14 +27,16 @@
 #include "IsdkPokeInteractor.generated.h"
 
 // Forward declarations of internal types
-namespace isdk::api
-{
-class PokeInteractor;
+namespace isdk {
+	namespace api
+	{
+		class PokeInteractor;
 
-namespace helper
-{
-class FPokeInteractorImpl;
-}
+		namespace helper
+		{
+			class FPokeInteractorImpl;
+		}
+	}
 } // namespace isdk::api
 
 /**

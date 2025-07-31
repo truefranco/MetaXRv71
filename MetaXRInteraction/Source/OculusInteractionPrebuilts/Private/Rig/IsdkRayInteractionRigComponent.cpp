@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  * All rights reserved.
  *
@@ -99,7 +99,7 @@ void UIsdkRayInteractionRigComponent::BindDataSources(
     HmdDataSource = HmdDataSourceIn;
   }
 
-  CreateRayVisual(AttachToComponent->GetAttachParentActor());
+  CreateRayVisual(AttachToComponent->GetOwner());
   if (IsValid(HmdDataSource.GetObject()) && IsValid(RayVisual))
   {
     RayVisual->HmdDataSource = HmdDataSource;

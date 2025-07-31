@@ -19,41 +19,47 @@
  */
 
 #include "IsdkBlankComponent.h"
-
+#include "Templates/PimplPtr.h"
 #include "isdk_api/isdk_api.hpp"
 #include "ApiImpl.h"
 #include "IsdkChecks.h"
 
 // BEGIN Ignore this section - it's here only so this example compiles
-namespace isdk::api
-{
-typedef struct isdk_BlankComponent_ isdk_BlankComponent;
+namespace isdk {
+	namespace api
+	{
+		typedef struct isdk_BlankComponent_ isdk_BlankComponent;
 
-class BlankComponent
-{
- public:
-  explicit BlankComponent(isdk_BlankComponent* handle = nullptr) {}
-  static void destroy(isdk_BlankComponent*) {}
-  void setSurfacePatch(isdk_ISurfacePatch* surfacePatch) {}
-  void setVectorOfSomething(const ovrpVector3f* vectorOfSomething) {}
-};
+		class BlankComponent
+		{
+		public:
+			explicit BlankComponent(isdk_BlankComponent* handle = nullptr) {}
+			static void destroy(isdk_BlankComponent*) {}
+			void setSurfacePatch(isdk_ISurfacePatch* surfacePatch) {}
+			void setVectorOfSomething(const ovrpVector3f* vectorOfSomething) {}
+		};
 
-using BlankComponentPtr = ObjectPtr<BlankComponent, isdk_BlankComponent>;
+		using BlankComponentPtr = ObjectPtr<BlankComponent, isdk_BlankComponent>;
+	}
 } // namespace isdk::api
 
 // END Ignore this section
 
-namespace isdk::api::helper
-{
-class FIsdkBlankComponentImpl
-    : public FApiImpl<isdk::api::BlankComponent, isdk::api::BlankComponentPtr>
-{
- public:
-  explicit FIsdkBlankComponentImpl(std::function<isdk::api::BlankComponentPtr()> CreateFn)
-      : FApiImpl(std::move(CreateFn))
-  {
-  }
-};
+namespace isdk {
+	namespace api {
+		namespace helper
+		{
+			class FIsdkBlankComponentImpl
+				: public FApiImpl<isdk::api::BlankComponent, isdk::api::BlankComponentPtr>
+			{
+			public:
+				explicit FIsdkBlankComponentImpl(std::function<isdk::api::BlankComponentPtr()> CreateFn)
+					: FApiImpl(std::move(CreateFn))
+				{
+				}
+			};
+		}
+	}
 } // namespace isdk::api::helper
 
 UIsdkBlankComponent::UIsdkBlankComponent()
@@ -65,7 +71,7 @@ UIsdkBlankComponent::UIsdkBlankComponent()
   // Create an instance of our opaque Impl class - IsdkBlankComponentImpl.
   // The `new` operator directly here MUST be matched by a `delete` in BeginDestroy().
   IsdkBlankComponentImpl =
-      MakePimpl<isdk::api::helper::FIsdkBlankComponentImpl, EPimplPtrMode::NoCopy>(
+      MakePimpl<isdk::api::helper::FIsdkBlankComponentImpl>(
           [this]() -> isdk::api::BlankComponentPtr
           {
             // Check that all dependencies are valid. This will lazy-create their own native

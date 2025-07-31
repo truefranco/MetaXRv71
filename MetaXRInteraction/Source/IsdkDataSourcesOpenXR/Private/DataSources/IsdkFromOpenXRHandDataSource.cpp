@@ -21,6 +21,7 @@
 #include "DataSources/IsdkFromOpenXRHandDataSource.h"
 #include "DrawDebugHelpers.h"
 #include "IHandTracker.h"
+#include "XRMotionControllerBase.h"
 #include "IsdkFunctionLibrary.h"
 #include "HeadMountedDisplayFunctionLibrary.h"
 #include "IsdkDataSourcesOpenXRLog.h"
@@ -83,9 +84,9 @@ UIsdkFromOpenXRHandDataSource* UIsdkFromOpenXRHandDataSource::MakeOpenXRHandData
   DataSourceComponent->RegisterComponent();
 
   const bool bLeftHandMismatch = InHandedness == EIsdkHandedness::Left &&
-      SourceMotionController->GetTrackingMotionSource() != IMotionController::LeftHandSourceId;
+      SourceMotionController->MotionSource != FXRMotionControllerBase::LeftHandSourceId;
   const bool bRightHandMismatch = InHandedness == EIsdkHandedness::Right &&
-      SourceMotionController->GetTrackingMotionSource() != IMotionController::RightHandSourceId;
+      SourceMotionController->MotionSource != FXRMotionControllerBase::RightHandSourceId;
   if (bLeftHandMismatch || bRightHandMismatch)
   {
     UE_LOG(
@@ -94,7 +95,7 @@ UIsdkFromOpenXRHandDataSource* UIsdkFromOpenXRHandDataSource::MakeOpenXRHandData
         TEXT(
             "UIsdkFromOpenXRHandDataSource created with mismatching Handedness \"%s\" and MotionController MotionSource \"%s\""),
         *StaticEnum<EIsdkHandedness>()->GetValueAsString(EIsdkHandedness::Left),
-        *SourceMotionController->GetTrackingMotionSource().ToString())
+        *SourceMotionController->MotionSource.ToString())
   }
 
   return DataSourceComponent;
@@ -153,7 +154,7 @@ void UIsdkFromOpenXRHandDataSource::TickComponent(
     DesiredSourceName = Handedness == EIsdkHandedness::Left ? IsdkXRUtils::LeftSourceName
                                                             : IsdkXRUtils::RightSourceName;
     // Update the motion controller's tracking source if necessary
-    if (MotionController->GetTrackingMotionSource() != DesiredSourceName)
+    if (MotionController->MotionSource != DesiredSourceName)
     {
       MotionController->SetTrackingMotionSource(DesiredSourceName);
     }
@@ -163,7 +164,7 @@ void UIsdkFromOpenXRHandDataSource::TickComponent(
   {
     DesiredSourceName = Handedness == EIsdkHandedness::Left ? IsdkXRUtils::LeftAimSourceName
                                                             : IsdkXRUtils::RightAimSourceName;
-    if (MotionController->GetTrackingMotionSource() != DesiredSourceName)
+    if (MotionController->MotionSource != DesiredSourceName)
     {
       MotionController->SetTrackingMotionSource(DesiredSourceName);
     }

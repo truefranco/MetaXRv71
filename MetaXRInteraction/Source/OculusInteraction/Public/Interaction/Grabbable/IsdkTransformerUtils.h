@@ -34,13 +34,13 @@ struct FIsdkAxisConstraints
   {
   }
 
-  UPROPERTY(BlueprintReadWrite, meta = (Input))
+  UPROPERTY(BlueprintReadWrite, meta = (Input), Category = "InteractionSDK")
   bool bUseConstraint = false;
 
-  UPROPERTY(BlueprintReadWrite, meta = (Input))
+  UPROPERTY(BlueprintReadWrite, meta = (Input), Category = "InteractionSDK")
   float Min = 0;
 
-  UPROPERTY(BlueprintReadWrite, meta = (Input))
+  UPROPERTY(BlueprintReadWrite, meta = (Input), Category = "InteractionSDK")
   float Max = 0;
 };
 
@@ -51,13 +51,13 @@ struct FIsdkConstraintAxes
 
   FIsdkConstraintAxes() = default;
 
-  UPROPERTY(BlueprintReadWrite, meta = (Input))
+  UPROPERTY(BlueprintReadWrite, meta = (Input), Category = "InteractionSDK")
   FIsdkAxisConstraints XAxis;
 
-  UPROPERTY(BlueprintReadWrite, meta = (Input))
+  UPROPERTY(BlueprintReadWrite, meta = (Input), Category = "InteractionSDK")
   FIsdkAxisConstraints YAxis;
 
-  UPROPERTY(BlueprintReadWrite, meta = (Input))
+  UPROPERTY(BlueprintReadWrite, meta = (Input), Category = "InteractionSDK")
   FIsdkAxisConstraints ZAxis;
 
   bool HasConstraints() const
@@ -293,7 +293,7 @@ struct FIsdkTransformerUtils
     {
       const auto TwistAngleRad = UnconstrainedRotation.GetTwistAngle(Axis);
       const auto TwistAngleDeg = -1.0 * FMath::RadiansToDegrees(TwistAngleRad);
-      const auto ConstrainedAngleDeg = FMath::Clamp(TwistAngleDeg, Constraint.Min, Constraint.Max);
+      const auto ConstrainedAngleDeg = FMath::Clamp((float)TwistAngleDeg, Constraint.Min, Constraint.Max);
       return FQuat(Axis, -1.0 * FMath::DegreesToRadians(ConstrainedAngleDeg));
     }
     else

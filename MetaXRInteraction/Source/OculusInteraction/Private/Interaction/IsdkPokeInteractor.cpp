@@ -21,7 +21,7 @@
 #include "Interaction/IsdkPokeInteractor.h"
 
 #include <Subsystem/IsdkWorldSubsystem.h>
-
+#include "Templates/PimplPtr.h"
 #include "StructTypesPrivate.h"
 #include "isdk_api/isdk_api.hpp"
 #include "ApiImpl.h"
@@ -40,22 +40,26 @@ namespace isdk
 extern TAutoConsoleVariable<bool> CVar_Meta_InteractionSDK_DebugInteractionVisuals;
 }
 
-namespace isdk::api::helper
-{
-class FPokeInteractorImpl : public FApiImpl<PokeInteractor, PokeInteractorPtr>
-{
- public:
-  explicit FPokeInteractorImpl(std::function<PokeInteractorPtr()> CreateFn)
-      : FApiImpl(std::move(CreateFn))
-  {
-  }
-};
+namespace isdk {
+	namespace api {
+		namespace helper
+		{
+			class FPokeInteractorImpl : public FApiImpl<PokeInteractor, PokeInteractorPtr>
+			{
+			public:
+				explicit FPokeInteractorImpl(std::function<PokeInteractorPtr()> CreateFn)
+					: FApiImpl(std::move(CreateFn))
+				{
+				}
+			};
+		}
+	}
 } // namespace isdk::api::helper
 
 UIsdkPokeInteractor::UIsdkPokeInteractor()
 {
   PrimaryComponentTick.bCanEverTick = true;
-  PokeInteractorImpl = MakePimpl<isdk::api::helper::FPokeInteractorImpl, EPimplPtrMode::NoCopy>(
+  PokeInteractorImpl = MakePimpl<isdk::api::helper::FPokeInteractorImpl>(
       [this]() -> PokeInteractorPtr
       {
         // Get Payload
@@ -219,7 +223,7 @@ void UIsdkPokeInteractor::DrawDebugVisuals() const
   FColor DebugColor = UIsdkDebugUtils::GetInteractorStateDebugColor(InteractorState);
 
   DrawDebugSphere(GetWorld(), GetComponentLocation(), Config.Radius, 12, DebugColor);
-  UE_VLOG_WIRESPHERE(
+  UE_VLOG_LOCATION(
       GetOwner(),
       LogOculusInteraction,
       Verbose,

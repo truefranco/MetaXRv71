@@ -195,14 +195,14 @@ void UIsdkRoundedButtonComponent::SetCornerRadius(float Radius)
 {
   CornerRadius = Radius;
   UIsdkRoundedBoxFunctionLibrary::SetRoundedBoxMaterialCornerRadius(
-      Cast<UMaterialInstanceDynamic>(ButtonMesh->GetMaterial(0)), FVector4::One() * CornerRadius);
+	  Cast<UMaterialInstanceDynamic>(ButtonMesh->GetMaterial(0)), FVector4(1.0f,1.0f,1.0f,1.0f) * CornerRadius);
 
   if (!CreateBackplane)
     return;
 
   UIsdkRoundedBoxFunctionLibrary::SetRoundedBoxMaterialCornerRadius(
       Cast<UMaterialInstanceDynamic>(BackplaneMesh->GetMaterial(0)),
-      FVector4::One() * CornerRadius);
+      FVector4(1.0f, 1.0f, 1.0f, 1.0f) * CornerRadius);
 }
 
 void UIsdkRoundedButtonComponent::SetBackplaneFillColor(FLinearColor Color)
@@ -321,7 +321,7 @@ void UIsdkRoundedButtonComponent::UpdateProperties()
 
   auto ButtonVisualProps = FIsdkRoundedBoxProperties();
   ButtonVisualProps.Size = ButtonSize;
-  ButtonVisualProps.CornerRadius = FVector4::One() * CornerRadius;
+  ButtonVisualProps.CornerRadius = FVector4(1.0f, 1.0f, 1.0f, 1.0f) * CornerRadius;
   ButtonVisualProps.FillColor = InteractableColorVisual->GetNormalColorState().Color;
   ButtonVisualProps.OutlineColor = InteractableColorVisual->GetNormalColorState().Color;
   ButtonVisualProps.OutlineColor.A = 0.0;

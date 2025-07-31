@@ -21,7 +21,7 @@
 #pragma once
 
 #include "GameFramework/Actor.h"
-
+#include "Templates/PimplPtr.h"
 #include "CoreMinimal.h"
 #include "IsdkHandData.h"
 #include "IsdkIHandJoints.h"
@@ -29,14 +29,16 @@
 #include "IsdkHandDataSource.generated.h"
 
 // Forward declarations of internal types
-namespace isdk::api
-{
-class IHandDataSource;
+namespace isdk {
+	namespace api
+	{
+		class IHandDataSource;
 
-namespace helper
-{
-class FDataSourceImpl;
-}
+		namespace helper
+		{
+			class FDataSourceImpl;
+		}
+	}
 } // namespace isdk::api
 
 /**

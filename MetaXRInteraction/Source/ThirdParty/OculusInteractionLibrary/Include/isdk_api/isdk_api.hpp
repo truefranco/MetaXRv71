@@ -7,7 +7,7 @@
 #include <memory>
 #include "isdk_api.h"
 
-namespace isdk::api {
+namespace isdk { namespace api {
 template <class TDerived, class TBase>
 TBase* tryInitWithCast(TDerived* handle, void (*castMethod)(TDerived*, TBase**)) {
   TBase* base{};
@@ -2975,5 +2975,6 @@ class ThumbRecognizer final : public DigitRecognizer {
 };
 using ThumbRecognizerPtr = ObjectPtr<ThumbRecognizer, isdk_ThumbRecognizer>;
 
-} // namespace isdk::api
+} 
+}// namespace isdk::api
 #endif // ISDK_API_HPP

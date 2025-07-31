@@ -21,6 +21,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Templates/PimplPtr.h"
 #include "Components/ActorComponent.h"
 #include "DataSources/IsdkSyntheticHand.h"
 #include "Interaction/IsdkPokeInteractor.h"
@@ -29,14 +30,16 @@
 #include "IsdkPokeLimiterVisual.generated.h"
 
 // Forward declarations of internal types
-namespace isdk::api
-{
-class HandPokeLimiterVisual;
+namespace isdk {
+	namespace api
+	{
+		class HandPokeLimiterVisual;
 
-namespace helper
-{
-class FPokeLimiterVisualImpl;
-}
+		namespace helper
+		{
+			class FPokeLimiterVisualImpl;
+		}
+	}
 } // namespace isdk::api
 
 /**

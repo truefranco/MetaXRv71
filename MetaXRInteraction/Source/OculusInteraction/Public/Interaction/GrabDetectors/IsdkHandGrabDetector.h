@@ -46,7 +46,7 @@ class OCULUSINTERACTION_API UIsdkHandGrabDetector : public UIsdkGrabDetector
   virtual void Initialize(UIsdkGrabberComponent* InGrabberComponent) override;
   virtual void Tick(float DeltaTime) override;
 
-  const TSet<TObjectPtr<UIsdkGrabbableComponent>>& GetHoveredGrabbables() const;
+  const TSet<UIsdkGrabbableComponent*>& GetHoveredGrabbables() const;
   virtual UIsdkGrabbableComponent* GetGrabCandidate(EIsdkGrabInputMethod InputMethod) override;
   virtual EIsdkGrabDetectorType GetGrabDetectorType() const override;
 
@@ -110,7 +110,7 @@ class OCULUSINTERACTION_API UIsdkHandGrabDetector : public UIsdkGrabDetector
    * The collider which is currently selecting the selected interactable
    */
   UPROPERTY(BlueprintReadOnly, Category = InteractionSDK)
-  TObjectPtr<UPrimitiveComponent> SelectingCollider;
+  UPrimitiveComponent* SelectingCollider;
 
   /* Radius of the to set when initializing for the pinch grab overlap collider */
   UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = InteractionSDK)
@@ -133,23 +133,23 @@ class OCULUSINTERACTION_API UIsdkHandGrabDetector : public UIsdkGrabDetector
 
   // HoveredGrabbables is the set of all grabbables hovered by ray, distance, and hand grab.
   UPROPERTY(BlueprintReadOnly, Category = InteractionSDK)
-  TSet<TObjectPtr<UIsdkGrabbableComponent>> HoveredGrabbables;
+  TSet<UIsdkGrabbableComponent*> HoveredGrabbables;
 
   // PinchGrabCandidate is the grabbable that will be grabbed if the user pinches
   UPROPERTY(BlueprintReadOnly, Category = InteractionSDK)
-  TObjectPtr<UIsdkGrabbableComponent> PinchGrabCandidate;
+  UIsdkGrabbableComponent* PinchGrabCandidate;
 
   // PalmGrabCandidate is the grabbable that will be grabbed if the user palm grabs
   UPROPERTY(BlueprintReadOnly, Category = InteractionSDK)
-  TObjectPtr<UIsdkGrabbableComponent> PalmGrabCandidate;
+  UIsdkGrabbableComponent* PalmGrabCandidate;
 
   // We use PinchColliders to track which colliders are being used for pinch grab.
   UPROPERTY(BlueprintReadOnly, Category = InteractionSDK)
-  TObjectPtr<UPrimitiveComponent> PinchCollider;
+  UPrimitiveComponent* PinchCollider;
 
   // We use PalmGrabColliders to track which colliders are being used for palm grab.
   UPROPERTY(BlueprintReadOnly, Category = InteractionSDK)
-  TObjectPtr<UPrimitiveComponent> PalmGrabCollider;
+  UPrimitiveComponent* PalmGrabCollider;
 
   // Allows disabling debug visuals
   UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = InteractionSDK)

@@ -124,8 +124,13 @@ FIsdkAxisAlignedBox::FIsdkAxisAlignedBox()
 FIsdkBoundsClipper::FIsdkBoundsClipper()
 {
   PoseProvider = nullptr;
-  StructTypesUtils::Copy(BoundsClipper_Default.position, Position);
-  StructTypesUtils::Copy(BoundsClipper_Default.size, Size);
+  FVector3f TempPosition;
+  FVector3f TempSize;
+  StructTypesUtils::Copy(BoundsClipper_Default.position, TempPosition);
+  StructTypesUtils::Copy(BoundsClipper_Default.size, TempSize);
+  Position = (FVector)TempPosition;
+  Size = (FVector)TempSize;
+
 }
 
 FIsdkRay::FIsdkRay()
@@ -142,8 +147,12 @@ FIsdkPointerEvent::FIsdkPointerEvent()
 {
   Identifier = PointerEvent_Default.identifier;
   Type = static_cast<EIsdkPointerEventType>(PointerEvent_Default.type);
-  StructTypesUtils::Copy(PointerEvent_Default.pose.Position, Pose.Position);
-  StructTypesUtils::Copy(PointerEvent_Default.pose.Orientation, Pose.Orientation);
+  FVector3f TempPosition;
+  FQuat4f TempOrientation;
+  StructTypesUtils::Copy(PointerEvent_Default.pose.Position, TempPosition);
+  StructTypesUtils::Copy(PointerEvent_Default.pose.Orientation, TempOrientation);
+  Pose.Position = (FVector)TempPosition;
+  Pose.Orientation = (FQuat)TempOrientation;
 }
 
 FIsdkRayInteractor_Config::FIsdkRayInteractor_Config()
@@ -277,22 +286,30 @@ void StructTypesUtils::Copy(const FIsdkPokeInteractor_Config& src, isdk_PokeInte
 
 void StructTypesUtils::Copy(const FIsdkAxisAlignedBox& src, isdk_AxisAlignedBox& dest)
 {
-  Copy(src.LowerBound, dest.lowerBound);
-  Copy(src.UpperBound, dest.upperBound);
-  Copy(src.Centroid, dest.centroid);
-  Copy(src.HalfSize, dest.halfSize);
+	FVector3f TempLowerBound = src.LowerBound;
+	FVector3f TempUpperBound = src.UpperBound;
+	FVector3f TempCentroid = src.Centroid;
+	FVector3f TempHalfSize = src.HalfSize;
+  Copy(TempLowerBound, dest.lowerBound);
+  Copy(TempUpperBound, dest.upperBound);
+  Copy(TempCentroid, dest.centroid);
+  Copy(TempHalfSize, dest.halfSize);
 }
 
 void StructTypesUtils::Copy(const FIsdkRay& src, isdk_Ray& dest)
 {
-  Copy(src.Origin, dest.origin);
-  Copy(src.Direction, dest.direction);
+	FVector3f TempOrigin = src.Origin;
+	FVector3f TempDirection = src.Direction;
+  Copy(TempOrigin, dest.origin);
+  Copy(TempDirection, dest.direction);
 }
 
 void StructTypesUtils::Copy(const FIsdkSurfaceHit& src, isdk_SurfaceHit& dest)
 {
-  Copy(src.Point, dest.point);
-  Copy(src.Normal, dest.normal);
+	FVector3f TempPoint = src.Point;
+	FVector3f TempNormal = src.Normal;
+  Copy(TempPoint, dest.point);
+  Copy(TempNormal, dest.normal);
   dest.distance = src.Distance;
 }
 
@@ -406,8 +423,10 @@ void StructTypesUtils::Copy(const FTransform& Src, ovrpPosef& Dest)
 {
   ovrpVector3f Position{};
   ovrpQuatf Orientation{};
-  Copy(Src.GetLocation(), Position);
-  Copy(Src.GetRotation(), Orientation);
+  FVector3d TempLocation = Src.GetLocation();
+  FQuat TempRotation = Src.GetRotation();
+  Copy(TempLocation, Position);
+  Copy((FQuat4d)TempRotation, Orientation);
   Dest = {Orientation, Position};
 }
 
@@ -415,8 +434,10 @@ void StructTypesUtils::Copy(const FIsdkPosef& Src, ovrpPosef& Dest)
 {
   ovrpVector3f Position{};
   ovrpQuatf Orientation{};
-  Copy(Src.Position, Position);
-  Copy(Src.Orientation, Orientation);
+  FVector3f TempPosition = Src.Position;
+  FQuat TempOrientation = Src.Orientation;
+  Copy(TempPosition, Position);
+  Copy((FQuat4d)TempOrientation, Orientation);
   Dest = {Orientation, Position};
 }
 
@@ -509,22 +530,33 @@ void StructTypesUtils::Copy(const isdk_PokeInteractor_Config& src, FIsdkPokeInte
 
 void StructTypesUtils::Copy(const isdk_AxisAlignedBox& src, FIsdkAxisAlignedBox& dest)
 {
-  Copy(src.lowerBound, dest.LowerBound);
-  Copy(src.upperBound, dest.UpperBound);
-  Copy(src.centroid, dest.Centroid);
-  Copy(src.halfSize, dest.HalfSize);
+	FVector3f TempLowerBound, TempUpperBound, TempCentroid, TempHalfSize;
+  Copy(src.lowerBound, TempLowerBound);
+  Copy(src.upperBound, TempUpperBound);
+  Copy(src.centroid, TempCentroid);
+  Copy(src.halfSize, TempHalfSize);
+  dest.LowerBound = (FVector)TempLowerBound;
+  dest.UpperBound = (FVector)TempUpperBound;
+  dest.Centroid = (FVector)TempCentroid;
+  dest.HalfSize = (FVector)TempHalfSize;
 }
 
 void StructTypesUtils::Copy(const isdk_Ray& src, FIsdkRay& dest)
 {
-  Copy(src.origin, dest.Origin);
-  Copy(src.direction, dest.Direction);
+	FVector3f TempOrigin, TempDirection;
+  Copy(src.origin, TempOrigin);
+  Copy(src.direction, TempDirection);
+  dest.Origin = (FVector)TempOrigin;
+  dest.Direction = (FVector)TempDirection;
 }
 
 void StructTypesUtils::Copy(const isdk_SurfaceHit& src, FIsdkSurfaceHit& dest)
 {
-  Copy(src.point, dest.Point);
-  Copy(src.normal, dest.Normal);
+	FVector3f TempPoint, TempNormal;
+  Copy(src.point, TempPoint);
+  Copy(src.normal, TempNormal);
+  dest.Point = (FVector)TempPoint;
+  dest.Normal = (FVector)TempNormal;
   dest.Distance = src.distance;
 }
 
@@ -538,8 +570,11 @@ void StructTypesUtils::Copy(const isdk_OptionalSurfaceHit& src, FIsdkOptionalSur
 {
   dest.HasValue = !!src.hasValue;
   dest.Value.Distance = src.value.distance;
-  Copy(src.value.normal, dest.Value.Normal);
-  Copy(src.value.point, dest.Value.Point);
+  FVector3f TempNormal, TempPoint;
+  Copy(src.value.normal, TempNormal);
+  Copy(src.value.point, TempPoint);
+  dest.Value.Normal = (FVector)TempNormal;
+  dest.Value.Point = (FVector)TempPoint;
 }
 
 void StructTypesUtils::Copy(const isdk_DigitRangeParams& src, FIsdkDigitRangeParams& dest)
@@ -640,16 +675,20 @@ void StructTypesUtils::Copy(const ovrpQuatf& src, FQuat4d& dest)
 void StructTypesUtils::Copy(const ovrpPosef& Src, FTransform& Dest)
 {
   FVector3d Position{};
-  FQuat Orientation{};
+  FQuat4d Orientation{};
   Copy(Src.Position, Position);
   Copy(Src.Orientation, Orientation);
-  Dest = {Orientation, Position};
+  Dest = {(FQuat)Orientation, (FVector)Position};
 }
 
 void StructTypesUtils::Copy(const ovrpPosef& Src, FIsdkPosef& Dest)
 {
-  Copy(Src.Position, Dest.Position);
-  Copy(Src.Orientation, Dest.Orientation);
+	FVector3f TempPosition;
+	FQuat4f TempOrientation;
+    Copy(Src.Position, TempPosition);
+    Copy(Src.Orientation, TempOrientation);
+	Dest.Position = (FVector)TempPosition;
+	Dest.Orientation = (FQuat)TempOrientation;
 }
 #pragma endregion Copy
 
@@ -762,29 +801,34 @@ isdk_PokeInteractor_Config StructTypesUtils::Convert(const FIsdkPokeInteractor_C
 isdk_AxisAlignedBox StructTypesUtils::Convert(const FIsdkAxisAlignedBox& src)
 {
   isdk_AxisAlignedBox dest{};
-
-  dest.lowerBound = Convert(src.LowerBound);
-  dest.upperBound = Convert(src.UpperBound);
-  dest.centroid = Convert(src.Centroid);
-  dest.halfSize = Convert(src.HalfSize);
+  FVector3f TempLowerBound = src.LowerBound;
+  FVector3f TempUpperBound = src.UpperBound;
+  FVector3f TempCentroid = src.Centroid;
+  FVector3f TempHalfSize = src.HalfSize;
+  dest.lowerBound = Convert(TempLowerBound);
+  dest.upperBound = Convert(TempUpperBound);
+  dest.centroid = Convert(TempCentroid);
+  dest.halfSize = Convert(TempHalfSize);
   return dest;
 }
 
 isdk_Ray StructTypesUtils::Convert(const FIsdkRay& src)
 {
   isdk_Ray dest{};
-
-  dest.origin = Convert(src.Origin);
-  dest.direction = Convert(src.Direction);
+  FVector3f TempOrigin = src.Origin;
+  FVector3f TempDirection = src.Direction;
+  dest.origin = Convert(TempOrigin);
+  dest.direction = Convert(TempDirection);
   return dest;
 }
 
 isdk_SurfaceHit StructTypesUtils::Convert(const FIsdkSurfaceHit& src)
 {
   isdk_SurfaceHit dest{};
-
-  dest.point = Convert(src.Point);
-  dest.normal = Convert(src.Normal);
+  FVector3f TempPoint = src.Point;
+  FVector3f TempNormal = src.Normal;
+  dest.point = Convert(TempPoint);
+  dest.normal = Convert(TempNormal);
   dest.distance = src.Distance;
   return dest;
 }
@@ -864,12 +908,16 @@ ovrpQuatf StructTypesUtils::Convert(const FQuat4d& src)
 
 ovrpPosef StructTypesUtils::Convert(const FTransform& src)
 {
-  return {Convert(src.GetRotation()), Convert(src.GetLocation())};
+	FQuat TempRotation = src.GetRotation();
+	FVector3d TempLocation = src.GetLocation();
+  return {Convert((FQuat4d)TempRotation), Convert(TempLocation)};
 }
 
 ovrpPosef StructTypesUtils::Convert(const FIsdkPosef& src)
 {
-  return {Convert(src.Orientation), Convert(src.Position)};
+	FQuat TempOrientation = src.Orientation;
+	FVector3f TempPosition = src.Position;
+  return {Convert((FQuat4d)TempOrientation), Convert(TempPosition)};
 }
 
 FIsdkFilterPropertyBlock StructTypesUtils::Convert(const isdk_FilterPropertyBlock& src)
@@ -981,10 +1029,10 @@ FIsdkAxisAlignedBox StructTypesUtils::Convert(const isdk_AxisAlignedBox& src)
 {
   FIsdkAxisAlignedBox dest{};
 
-  dest.LowerBound = Convert(src.lowerBound);
-  dest.UpperBound = Convert(src.upperBound);
-  dest.Centroid = Convert(src.centroid);
-  dest.HalfSize = Convert(src.halfSize);
+  dest.LowerBound = (FVector)Convert(src.lowerBound);
+  dest.UpperBound = (FVector)Convert(src.upperBound);
+  dest.Centroid = (FVector)Convert(src.centroid);
+  dest.HalfSize = (FVector)Convert(src.halfSize);
   return dest;
 }
 
@@ -992,8 +1040,8 @@ FIsdkRay StructTypesUtils::Convert(const isdk_Ray& src)
 {
   FIsdkRay dest{};
 
-  dest.Origin = Convert(src.origin);
-  dest.Direction = Convert(src.direction);
+  dest.Origin = (FVector)Convert(src.origin);
+  dest.Direction = (FVector)Convert(src.direction);
   return dest;
 }
 
@@ -1001,8 +1049,8 @@ FIsdkSurfaceHit StructTypesUtils::Convert(const isdk_SurfaceHit& src)
 {
   FIsdkSurfaceHit dest{};
 
-  dest.Point = Convert(src.point);
-  dest.Normal = Convert(src.normal);
+  dest.Point = (FVector)Convert(src.point);
+  dest.Normal = (FVector)Convert(src.normal);
   dest.Distance = src.distance;
   return dest;
 }
@@ -1022,8 +1070,11 @@ FIsdkOptionalSurfaceHit StructTypesUtils::Convert(const isdk_OptionalSurfaceHit&
 
   dest.HasValue = !!src.hasValue;
   dest.Value.Distance = src.value.distance;
-  Copy(src.value.normal, dest.Value.Normal);
-  Copy(src.value.point, dest.Value.Point);
+  FVector3f TempNormal, TempPoint;
+  Copy(src.value.normal, TempNormal);
+  Copy(src.value.point, TempPoint);
+  dest.Value.Normal = (FVector)TempNormal;
+  dest.Value.Point = (FVector)TempPoint;
   return dest;
 }
 
@@ -1071,11 +1122,15 @@ FQuat4d StructTypesUtils::ConvertDouble(const ovrpQuatf& src)
 
 FTransform StructTypesUtils::ConvertTransform(const ovrpPosef& src)
 {
-  return FTransform{ConvertDouble(src.Orientation), ConvertDouble(src.Position)};
+	FQuat4d TempOrientation = ConvertDouble(src.Orientation);
+	FVector3d TempPosition = ConvertDouble(src.Position);
+  return FTransform{ (FQuat)TempOrientation, (FVector)TempPosition };
 }
 
 FIsdkPosef StructTypesUtils::Convert(const ovrpPosef& src)
 {
-  return {ConvertDouble(src.Orientation), Convert(src.Position)};
+	FQuat4d TempOrientation = ConvertDouble(src.Orientation);
+	FVector3f TempPosition = Convert(src.Position);
+  return { (FQuat)TempOrientation, (FVector)TempPosition };
 }
 #pragma endregion Convert

@@ -22,25 +22,29 @@
 
 #include "ApiImpl.h"
 
-namespace isdk::api::helper
-{
-class FSelectorImpl : public FApiImpl<Selector, SelectorPtr>
-{
- public:
-  FSelectorImpl()
-      : FApiImpl(
-            [this]() -> SelectorPtr
-            {
-              // Selector - to access pointer events
-              SelectorPtr Selector = Selector::create();
-              if (!ensureMsgf(Selector.IsValid(), TEXT("Failed to create Selector")))
-              {
-                return nullptr;
-              }
+namespace isdk {
+	namespace api {
+		namespace helper
+		{
+			class FSelectorImpl : public FApiImpl<Selector, SelectorPtr>
+			{
+			public:
+				FSelectorImpl()
+					: FApiImpl(
+						[this]() -> SelectorPtr
+						{
+							// Selector - to access pointer events
+							SelectorPtr Selector = Selector::create();
+							if (!ensureMsgf(Selector.IsValid(), TEXT("Failed to create Selector")))
+							{
+								return nullptr;
+							}
 
-              return Selector;
-            })
-  {
-  }
-};
+							return Selector;
+						})
+				{
+				}
+			};
+		}
+	}
 } // namespace isdk::api::helper

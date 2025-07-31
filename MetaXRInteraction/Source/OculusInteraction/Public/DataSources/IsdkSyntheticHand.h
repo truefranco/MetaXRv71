@@ -21,20 +21,23 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Templates/PimplPtr.h"
 #include "IsdkIRootPoseLocker.h"
 #include "DataSources/IsdkHandDataModifier.h"
 
 #include "IsdkSyntheticHand.generated.h"
 
 // Forward declarations of internal types
-namespace isdk::api
-{
-class SyntheticHand;
+namespace isdk {
+	namespace api
+	{
+		class SyntheticHand;
 
-namespace helper
-{
-class FSyntheticHandImpl;
-}
+		namespace helper
+		{
+			class FSyntheticHandImpl;
+		}
+	}
 } // namespace isdk::api
 
 /* Hand Data Modifier that returns a HandDataSource driven by the API's Synthetic Hand */

@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  * All rights reserved.
  *
@@ -21,19 +21,22 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Templates/PimplPtr.h"
 #include "UObject/Object.h"
 #include "DataSources/IsdkHandDataSource.h"
 #include "IsdkExternalHandDataSource.generated.h"
 
 // Forward declarations of internal types
-namespace isdk::api
-{
-class ExternalHandSource;
+namespace isdk {
+	namespace api
+	{
+		class ExternalHandSource;
 
-namespace helper
-{
-class FExternalHandDataSourceImpl;
-}
+		namespace helper
+		{
+			class FExternalHandDataSourceImpl;
+		}
+	}
 } // namespace isdk::api
 
 /**

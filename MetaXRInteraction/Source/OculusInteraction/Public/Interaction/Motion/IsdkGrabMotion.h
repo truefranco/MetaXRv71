@@ -97,15 +97,15 @@ class OCULUSINTERACTION_API UIsdkGrabMotion : public UObject
 
   // The grabbable that motion is being applied to
   UPROPERTY(BlueprintReadOnly, Category = InteractionSDK)
-  TObjectPtr<UIsdkGrabbableComponent> GrabbableComponent;
+  UIsdkGrabbableComponent* GrabbableComponent;
 
   // The grabber that is applying the motion
   UPROPERTY(BlueprintReadOnly, Category = InteractionSDK)
-  TObjectPtr<UIsdkGrabberComponent> GrabberComponent;
+  UIsdkGrabberComponent* GrabberComponent;
 
   // The grab transformer component associated with the grabbable component
   UPROPERTY(BlueprintReadOnly, Category = InteractionSDK)
-  TObjectPtr<UIsdkGrabTransformerComponent> GrabTransformerComponent;
+  UIsdkGrabTransformerComponent* GrabTransformerComponent;
 };
 
 /**
@@ -168,7 +168,7 @@ class OCULUSINTERACTION_API UIsdkPullToHandGrabMotion : public UIsdkGrabMotion
    * seconds, and the y-axis represents a coefficient by which PullSpeed is multiplied.
    */
   UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = InteractionSDK)
-  TObjectPtr<UCurveFloat> PullCurve;
+  UCurveFloat* PullCurve;
 
   /**
    * When the motion started.

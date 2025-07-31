@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  * All rights reserved.
  *
@@ -57,7 +57,7 @@ class OCULUSINTERACTIONPREBUILTS_API UIsdkHideVisualRigModifier : public UIsdkRi
   void SetHideVisual(bool bNewHideVisual, USceneComponent* ComponentIn);
 
   UPROPERTY()
-  TObjectPtr<USceneComponent> LastTriggeringInteractor;
+  USceneComponent* LastTriggeringInteractor;
 
   bool bHideVisualTriggered = false;
 };

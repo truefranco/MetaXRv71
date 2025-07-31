@@ -19,7 +19,7 @@
  */
 
 #include "DataSources/IsdkFromMetaXRControllerDataSource.h"
-
+#include "XRMotionControllerBase.h"
 #include "IsdkDataSourcesMetaXR.h"
 #include "IsdkDataSourcesMetaXRLog.h"
 #include "IsdkDataSourcesMetaXRSubsystem.h"
@@ -74,9 +74,9 @@ UIsdkFromMetaXRControllerDataSource::MakeMetaXRControllerDataSource(
   DataSourceComponent->RegisterComponent();
 
   const bool bLeftHandMismatch = InHandedness == EIsdkHandedness::Left &&
-      SourceMotionController->GetTrackingMotionSource() != IMotionController::LeftHandSourceId;
+      SourceMotionController->MotionSource != FXRMotionControllerBase::LeftHandSourceId;
   const bool bRightHandMismatch = InHandedness == EIsdkHandedness::Right &&
-      SourceMotionController->GetTrackingMotionSource() != IMotionController::RightHandSourceId;
+      SourceMotionController->MotionSource != FXRMotionControllerBase::RightHandSourceId;
   if (bLeftHandMismatch || bRightHandMismatch)
   {
     UE_LOG(
@@ -85,7 +85,7 @@ UIsdkFromMetaXRControllerDataSource::MakeMetaXRControllerDataSource(
         TEXT(
             "UIsdkFromMetaXRControllerDataSource created with mismatching Handedness \"%s\" and MotionController MotionSource \"%s\""),
         *StaticEnum<EIsdkHandedness>()->GetValueAsString(EIsdkHandedness::Left),
-        *SourceMotionController->GetTrackingMotionSource().ToString())
+        *SourceMotionController->MotionSource.ToString())
   }
 
   return DataSourceComponent;
@@ -139,7 +139,7 @@ void UIsdkFromMetaXRControllerDataSource::TickComponent(
                                                               : IsdkXRUtils::RightSourceName;
     }
 
-    if (MotionController->GetTrackingMotionSource() != DesiredSourceName)
+    if (MotionController->MotionSource != DesiredSourceName)
     {
       MotionController->SetTrackingMotionSource(DesiredSourceName);
     }

@@ -85,7 +85,7 @@ DEFINE_LATENT_AUTOMATION_COMMAND_THREE_PARAMETER(
     FIsdkTestSetPokeInteractableSurfaceClippers,
     float,
     ActorScale,
-    FVector3f,
+    FVector,
     ClipperPosition,
     float,
     ClipperSize);
@@ -101,7 +101,7 @@ DEFINE_LATENT_AUTOMATION_COMMAND_FOUR_PARAMETER(
     FIsdkTestSetPokeInteractableSurfaceClippersOverlap,
     float,
     ActorScale,
-    FVector3f,
+    FVector,
     ClipperPosition,
     float,
     ClipperSize,
@@ -129,7 +129,7 @@ bool IsdkPokeInteractionClippersUpdateTests::RunTest(const FString& Parameters)
   ADD_LATENT_AUTOMATION_COMMAND(
       FIsdkTestSetPokeInteractorPosition(this, FVector(-1.0, -2.0, -2.0)));
   ADD_LATENT_AUTOMATION_COMMAND(
-      FIsdkTestSetPokeInteractableSurfaceClippers(1.0, FVector3f(0.0, 0.0, 0.0), 1.0));
+      FIsdkTestSetPokeInteractableSurfaceClippers(1.0, FVector(0.0, 0.0, 0.0), 1.0));
 
   ADD_LATENT_AUTOMATION_COMMAND(FWaitLatentCommand(isdk::test::OneFrameDelay));
 
@@ -142,7 +142,7 @@ bool IsdkPokeInteractionClippersUpdateTests::RunTest(const FString& Parameters)
   ADD_LATENT_AUTOMATION_COMMAND(FIsdkTestCheckPokeInteractableCurrentState(
       this, EIsdkInteractableState::Hover, TEXT("Poke interactable check after adding clippers.")));
   ADD_LATENT_AUTOMATION_COMMAND(
-      FIsdkTestSetPokeInteractableSurfaceClippers(1.0, FVector3f(0.0, 5.0, 5.0), 3.0));
+      FIsdkTestSetPokeInteractableSurfaceClippers(1.0, FVector(0.0, 5.0, 5.0), 3.0));
 
   ADD_LATENT_AUTOMATION_COMMAND(FWaitLatentCommand(isdk::test::OneFrameDelay));
 
@@ -159,7 +159,7 @@ bool IsdkPokeInteractionClippersUpdateTests::RunTest(const FString& Parameters)
       EIsdkInteractableState::Hover,
       TEXT("Poke interactable check after moving interactor into the clipper.")));
   ADD_LATENT_AUTOMATION_COMMAND(
-      FIsdkTestSetPokeInteractableSurfaceClippers(2.0, FVector3f(0.0, 5.0, 5.0), 3.0));
+      FIsdkTestSetPokeInteractableSurfaceClippers(2.0, FVector(0.0, 5.0, 5.0), 3.0));
 
   ADD_LATENT_AUTOMATION_COMMAND(FWaitLatentCommand(isdk::test::OneFrameDelay));
 
@@ -178,7 +178,7 @@ bool IsdkPokeInteractionClippersUpdateTests::RunTest(const FString& Parameters)
 
   ADD_LATENT_AUTOMATION_COMMAND(FIsdkTestSetPokeInteractorPosition(this, FVector(-1.0, 0.0, 0.0)));
   ADD_LATENT_AUTOMATION_COMMAND(
-      FIsdkTestSetPokeInteractableSurfaceClippersOverlap(1.0, FVector3f(0.0, 0.0, 0.0), 3.0, 5.0));
+      FIsdkTestSetPokeInteractableSurfaceClippersOverlap(1.0, FVector(0.0, 0.0, 0.0), 3.0, 5.0));
 
   ADD_LATENT_AUTOMATION_COMMAND(FWaitLatentCommand(isdk::test::OneFrameDelay));
   ADD_LATENT_AUTOMATION_COMMAND(FIsdkTestCheckPokeInteractableCurrentState(
@@ -186,7 +186,7 @@ bool IsdkPokeInteractionClippersUpdateTests::RunTest(const FString& Parameters)
       EIsdkInteractableState::Normal,
       TEXT("Poke interactable check after setting 2 non overlapping clippers.")));
   ADD_LATENT_AUTOMATION_COMMAND(
-      FIsdkTestSetPokeInteractableSurfaceClippersOverlap(1.0, FVector3f(0.0, 0.0, 0.0), 3.0, 1.0));
+      FIsdkTestSetPokeInteractableSurfaceClippersOverlap(1.0, FVector(0.0, 0.0, 0.0), 3.0, 1.0));
 
   ADD_LATENT_AUTOMATION_COMMAND(FWaitLatentCommand(isdk::test::OneFrameDelay));
   ADD_LATENT_AUTOMATION_COMMAND(FIsdkTestCheckPokeInteractableCurrentState(
@@ -213,7 +213,7 @@ bool IsdkPokeInteractionStateTests::RunTest(const FString& Parameters)
   ADD_LATENT_AUTOMATION_COMMAND(
       FIsdkTestSetPokeInteractorPosition(this, FVector(-1.0, -2.0, -2.0)));
   ADD_LATENT_AUTOMATION_COMMAND(
-      FIsdkTestSetPokeInteractableSurfaceClippers(1.0, FVector3f(0.0, 0.0, 0.0), 1.0));
+      FIsdkTestSetPokeInteractableSurfaceClippers(1.0, FVector(0.0, 0.0, 0.0), 1.0));
   ADD_LATENT_AUTOMATION_COMMAND(FWaitLatentCommand(isdk::test::OneFrameDelay));
 
   ADD_LATENT_AUTOMATION_COMMAND(FIsdkTestCheckPokeInteractableCurrentState(

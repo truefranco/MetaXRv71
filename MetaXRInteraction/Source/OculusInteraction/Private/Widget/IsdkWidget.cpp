@@ -25,7 +25,7 @@
 
 void UIsdkWidget::HandleVirtualUserPointerEvent(
     FIsdkVirtualUserPointerEvent VirtualUserPointerEvent,
-    TObjectPtr<UWidgetComponent> AttachedWidget,
+    UWidgetComponent* AttachedWidget,
     FIsdkWidgetEventDelegate WidgetEventDelegate,
     UIsdkWidgetSubsystem& WidgetSubsystem,
     float MinMoveTravelDistance,

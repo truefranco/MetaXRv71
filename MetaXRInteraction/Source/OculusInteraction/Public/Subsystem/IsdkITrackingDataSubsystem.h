@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  * All rights reserved.
  *
@@ -34,12 +34,6 @@
 class IIsdkITrackingDataSubsystem;
 enum class EControllerHandBehavior : uint8;
 
-UINTERFACE(BlueprintType)
-class OCULUSINTERACTION_API UIsdkITrackingDataSubsystem : public UInterface
-{
-  GENERATED_BODY()
-};
-
 USTRUCT(BlueprintType)
 struct FIsdkTrackingDataSources
 {
@@ -64,7 +58,7 @@ struct FIsdkTrackingDataSources
   bool bIsInitialized = false;
 
   UPROPERTY(BlueprintReadOnly, Category = InteractionSDK)
-  TObjectPtr<UIsdkHandDataSource> DataSourceComponent;
+  UIsdkHandDataSource* DataSourceComponent = nullptr;
 
   UPROPERTY(BlueprintReadOnly, Category = InteractionSDK)
   TScriptInterface<IIsdkIRootPose> HandRootPose;
@@ -74,6 +68,12 @@ struct FIsdkTrackingDataSources
 
   UPROPERTY(BlueprintReadOnly, Category = InteractionSDK)
   TScriptInterface<IIsdkIHandJoints> HandJoints;
+};
+
+UINTERFACE(BlueprintType)
+class OCULUSINTERACTION_API UIsdkITrackingDataSubsystem : public UInterface
+{
+	GENERATED_BODY()
 };
 
 /**

@@ -21,18 +21,21 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Templates/PimplPtr.h"
 #include "DataSources/IsdkHandDataModifier.h"
 #include "IsdkOneEuroFilterDataModifier.generated.h"
 
 // Forward declarations of internal types
-namespace isdk::api
-{
-class OneEuroHandFilter;
+namespace isdk {
+	namespace api
+	{
+		class OneEuroHandFilter;
 
-namespace helper
-{
-class FOneEuroHandFilterImpl;
-}
+		namespace helper
+		{
+			class FOneEuroHandFilterImpl;
+		}
+	}
 } // namespace isdk::api
 
 /* Hand Data Modifier that returns a HandDataSource having a One Euro Filter applied to it */

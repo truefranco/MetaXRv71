@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  * All rights reserved.
  *
@@ -21,6 +21,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Templates/PimplPtr.h"
 #include "StructTypes.h"
 #include "UObject/Object.h"
 #include "IsdkHandPalmGrabRecognizer.generated.h"
@@ -30,10 +31,12 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FIsdkPalmGrabRecognizerEventDelegate);
 class UIsdkHandMeshComponent;
 
 // Forward declarations of internal types
-namespace isdk::api
-{
-class PalmGrabRecognizer;
-class IHandPositionFrame;
+namespace isdk {
+	namespace api
+	{
+		class PalmGrabRecognizer;
+		class IHandPositionFrame;
+	}
 } // namespace isdk::api
 
 /**

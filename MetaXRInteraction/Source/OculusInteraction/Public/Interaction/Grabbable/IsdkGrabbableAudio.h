@@ -155,10 +155,10 @@ class OCULUSINTERACTION_API UIsdkGrabbableAudio final : public UActorComponent
       BlueprintGetter = GetGrabTransformer,
       BlueprintSetter = SetGrabTransformer,
       Category = InteractionSDK)
-  TObjectPtr<UIsdkGrabTransformerComponent> GrabTransformer;
+  UIsdkGrabTransformerComponent* GrabTransformer;
 
   UPROPERTY()
-  TObjectPtr<UAudioComponent> GrabbableAudioComponent = nullptr;
+  UAudioComponent* GrabbableAudioComponent = nullptr;
 
   FVector PreviousScale = FVector::OneVector;
   float LastEventTime = 0;

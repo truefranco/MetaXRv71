@@ -225,7 +225,7 @@ protected:
       meta =
           (EditCondition = "ColliderMode==EIsdkGrabbableColliderMode::CustomMesh",
            EditConditionHides))
-  TObjectPtr<UStaticMesh> CustomCollisionMesh;
+  UStaticMesh* CustomCollisionMesh;
 
   /**
    * Uses the default collision of the provided static mesh as the collider.  Only valid if
@@ -249,24 +249,24 @@ protected:
     BlueprintSetter=SetGrabTransformer,
     meta = (ExposeOnSpawn = true),
     Category = "InteractionSDK")
-  TObjectPtr<UIsdkGrabTransformerComponent> GrabTransformerComponent;
+  UIsdkGrabTransformerComponent* GrabTransformerComponent;
 
   /**
    * The collider we'll use to detect grabs.  If not set, we'll find the first
    * UPrimitiveComponent found in the scene component hierarchy.
    */
   UPROPERTY(BlueprintReadWrite, Category = "InteractionSDK")
-  TObjectPtr<UPrimitiveComponent> GrabCollider;
+  UPrimitiveComponent* GrabCollider;
 
   /**
    * A list of grabbers which are currently grabbing this grabbable component
    */
-  TArray<TObjectPtr<UIsdkGrabberComponent>> SelectedGrabbers;
+  TArray<UIsdkGrabberComponent*> SelectedGrabbers;
 
   /**
    * A list of grabbers which are currently hovering this grabbable component
    */
-  TArray<TObjectPtr<UIsdkGrabberComponent>> HoveredGrabbers;
+  TArray<UIsdkGrabberComponent*> HoveredGrabbers;
 
   /**
    * Delegate broadcast when pointer events are triggered
@@ -278,5 +278,5 @@ protected:
   void HandlePointerEvent(const FIsdkInteractionPointerEvent& PointerEvent);
 
   UPROPERTY()
-  TObjectPtr<UMaterialInterface> CustomCollisionMaterial;
+  UMaterialInterface* CustomCollisionMaterial;
 };

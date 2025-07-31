@@ -235,49 +235,49 @@ class OCULUSINTERACTION_API UIsdkGrabberComponent : public UIsdkSceneInteractorC
 
   // HandGrabDetector detects pinch and palm grabs via colliders attached to the hand/controller
   UPROPERTY(EditAnywhere, BlueprintReadOnly, NoClear, Category = InteractionSDK)
-  TObjectPtr<UIsdkHandGrabDetector> HandGrabDetector;
+  UIsdkHandGrabDetector* HandGrabDetector;
 
   // DistanceGrabDetector detects pinch and palm grabs via a frustum positioned relative to the
   // pointer transform
   UPROPERTY(EditAnywhere, BlueprintReadOnly, NoClear, Category = InteractionSDK)
-  TObjectPtr<UIsdkDistanceGrabDetector> DistanceGrabDetector;
+  UIsdkDistanceGrabDetector* DistanceGrabDetector;
 
   // RayGrabDetector detects pinch and palm grabs via a line trace out from the pointer transform
   UPROPERTY(EditAnywhere, BlueprintReadOnly, NoClear, Category = InteractionSDK)
-  TObjectPtr<UIsdkRayGrabDetector> RayGrabDetector;
+  UIsdkRayGrabDetector* RayGrabDetector;
 
   // A set of all grabbables hovered by the grabber this frame
   UPROPERTY(BlueprintReadOnly, Category = InteractionSDK)
-  TSet<TObjectPtr<UIsdkGrabbableComponent>> HoveredGrabbables;
+  TSet<UIsdkGrabbableComponent*> HoveredGrabbables;
 
   // The grab motion which is currently being applied to the grabbed grabbable
   UPROPERTY(BlueprintReadOnly, Category = InteractionSDK)
-  TObjectPtr<UIsdkGrabMotion> CurrentGrabMotion;
+  UIsdkGrabMotion* CurrentGrabMotion;
 
   // The grab detector which detected the grabbable that is currently being grabbed
   UPROPERTY(BlueprintReadOnly, Category = InteractionSDK)
-  TObjectPtr<UIsdkGrabDetector> CurrentGrabDetector;
+  UIsdkGrabDetector* CurrentGrabDetector;
 
   // The grab detector which detected the grabbable that is currently being hovered.  Prioritized
   // in order of Hand > Ray > Distance
   UPROPERTY(BlueprintReadOnly, Category = InteractionSDK)
-  TObjectPtr<UIsdkGrabDetector> CurrentHoverDetector;
+  UIsdkGrabDetector* CurrentHoverDetector;
 
   // The niagara particle system used to display distance grab effects while hovering or grabbing
   UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = InteractionSDK)
-  TObjectPtr<UNiagaraSystem> DistanceGrabNiagaraSystem;
+  UNiagaraSystem* DistanceGrabNiagaraSystem;
 
   // The component that holds the DistanceGrabNiagaraSystem
   UPROPERTY(BlueprintReadOnly, Category = InteractionSDK)
-  TObjectPtr<UNiagaraComponent> DistanceGrabNiagaraComponent;
+  UNiagaraComponent* DistanceGrabNiagaraComponent;
 
   // The niagara particle system used to display ray grab effects
   UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = InteractionSDK)
-  TObjectPtr<UNiagaraSystem> RayGrabNiagaraSystem;
+  UNiagaraSystem* RayGrabNiagaraSystem;
 
   // The component that holds the RayGrabNiagaraSystem
   UPROPERTY(BlueprintReadOnly, Category = InteractionSDK)
-  TObjectPtr<UNiagaraComponent> RayGrabNiagaraComponent;
+  UNiagaraComponent* RayGrabNiagaraComponent;
 
   UPROPERTY()
   TScriptInterface<IIsdkIHandPointerPose> HandPointerPose;
@@ -296,7 +296,7 @@ class OCULUSINTERACTION_API UIsdkGrabberComponent : public UIsdkSceneInteractorC
   int64 PointerEventToken = 0;
 
   UPROPERTY(Instanced)
-  TObjectPtr<UIsdkGrabbableComponent> GrabbedComponent;
+  UIsdkGrabbableComponent* GrabbedComponent;
 
   /**
    * A set of flags indicating all currently active grab input methods.

@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  * All rights reserved.
  *
@@ -153,7 +153,7 @@ class OCULUSINTERACTIONPREBUILTS_API UIsdkTrackedDataSourceRigComponent : public
    * Motion controller this Rig Component is currently attached to
    */
   UPROPERTY(BlueprintReadOnly, Category = InteractionSDK)
-  TObjectPtr<UMotionControllerComponent> AttachedToMotionController;
+  UMotionControllerComponent* AttachedToMotionController;
 
   /**
    * @brief Get the Tracked Visual SceneComponent (driven by data source) associated with this Rig
@@ -232,5 +232,5 @@ class OCULUSINTERACTIONPREBUILTS_API UIsdkTrackedDataSourceRigComponent : public
    * constituent conditionals must be true for this to be true.
    */
   UPROPERTY()
-  TObjectPtr<UIsdkConditionalGroupAll> ForceOffVisibility;
+  UIsdkConditionalGroupAll* ForceOffVisibility;
 };

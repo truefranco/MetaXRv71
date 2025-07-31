@@ -19,7 +19,7 @@
  */
 
 #include "Interaction/IsdkPokeLimiterVisual.h"
-
+#include "Templates/PimplPtr.h"
 #include "isdk_api/isdk_api.hpp"
 #include "ApiImpl.h"
 #include "IsdkChecks.h"
@@ -30,16 +30,20 @@ using isdk::api::HandPokeLimiterVisual;
 using isdk::api::HandPokeLimiterVisualPtr;
 using isdk::api::IInteractable;
 
-namespace isdk::api::helper
-{
-class FPokeLimiterVisualImpl : public FApiImpl<HandPokeLimiterVisual, HandPokeLimiterVisualPtr>
-{
- public:
-  explicit FPokeLimiterVisualImpl(std::function<HandPokeLimiterVisualPtr()> CreateFn)
-      : FApiImpl(std::move(CreateFn))
-  {
-  }
-};
+namespace isdk {
+	namespace api {
+		namespace helper
+		{
+			class FPokeLimiterVisualImpl : public FApiImpl<HandPokeLimiterVisual, HandPokeLimiterVisualPtr>
+			{
+			public:
+				explicit FPokeLimiterVisualImpl(std::function<HandPokeLimiterVisualPtr()> CreateFn)
+					: FApiImpl(std::move(CreateFn))
+				{
+				}
+			};
+		}
+	}
 } // namespace isdk::api::helper
 
 UIsdkPokeLimiterVisual::UIsdkPokeLimiterVisual()
@@ -48,7 +52,7 @@ UIsdkPokeLimiterVisual::UIsdkPokeLimiterVisual()
   PrimaryComponentTick.TickGroup = TG_PrePhysics;
 
   PokeLimiterVisualImpl =
-      MakePimpl<isdk::api::helper::FPokeLimiterVisualImpl, EPimplPtrMode::NoCopy>(
+      MakePimpl<isdk::api::helper::FPokeLimiterVisualImpl>(
           [this]() -> HandPokeLimiterVisualPtr
           {
             // Check dependencies

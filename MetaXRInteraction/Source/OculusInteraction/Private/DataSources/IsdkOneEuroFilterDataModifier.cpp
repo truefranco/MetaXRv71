@@ -19,6 +19,7 @@
  */
 
 #include "DataSources/IsdkOneEuroFilterDataModifier.h"
+#include "Templates/PimplPtr.h"
 #include "ApiImpl.h"
 #include "isdk_api/isdk_api.hpp"
 #include "IsdkChecks.h"
@@ -28,22 +29,26 @@ using isdk::api::IHandDataSource;
 using isdk::api::OneEuroHandFilter;
 using isdk::api::OneEuroHandFilterPtr;
 
-namespace isdk::api::helper
-{
-class FOneEuroHandFilterImpl : public FApiImpl<OneEuroHandFilter, OneEuroHandFilterPtr>
-{
- public:
-  explicit FOneEuroHandFilterImpl(std::function<OneEuroHandFilterPtr()> CreateFn)
-      : FApiImpl(std::move(CreateFn))
-  {
-  }
-};
+namespace isdk {
+	namespace api {
+		namespace helper
+		{
+			class FOneEuroHandFilterImpl : public FApiImpl<OneEuroHandFilter, OneEuroHandFilterPtr>
+			{
+			public:
+				explicit FOneEuroHandFilterImpl(std::function<OneEuroHandFilterPtr()> CreateFn)
+					: FApiImpl(std::move(CreateFn))
+				{
+				}
+			};
+		}
+	}
 } // namespace isdk::api::helper
 
 UIsdkOneEuroFilterDataModifier::UIsdkOneEuroFilterDataModifier()
 {
   OneEuroHandFilterImpl =
-      MakePimpl<isdk::api::helper::FOneEuroHandFilterImpl, EPimplPtrMode::NoCopy>(
+      MakePimpl<isdk::api::helper::FOneEuroHandFilterImpl>(
           [this]() -> OneEuroHandFilterPtr
           {
             // If FromDataSource is set, validate its handle. Otherwise, create our instance with no

@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  * All rights reserved.
  *
@@ -153,7 +153,7 @@ bool FIsdkTestValidateHoverState::Update()
   Test->TestTrue("Grab Interactable Actor was not created", IsValid(GrabInteractableActor));
 
   UIsdkHandGrabDetector* TestGrabDetector = GrabInteractorActor->GetHandGrabDetector();
-  const TSet<TObjectPtr<UIsdkGrabbableComponent>> HoveredGrabbables =
+  const TSet<UIsdkGrabbableComponent*> HoveredGrabbables =
       TestGrabDetector->GetHoveredGrabbables();
 
   UIsdkGrabbableComponent* HoveredComponent = nullptr;

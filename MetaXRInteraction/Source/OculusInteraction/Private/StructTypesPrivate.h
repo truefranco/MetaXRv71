@@ -4,6 +4,8 @@
 #pragma once
 
 #include "StructTypes.h"
+#include "VectorTypes.h"
+#include "Quaternion.h"
 #include "isdk_api/isdk_api.hpp"
 
 class OCULUSINTERACTION_API StructTypesUtils

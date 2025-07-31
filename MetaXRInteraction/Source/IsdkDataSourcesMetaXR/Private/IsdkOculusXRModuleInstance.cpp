@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  * All rights reserved.
  *
@@ -45,8 +45,8 @@ FIsdkOculusXRModuleInstance::FIsdkOculusXRModuleInstance()
     ++It;
   };
 
-  OculusXR_Class = FindFirstObjectSafe<UClass>(TEXT("OculusXRFunctionLibrary"));
-  if (ensureMsgf(OculusXR_Class, TEXT("Could not find OculusXRFunctionLibrary")))
+  OculusXR_Class = FindObjectSafe<UClass>(ANY_PACKAGE, TEXT("OculusFunctionLibrary"));
+  if (ensureMsgf(OculusXR_Class, TEXT("Could not find OculusFunctionLibrary")))
   {
     // IsDeviceTracked UFUNCTION
     {
@@ -95,8 +95,8 @@ FIsdkOculusXRModuleInstance::FIsdkOculusXRModuleInstance()
     }
   }
 
-  OculusXRInput_Class = FindFirstObjectSafe<UClass>(TEXT("OculusXRInputFunctionLibrary"));
-  if (ensureMsgf(OculusXRInput_Class, TEXT("Could not find OculusXRInputFunctionLibrary")))
+  OculusXRInput_Class = FindObjectSafe<UClass>(ANY_PACKAGE, TEXT("OculusInputFunctionLibrary"));
+  if (ensureMsgf(OculusXRInput_Class, TEXT("Could not find OculusInputFunctionLibrary")))
   {
     auto InitDeviceHandInParamFunction =
         [Class = OculusXRInput_Class](
@@ -188,7 +188,7 @@ bool FIsdkOculusXRModuleInstance::IsDeviceTracked_Hmd() const
   UFunction* Function = OculusXR_IsDeviceTracked_Fn.Function;
 
   uint8* Parms =
-      static_cast<uint8*>(FMemory_Alloca_Aligned(Function->ParmsSize, Function->GetMinAlignment()));
+      static_cast<uint8*>(FMemory_Alloca(Function->ParmsSize + Function->GetMinAlignment()));
   FMemory::Memzero(Parms, Function->ParmsSize);
 
   // Param 0
@@ -218,7 +218,7 @@ void FIsdkOculusXRModuleInstance::GetPose(
   UFunction* Function = OculusXR_GetPose_Fn.Function;
 
   uint8* Parms =
-      static_cast<uint8*>(FMemory_Alloca_Aligned(Function->ParmsSize, Function->GetMinAlignment()));
+      static_cast<uint8*>(FMemory_Alloca(Function->ParmsSize + Function->GetMinAlignment()));
   FMemory::Memzero(Parms, Function->ParmsSize);
 
   // Param 3 - bUseOrienationForPlayerCamera
@@ -255,7 +255,7 @@ void FIsdkOculusXRModuleInstance::GetPose(
     if (Property->HasAnyPropertyFlags(CPF_OutParm))
     {
       CA_SUPPRESS(6263)
-      FOutParmRec* Out = (FOutParmRec*)UE_VSTACK_ALLOC(VirtualStackAllocator, sizeof(FOutParmRec));
+      FOutParmRec* Out = (FOutParmRec*)FMemory_Alloca(sizeof(FOutParmRec));
       // set the address and property in the out param info
       // note that since C++ doesn't support "optional out" we can ignore that here
       Out->PropAddr = Property->ContainerPtrToValuePtr<uint8>(Parms);
@@ -357,7 +357,7 @@ FQuat FIsdkOculusXRModuleInstance::Input_GetBoneRotation(
   UFunction* Function = OculusXRInput_GetBoneRotation_Fn.Function;
 
   uint8* Parms =
-      static_cast<uint8*>(FMemory_Alloca_Aligned(Function->ParmsSize, Function->GetMinAlignment()));
+      static_cast<uint8*>(FMemory_Alloca(Function->ParmsSize + Function->GetMinAlignment()));
   FMemory::Memzero(Parms, Function->ParmsSize);
 
   // Param 0
@@ -392,7 +392,7 @@ bool FIsdkOculusXRModuleInstance::Input_IsHandTrackingEnabled() const
   UFunction* Function = OculusXRInput_IsHandTrackingEnabled_Fn.Function;
 
   uint8* Parms =
-      static_cast<uint8*>(FMemory_Alloca_Aligned(Function->ParmsSize, Function->GetMinAlignment()));
+      static_cast<uint8*>(FMemory_Alloca(Function->ParmsSize + Function->GetMinAlignment()));
   FMemory::Memzero(Parms, Function->ParmsSize);
 
   // Return Value Param
@@ -411,7 +411,7 @@ FIsdkOculusXRModuleInstance::Input_GetControllerDrivenHandPoses() const
   UFunction* Function = OculusXRInput_GetControllerDrivenHandPoses_Fn.Function;
 
   uint8* Parms =
-      static_cast<uint8*>(FMemory_Alloca_Aligned(Function->ParmsSize, Function->GetMinAlignment()));
+      static_cast<uint8*>(FMemory_Alloca(Function->ParmsSize + Function->GetMinAlignment()));
   FMemory::Memzero(Parms, Function->ParmsSize);
 
   // Return Value Param
@@ -432,7 +432,7 @@ void FIsdkOculusXRModuleInstance::Input_SetControllerDrivenHandPoses(
   UFunction* Function = OculusXRInput_SetControllerDrivenHandPoses_Fn.Function;
 
   uint8* Parms =
-      static_cast<uint8*>(FMemory_Alloca_Aligned(Function->ParmsSize, Function->GetMinAlignment()));
+      static_cast<uint8*>(FMemory_Alloca(Function->ParmsSize + Function->GetMinAlignment()));
   FMemory::Memzero(Parms, Function->ParmsSize);
 
   // Pose Type Param
@@ -458,7 +458,7 @@ void FIsdkOculusXRModuleInstance::CallDeviceHandFunction(
 {
   UFunction* Function = FunctionDesc.Function;
   uint8* Parms =
-      static_cast<uint8*>(FMemory_Alloca_Aligned(Function->ParmsSize, Function->GetMinAlignment()));
+      static_cast<uint8*>(FMemory_Alloca(Function->ParmsSize + Function->GetMinAlignment()));
   FMemory::Memzero(Parms, Function->ParmsSize);
 
   SetHandednessProperty(FunctionDesc.Arg_DeviceHand, Parms, Handedness);
@@ -485,7 +485,7 @@ EIsdkXRControllerType FIsdkOculusXRModuleInstance::GetControllerType(
   UFunction* Function = OculusXR_GetControllerType_Fn.Function;
 
   uint8* Parms =
-      static_cast<uint8*>(FMemory_Alloca_Aligned(Function->ParmsSize, Function->GetMinAlignment()));
+      static_cast<uint8*>(FMemory_Alloca(Function->ParmsSize + Function->GetMinAlignment()));
   FMemory::Memzero(Parms, Function->ParmsSize);
 
   // Hand Param

@@ -10,7 +10,7 @@
 	"DocsURL": "https://developers.meta.com/horizon/documentation/unreal/unreal-isdk-overview",
 	"MarketplaceURL": "com.epicgames.launcher://ue/marketplace/product/2372b714e0aa46ab85168aaf035e099a",
 	"SupportURL": "https://communityforums.atmeta.com/t5/Developer/ct-p/developer",
-	"EngineVersion": "5.6.0",
+	"EngineVersion": "4.27.2",
 	"CanContainContent": true,
 	"IsExperimentalVersion": true,
 	"Installed": true,
@@ -62,14 +62,6 @@
 			"Enabled": true
 		},
 		{
-			"Name": "XRBase",
-			"Enabled": true,
-			"SupportedTargetPlatforms": [
-				"Win64",
-				"Android"
-			]
-		},
-		{
 			"Name": "OpenXRHandTracking",
 			"Enabled": true,
 			"Optional": true,
@@ -81,6 +73,11 @@
 		{
 			"Name": "Niagara",
 			"Enabled": true
+		},
+		{
+			"Name": "GeometryProcessing",
+			"Enabled": true,
+			"BlacklistTargets": [ "Server" ]
 		}
 	]
 }

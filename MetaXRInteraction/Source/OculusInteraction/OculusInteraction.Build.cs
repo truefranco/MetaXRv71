@@ -39,8 +39,8 @@ public class OculusInteraction : ModuleRules
                 "ThirdParty/OculusInteractionLibrary/Include"
             }
         );
-
-        PublicDependencyModuleNames.AddRange(
+		
+		PublicDependencyModuleNames.AddRange(
             new[]
             {
                 "Core",
@@ -49,14 +49,16 @@ public class OculusInteraction : ModuleRules
                 "OculusInteractionLibrary",
                 "Projects",
                 "HeadMountedDisplay",
-                "XRBase",
                 "InputCore",
                 "Slate",
                 "SlateCore",
                 "UMG",
                 "EnhancedInput",
                 "GameplayTags",
-                "Niagara"
+				"GeometricObjects",
+			    "GeometryAlgorithms",
+				"IntelISPC",
+				"Niagara"
             }
         );
 

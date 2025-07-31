@@ -23,7 +23,7 @@
 #include "Interaction/IsdkIInteractableState.h"
 #include "isdk_api/isdk_api.hpp"
 #include "ApiImpl.h"
-
+#include "Templates/PimplPtr.h"
 #include "Subsystem/IsdkWorldSubsystem.h"
 
 using isdk::api::ActiveStateBool;
@@ -31,25 +31,29 @@ using isdk::api::ActiveStateBoolPtr;
 using isdk::api::InteractorPayload;
 using isdk::api::InteractorPayloadPtr;
 
-namespace isdk::api::helper
-{
-class FInteractorPayloadImpl : public FApiImpl<InteractorPayload, InteractorPayloadPtr>
-{
- public:
-  explicit FInteractorPayloadImpl(std::function<InteractorPayloadPtr()> CreateFn)
-      : FApiImpl(std::move(CreateFn))
-  {
-  }
-};
+namespace isdk {
+	namespace api {
+		namespace helper
+		{
+			class FInteractorPayloadImpl : public FApiImpl<InteractorPayload, InteractorPayloadPtr>
+			{
+			public:
+				explicit FInteractorPayloadImpl(std::function<InteractorPayloadPtr()> CreateFn)
+					: FApiImpl(std::move(CreateFn))
+				{
+				}
+			};
 
-class FInteractorActiveStateImpl : public FApiImpl<ActiveStateBool, ActiveStateBoolPtr>
-{
- public:
-  explicit FInteractorActiveStateImpl(std::function<ActiveStateBoolPtr()> CreateFn)
-      : FApiImpl(std::move(CreateFn))
-  {
-  }
-};
+			class FInteractorActiveStateImpl : public FApiImpl<ActiveStateBool, ActiveStateBoolPtr>
+			{
+			public:
+				explicit FInteractorActiveStateImpl(std::function<ActiveStateBoolPtr()> CreateFn)
+					: FApiImpl(std::move(CreateFn))
+				{
+				}
+			};
+		}
+	}
 } // namespace isdk::api::helper
 
 UIsdkInteractorComponent::UIsdkInteractorComponent()
@@ -58,7 +62,7 @@ UIsdkInteractorComponent::UIsdkInteractorComponent()
   PrimaryComponentTick.bCanEverTick = true;
   CurrentState = EIsdkInteractorState::Disabled;
   InteractorPayloadImpl =
-      MakePimpl<isdk::api::helper::FInteractorPayloadImpl, EPimplPtrMode::NoCopy>(
+      MakePimpl<isdk::api::helper::FInteractorPayloadImpl>(
           [this]() -> InteractorPayloadPtr
           {
             auto Instance = InteractorPayload::create(nullptr, this);
@@ -66,7 +70,7 @@ UIsdkInteractorComponent::UIsdkInteractorComponent()
             return Instance;
           });
   InteractorActiveStateImpl =
-      MakePimpl<isdk::api::helper::FInteractorActiveStateImpl, EPimplPtrMode::NoCopy>(
+      MakePimpl<isdk::api::helper::FInteractorActiveStateImpl>(
           [this]() -> ActiveStateBoolPtr
           {
             auto Instance = ActiveStateBool::create();

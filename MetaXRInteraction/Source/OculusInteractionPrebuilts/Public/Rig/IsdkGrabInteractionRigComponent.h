@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  * All rights reserved.
  *
@@ -70,7 +70,7 @@ class OCULUSINTERACTIONPREBUILTS_API UIsdkGrabInteractionRigComponent : public U
 
   // A reference to the grab component we'll bind input to
   UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = InteractionSDK)
-  TObjectPtr<UIsdkGrabberComponent> Grabber;
+  UIsdkGrabberComponent* Grabber;
 
   /*
    * Gets the EnabledConditionalGroup, which allows adding conditions that drive whether
@@ -84,7 +84,7 @@ class OCULUSINTERACTIONPREBUILTS_API UIsdkGrabInteractionRigComponent : public U
 
  protected:
   UPROPERTY()
-  TObjectPtr<UIsdkRigComponent> RigComponent;
+  UIsdkRigComponent* RigComponent;
 
  private:
   UPROPERTY()
@@ -101,18 +101,18 @@ class OCULUSINTERACTIONPREBUILTS_API UIsdkGrabInteractionRigComponent : public U
   FName ThumbTipSocketName;
 
   UPROPERTY()
-  TObjectPtr<USkinnedMeshComponent> PinchAttachMesh;
+  USkinnedMeshComponent* PinchAttachMesh;
 
   // Allows adding conditions that drive whether the grabber component is activated.
   UPROPERTY(BlueprintGetter = GetEnabledConditional, Category = InteractionSDK)
-  TObjectPtr<UIsdkConditionalGroupAll> EnabledConditionalGroup;
+  UIsdkConditionalGroupAll* EnabledConditionalGroup;
 
   /*
    * A conditional that detects whether this component is active or not, is used by
    * EnabledConditionalGroup to drive whether the grabber is active.
    */
   UPROPERTY()
-  TObjectPtr<UIsdkConditionalComponentIsActive> IsActiveConditional;
+  UIsdkConditionalComponentIsActive* IsActiveConditional;
 
   bool bLastIsGrabbing = true;
 

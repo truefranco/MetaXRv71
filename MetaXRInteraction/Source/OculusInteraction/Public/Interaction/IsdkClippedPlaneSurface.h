@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  * All rights reserved.
  *
@@ -21,6 +21,7 @@
 #pragma once
 
 #include "Components/ActorComponent.h"
+#include "Templates/PimplPtr.h"
 #include "CoreMinimal.h"
 #include "Input/IsdkIPose.h"
 #include "IsdkISurfacePatch.h"
@@ -29,14 +30,16 @@
 #include "IsdkClippedPlaneSurface.generated.h"
 
 // Forward declarations of internal types
-namespace isdk::api
-{
-class ClippedPlaneSurface;
+namespace isdk {
+	namespace api
+	{
+		class ClippedPlaneSurface;
 
-namespace helper
-{
-class FClippedPlaneSurfaceImpl;
-}
+		namespace helper
+		{
+			class FClippedPlaneSurfaceImpl;
+		}
+	}
 } // namespace isdk::api
 
 class UIsdkPointablePlane;

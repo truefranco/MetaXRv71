@@ -151,7 +151,7 @@ class OCULUSINTERACTION_API UIsdkFunctionLibrary final : public UBlueprintFuncti
   MakeGrabPoseStruct(int Identifier, const FVector& Location, const FQuat& Orientation)
   {
     auto Pose = FIsdkPosef();
-    Pose.Position = FVector3f(Location);
+    Pose.Position = FVector(Location);
     Pose.Orientation = Orientation;
     return FIsdkGrabPose(Identifier, Pose);
   }

@@ -61,7 +61,7 @@ bool FIsdkPrefixTest::RunTest(const FString& Parameters)
       ObjectBuffer,
       true,
       RF_ClassDefaultObject,
-      EInternalObjectFlags_AllFlags);
+	  EInternalObjectFlags::AllFlags);
   for (const UObject* ThisObject : ObjectBuffer)
   {
     FullObjectName = ThisObject->GetFullName();
@@ -75,7 +75,7 @@ bool FIsdkPrefixTest::RunTest(const FString& Parameters)
       ObjectBuffer,
       true,
       RF_ClassDefaultObject,
-      EInternalObjectFlags_AllFlags);
+	  EInternalObjectFlags::AllFlags);
   for (const UObject* ThisObject : ObjectBuffer)
   {
     FullObjectName = ThisObject->GetFullName();
@@ -89,7 +89,7 @@ bool FIsdkPrefixTest::RunTest(const FString& Parameters)
       ObjectBuffer,
       true,
       RF_ClassDefaultObject,
-      EInternalObjectFlags_AllFlags);
+	  EInternalObjectFlags::AllFlags);
   for (const UObject* ThisObject : ObjectBuffer)
   {
     FullObjectName = ThisObject->GetFullName();

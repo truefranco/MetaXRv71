@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  * All rights reserved.
  *
@@ -107,8 +107,8 @@ UIsdkHandVisualsRigComponentLeft::UIsdkHandVisualsRigComponentLeft()
 
   static ConstructorHelpers::FObjectFinder<USkeletalMesh> LeftHandMeshFinder =
       IsdkContentAssetPaths::Models::Hand::OpenXRLeftHand;
-  TrackedHandVisual->SetSkinnedAsset(LeftHandMeshFinder.Object);
-  SyntheticHandVisual->SetSkinnedAsset(LeftHandMeshFinder.Object);
+  TrackedHandVisual->SetSkeletalMesh(LeftHandMeshFinder.Object);
+  SyntheticHandVisual->SetSkeletalMesh(LeftHandMeshFinder.Object);
 }
 
 UIsdkHandVisualsRigComponentRight::UIsdkHandVisualsRigComponentRight()
@@ -117,6 +117,6 @@ UIsdkHandVisualsRigComponentRight::UIsdkHandVisualsRigComponentRight()
 
   static ConstructorHelpers::FObjectFinder<USkeletalMesh> RightHandMeshFinder =
       IsdkContentAssetPaths::Models::Hand::OpenXRRightHand;
-  TrackedHandVisual->SetSkinnedAsset(RightHandMeshFinder.Object);
-  SyntheticHandVisual->SetSkinnedAsset(RightHandMeshFinder.Object);
+  TrackedHandVisual->SetSkeletalMesh(RightHandMeshFinder.Object);
+  SyntheticHandVisual->SetSkeletalMesh(RightHandMeshFinder.Object);
 }

@@ -65,6 +65,6 @@ bool FIsdkOculusXRHelper::IsHoldingAController(UObject* WorldContextObject)
 
 const TCHAR* FIsdkOculusXRHelper::GetOculusXRHMDModuleName()
 {
-  static const TCHAR* ModuleNameOculusXRHMD = TEXT("OculusXRHMD");
+  static const TCHAR* ModuleNameOculusXRHMD = TEXT("OculusHMD");
   return ModuleNameOculusXRHMD;
 }

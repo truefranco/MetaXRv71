@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  * All rights reserved.
  *
@@ -177,7 +177,7 @@ void UIsdkHandPoseRigModifier::HandleInteractorStateEvent(
         {
           UIsdkHandPoseData* HandPoseData = nullptr;
           USceneComponent* PoseComponent = nullptr;
-          AActor* InteractableActor = GrabbableComponent->GetAttachParentActor();
+          AActor* InteractableActor = GrabbableComponent->GetOwner();
           FTransform RootPoseOffset;
           FTransform SnapOffset;
           FIsdkHandGrabPoseProperties HandPosePropertiesOut;

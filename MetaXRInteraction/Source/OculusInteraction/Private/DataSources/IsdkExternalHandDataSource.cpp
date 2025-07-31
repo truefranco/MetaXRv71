@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  * All rights reserved.
  *
@@ -19,7 +19,7 @@
  */
 
 #include "DataSources/IsdkExternalHandDataSource.h"
-
+#include "Templates/PimplPtr.h"
 #include "ApiImpl.h"
 #include "IsdkChecks.h"
 #include "StructTypesPrivate.h"
@@ -28,25 +28,29 @@ using isdk::api::ExternalHandSource;
 using isdk::api::ExternalHandSourcePtr;
 using isdk::api::IHandDataSource;
 
-namespace isdk::api::helper
-{
-class FExternalHandDataSourceImpl : public FApiImpl<ExternalHandSource, ExternalHandSourcePtr>
-{
- public:
-  explicit FExternalHandDataSourceImpl(std::function<ExternalHandSourcePtr()> CreateFn)
-      : FApiImpl(std::move(CreateFn))
-  {
-  }
+namespace isdk {
+	namespace api {
+		namespace helper
+		{
+			class FExternalHandDataSourceImpl : public FApiImpl<ExternalHandSource, ExternalHandSourcePtr>
+			{
+			public:
+				explicit FExternalHandDataSourceImpl(std::function<ExternalHandSourcePtr()> CreateFn)
+					: FApiImpl(std::move(CreateFn))
+				{
+				}
 
-  isdk_HandData ScratchHandData{};
-};
+				isdk_HandData ScratchHandData{};
+			};
+		}
+	}
 } // namespace isdk::api::helper
 
 UIsdkExternalHandDataSource::UIsdkExternalHandDataSource()
 {
   HandJointMappings = CreateDefaultSubobject<UIsdkHandJointMappings>(TEXT("HandJointMappings"));
   ExternalHandDataSourceImpl =
-      MakePimpl<isdk::api::helper::FExternalHandDataSourceImpl, EPimplPtrMode::NoCopy>(
+      MakePimpl<isdk::api::helper::FExternalHandDataSourceImpl>(
           [this]() -> ExternalHandSourcePtr
           {
             auto Instance =

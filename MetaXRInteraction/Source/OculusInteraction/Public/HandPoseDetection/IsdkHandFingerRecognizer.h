@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  * All rights reserved.
  *
@@ -21,13 +21,18 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Templates/PimplPtr.h"
 #include "IsdkHandDigitRecognizer.h"
 #include "UObject/Object.h"
 #include "IsdkHandFingerRecognizer.generated.h"
 
-namespace isdk::api::helper
-{
-class FFingerRecognizerImpl;
+namespace isdk {
+	namespace api {
+		namespace helper
+		{
+			class FFingerRecognizerImpl;
+		}
+	}
 }
 
 /**
@@ -49,7 +54,7 @@ class OCULUSINTERACTION_API UIsdkHandFingerRecognizer : public UIsdkHandDigitRec
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = InteractionSDK, meta = (ExposeOnSpawn))
   EIsdkDetection_FingerCalcType CalcType{};
 
-  virtual FVector2f GetRawExpectedRange() override;
+  virtual FVector2D GetRawExpectedRange() override;
 
  protected:
   virtual isdk::api::DigitRecognizer* CreateDigitRecognizer() override;

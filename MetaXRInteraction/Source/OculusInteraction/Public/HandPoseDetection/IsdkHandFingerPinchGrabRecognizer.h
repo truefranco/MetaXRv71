@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  * All rights reserved.
  *
@@ -21,6 +21,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Templates/PimplPtr.h"
 #include "StructTypes.h"
 #include "UObject/Object.h"
 #include "IsdkHandFingerPinchGrabRecognizer.generated.h"
@@ -30,14 +31,16 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FIsdkPinchGrabRecognizerEventDelegate);
 class UIsdkHandMeshComponent;
 
 // Forward declarations of internal types
-namespace isdk::api
-{
-class IHandPositionFrame;
+namespace isdk {
+	namespace api
+	{
+		class IHandPositionFrame;
 
-namespace helper
-{
-class FFingerPinchGrabRecognizerImpl;
-}
+		namespace helper
+		{
+			class FFingerPinchGrabRecognizerImpl;
+		}
+	}
 } // namespace isdk::api
 
 /**

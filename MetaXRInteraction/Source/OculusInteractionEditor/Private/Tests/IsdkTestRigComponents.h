@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  * All rights reserved.
  *
@@ -20,6 +20,7 @@
 
 #pragma once
 #include "IsdkTestFakes.h"
+#include "XRMotionControllerBase.h"
 #include "Rig/IsdkHandVisualsRigComponent.h"
 #include "Rig/IsdkInputActionsRigComponent.h"
 
@@ -115,7 +116,7 @@ class AIsdkTestRigActor : public AActor
   virtual void OnConstruction(const FTransform& Transform) override
   {
     Super::OnConstruction(Transform);
-    LeftHandMotionController->MotionSource = IMotionController::LeftHandSourceId;
+    LeftHandMotionController->MotionSource = FXRMotionControllerBase::LeftHandSourceId;
   }
 
   UIsdkFakeHandDataSource* GetFakeHandDataSource()
@@ -152,8 +153,9 @@ class AIsdkTestRigActor : public AActor
   {
     return [](const FIsdkInteractorStateEvent& Event)
     {
-      return FIsdkInteractionGroupMemberState{
-          .bIsSelectStateBlocking = Event.Args.NewState == EIsdkInteractorState::Select};
+		FIsdkInteractionGroupMemberState state{};
+          state.bIsSelectStateBlocking = Event.Args.NewState == EIsdkInteractorState::Select;
+		  return state;
     };
   }
 
@@ -170,9 +172,9 @@ class AIsdkTestRigActor : public AActor
       const auto* Conditional2 = Group->FindConditionalForInteractor(Actor.FakeInteractor2);
 
       const TOptional<bool> Actual1 =
-          IsValid(Conditional1) ? TOptional(Conditional1->GetResolvedValue()) : TOptional<bool>();
+          IsValid(Conditional1) ? TOptional<bool>(Conditional1->GetResolvedValue()) : TOptional<bool>();
       const TOptional<bool> Actual2 =
-          IsValid(Conditional2) ? TOptional(Conditional2->GetResolvedValue()) : TOptional<bool>();
+          IsValid(Conditional2) ? TOptional<bool>(Conditional2->GetResolvedValue()) : TOptional<bool>();
 
       Test->TestEqual(*(TestStepName + TEXT(": Conditional1")), Expected1, Actual1);
       Test->TestEqual(*(TestStepName + TEXT(": Conditional2")), Expected2, Actual2);
@@ -296,7 +298,10 @@ class AIsdkTestRigActor : public AActor
     {
       const auto SocketName = Actor.RigComponentBase->GetPointerPoseSocketName();
       const auto ActualTransform = Actor.RigComponentBase->GetSocketTransform(SocketName);
-      Test->TestNearlyEqual(TEXT("Pointer Pose Transform Equal"), ActualTransform, T);
+	  const float Tolerance = 0.001f;
+	  Test->TestEqual(TEXT("Pointer Pose Translation Equal"), ActualTransform.GetTranslation(), T.GetTranslation(), Tolerance);
+	  Test->TestTrue(TEXT("Pointer Pose Rotation Equal"), ActualTransform.GetRotation().Equals(T.GetRotation(), Tolerance));
+	  Test->TestEqual(TEXT("Pointer Pose Scale Equal"), ActualTransform.GetScale3D(), T.GetScale3D(), Tolerance);
     };
   }
 };

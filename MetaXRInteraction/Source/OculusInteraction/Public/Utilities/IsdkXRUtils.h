@@ -43,7 +43,7 @@ inline bool IsUsingOculusXR()
 {
   FString XrApi;
   const bool bValueFound = GConfig->GetString(
-      TEXT("/Script/OculusXRHMD.OculusXRHMDRuntimeSettings"), TEXT("XrApi"), XrApi, GEngineIni);
+      TEXT("/Script/OculusHMD.OculusHMDRuntimeSettings"), TEXT("XrApi"), XrApi, GEngineIni);
 
   // Default value is to use OVR Plugin as the XRApi.  The value will not be present in config
   // unless it has been manually changed, so we are using the OVR if the value is not found or if
@@ -55,10 +55,10 @@ namespace OXR
 {
 // OpenXR hand constants
 const FQuat HandRootFixupRotation =
-    FQuat(FVector::UnitZ(), UE_HALF_PI) * FQuat(FVector::UnitX(), -UE_HALF_PI);
+    FQuat(FVector::UnitZ(), HALF_PI) * FQuat(FVector::UnitX(), -HALF_PI);
 const FQuat HandJointFixupRotation =
-    FQuat(FVector::UnitX(), -UE_HALF_PI) * FQuat(FVector::UnitY(), -UE_HALF_PI);
-const FQuat HandRelativePointerRotation = FQuat(FVector::UnitY(), UE_PI / 4);
+    FQuat(FVector::UnitX(), -HALF_PI) * FQuat(FVector::UnitY(), -HALF_PI);
+const FQuat HandRelativePointerRotation = FQuat(FVector::UnitY(), PI / 4);
 const FVector HandRootWristOffsetLeft = FVector(-0.089, -0.131, 4.917);
 const FVector HandRootWristOffsetRight = FVector(0.089, -0.131, 4.917);
 const FVector HandRelativePointerOffset = FVector(5, 0, 0);
@@ -69,16 +69,16 @@ const FVector ControllerRelativePointerOffset = FVector(4.0, 0, 0);
 namespace OVR
 {
 // OVR hand constants
-const FQuat HandRootFixupRotationLeft = FQuat(FVector::UnitX(), UE_HALF_PI);
-const FQuat HandRootFixupRotationRight = FQuat(FVector::UnitX(), -UE_HALF_PI);
-const FQuat HandRootInvFixupRotationLeft = FQuat(FVector::UnitX(), -UE_HALF_PI);
-const FQuat HandRootInvFixupRotationRight = FQuat(FVector::UnitX(), UE_HALF_PI);
+const FQuat HandRootFixupRotationLeft = FQuat(FVector::UnitX(), HALF_PI);
+const FQuat HandRootFixupRotationRight = FQuat(FVector::UnitX(), -HALF_PI);
+const FQuat HandRootInvFixupRotationLeft = FQuat(FVector::UnitX(), -HALF_PI);
+const FQuat HandRootInvFixupRotationRight = FQuat(FVector::UnitX(), HALF_PI);
 const FTransform LeftControllerHandTransform =
     FTransform(FRotator(90, 0.f, 15.f), FVector(-10.5f, -3.f, -4.2), FVector::OneVector);
 const FTransform RightControllerHandTransform =
     FTransform(FRotator(-90.f, 0.f, 195.f), FVector(-10.5f, 3.0f, -4.2f), FVector::OneVector);
-const FQuat OVRToOXRLeft = FQuat(FVector::UnitY(), -UE_HALF_PI) * FQuat(FVector::UnitZ(), PI);
-const FQuat OVRToOXRRight = FQuat(FVector::UnitY(), UE_HALF_PI);
+const FQuat OVRToOXRLeft = FQuat(FVector::UnitY(), -HALF_PI) * FQuat(FVector::UnitZ(), PI);
+const FQuat OVRToOXRRight = FQuat(FVector::UnitY(), HALF_PI);
 // OVR controller constants
 const FVector ControllerRelativePointerOffset = FVector(5.5, 0, 0);
 } // namespace OVR

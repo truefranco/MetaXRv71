@@ -30,9 +30,11 @@
 #include "IsdkFromMetaXRControllerDataSource.generated.h"
 
 // Forward declarations of internal types
-namespace isdk::api
-{
-class ExternalHandSource;
+namespace isdk {
+	namespace api
+	{
+		class ExternalHandSource;
+	}
 }
 
 /**
@@ -186,10 +188,10 @@ class ISDKDATASOURCESMETAXR_API UIsdkFromMetaXRControllerDataSource
   UMotionControllerComponent* MotionController;
 
   UPROPERTY()
-  TObjectPtr<UIsdkConditionalBool> IsRootPoseConnected;
+  UIsdkConditionalBool* IsRootPoseConnected;
 
   UPROPERTY()
-  TObjectPtr<UIsdkConditionalBool> IsRootPoseHighConfidence;
+  UIsdkConditionalBool* IsRootPoseHighConfidence;
 
 #if !UE_BUILD_SHIPPING
   void DebugLog();

@@ -22,6 +22,7 @@
 
 #include "CoreMinimal.h"
 #include "IsdkHandData.h"
+#include "Templates/PimplPtr.h"
 #include "Components/PoseableMeshComponent.h"
 #include "IsdkHandPoseData.h"
 #include "StructTypes.h"
@@ -30,15 +31,17 @@
 class IIsdkIRootPose;
 
 // Forward declarations of internal types
-namespace isdk::api
-{
-class IHandPositionFrame;
-class ExternalHandPositionFrame;
+namespace isdk {
+	namespace api
+	{
+		class IHandPositionFrame;
+		class ExternalHandPositionFrame;
 
-namespace helper
-{
-class FExternalHandPositionFrameImpl;
-}
+		namespace helper
+		{
+			class FExternalHandPositionFrameImpl;
+		}
+	}
 } // namespace isdk::api
 
 UENUM()
@@ -219,7 +222,7 @@ class OCULUSINTERACTION_API UIsdkHandMeshComponent : public UPoseableMeshCompone
   EIsdkSkeletonMappingState MappingState;
 
   UPROPERTY(Transient)
-  TObjectPtr<UObject> MappedSkeleton;
+  UObject* MappedSkeleton;
 
   void SetInvalidMappingState(UObject* Skeleton)
   {
@@ -282,7 +285,7 @@ class OCULUSINTERACTION_API UIsdkHandMeshComponent : public UPoseableMeshCompone
   TPimplPtr<isdk::api::helper::FExternalHandPositionFrameImpl> ExternalHandPositionFrameImpl;
 
   UPROPERTY()
-  TObjectPtr<UIsdkHandPoseData> HandPoseDataOverride;
+  UIsdkHandPoseData* HandPoseDataOverride;
 
  private:
   EIsdkLerpState HandPoseLerpState = EIsdkLerpState::Inactive;
@@ -299,5 +302,5 @@ class OCULUSINTERACTION_API UIsdkHandMeshComponent : public UPoseableMeshCompone
 
   EIsdkHandGrabPoseMode CurrentHandGrabPoseMode = EIsdkHandGrabPoseMode::None;
   FTransform RootOffset;
-  TObjectPtr<AActor> InteractableActor;
+  AActor* InteractableActor;
 };

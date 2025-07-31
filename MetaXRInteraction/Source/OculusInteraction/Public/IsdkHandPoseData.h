@@ -27,7 +27,6 @@
 #include "OculusInteractionLog.h"
 #include "IsdkHandData.h"
 #include "Engine/DataTable.h"
-#include "Engine/SkinnedAsset.h"
 #include "DataSources/IsdkIHandJoints.h"
 #include "IsdkHandPoseData.generated.h"
 
@@ -74,11 +73,11 @@ class OCULUSINTERACTION_API UIsdkHandPoseData : public UPrimaryDataAsset, public
 
   /* Hand Data object, storing joint & bone information */
   UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = InteractionSDK)
-  TObjectPtr<UIsdkHandData> HandData;
+  UIsdkHandData* HandData;
 
   /* Thumb and Finger Joint Mappings */
   UPROPERTY(Transient)
-  TObjectPtr<UIsdkHandJointMappings> HandJointMapping;
+  UIsdkHandJointMappings* HandJointMapping;
 
   virtual UIsdkHandData* GetHandData_Implementation() override
   {
@@ -128,7 +127,7 @@ class OCULUSINTERACTION_API UIsdkHandPoseData : public UPrimaryDataAsset, public
   }
   /* Sets the Hand Pose (all joints) from a given skeleton */
   UFUNCTION(CallInEditor, BlueprintCallable, Category = InteractionSDK)
-  void SetRotationFromSkeleton(USkinnedAsset* SkinnedAsset);
+  void SetRotationFromSkeleton(USkeletalMesh* SkinnedAsset);
 
   /* Sets the Hand Pose (all joints) from a given Hand Visual Component */
   UFUNCTION(CallInEditor, BlueprintCallable, Category = InteractionSDK)

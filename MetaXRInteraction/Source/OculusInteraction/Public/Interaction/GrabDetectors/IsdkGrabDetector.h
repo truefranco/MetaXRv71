@@ -69,7 +69,7 @@ class OCULUSINTERACTION_API UIsdkGrabDetector : public UObject
 
           protected :
 
-      UPROPERTY() TObjectPtr<UIsdkGrabberComponent> GrabberComponent;
+      UPROPERTY() UIsdkGrabberComponent* GrabberComponent;
 
   bool bIsSelecting = false;
 };

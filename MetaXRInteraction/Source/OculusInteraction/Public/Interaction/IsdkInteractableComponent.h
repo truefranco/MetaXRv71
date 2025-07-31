@@ -32,10 +32,12 @@
 #include "IsdkInteractableComponent.generated.h"
 
 // Forward declarations of internal types
-namespace isdk::api
-{
-class IInteractable;
-class PointerEventQueue;
+namespace isdk {
+	namespace api
+	{
+		class IInteractable;
+		class PointerEventQueue;
+	}
 } // namespace isdk::api
 
 /**

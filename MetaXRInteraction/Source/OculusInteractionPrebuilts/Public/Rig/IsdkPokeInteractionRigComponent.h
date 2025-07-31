@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  * All rights reserved.
  *
@@ -49,14 +49,14 @@ class OCULUSINTERACTIONPREBUILTS_API UIsdkPokeInteractionRigComponent : public U
    * @brief PokeInteractor component reference, utilized for generating events based on state
    */
   UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = InteractionSDK)
-  TObjectPtr<UIsdkPokeInteractor> PokeInteractor;
+  UIsdkPokeInteractor* PokeInteractor;
 
   /**
    * @brief PokeLimiterVisual component reference, optionally utilized for preventing hand visuals
    * from poking through poked surfaces
    */
   UPROPERTY(BlueprintReadOnly, Category = InteractionSDK)
-  TObjectPtr<UIsdkPokeLimiterVisual> PokeLimiterVisual;
+  UIsdkPokeLimiterVisual* PokeLimiterVisual;
 
   /**
    * @brief Sets default values for this component's properties
@@ -107,15 +107,15 @@ class OCULUSINTERACTIONPREBUILTS_API UIsdkPokeInteractionRigComponent : public U
    */
  protected:
   UPROPERTY()
-  TObjectPtr<UIsdkRigComponent> RigComponent;
+  UIsdkRigComponent* RigComponent;
 
  private:
   UFUNCTION()
   void HandleIsEnabledConditionalChanged(bool bIsEnabled);
 
   UPROPERTY(BlueprintGetter = GetEnabledConditional, Category = InteractionSDK)
-  TObjectPtr<UIsdkConditionalGroupAll> EnabledConditionalGroup;
+  UIsdkConditionalGroupAll* EnabledConditionalGroup;
 
   UPROPERTY()
-  TObjectPtr<UIsdkConditionalComponentIsActive> IsActiveConditional;
+  UIsdkConditionalComponentIsActive* IsActiveConditional;
 };
