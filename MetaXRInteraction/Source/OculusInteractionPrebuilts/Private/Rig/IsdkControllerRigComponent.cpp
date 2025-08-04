@@ -19,7 +19,6 @@
  */
 
 #include "Rig/IsdkControllerRigComponent.h"
-#include "EnhancedInputComponent.h"
 #include "IsdkContentAssetPaths.h"
 #include "IsdkControllerMeshComponent.h"
 #include "IsdkFunctionLibrary.h"
@@ -30,6 +29,7 @@
 #include "UObject/ConstructorHelpers.h"
 #include "Components/SkinnedMeshComponent.h"
 #include "Components/SkeletalMeshComponent.h"
+
 
 UIsdkControllerRigComponent::UIsdkControllerRigComponent()
     : UIsdkControllerRigComponent(EIsdkHandedness::Left)
@@ -84,51 +84,30 @@ USkinnedMeshComponent* UIsdkControllerRigComponent::GetPinchAttachMesh() const
   return nullptr;
 }
 
-void UIsdkControllerRigComponent::BindInputActions(UEnhancedInputComponent* EnhancedInputComponent)
+void UIsdkControllerRigComponent::BindInputActions(UInputComponent* InputComponent)
 {
-  ControllerVisualsComponent->BindInputActions(EnhancedInputComponent, InputActions);
+	Super::BindInputActions(InputComponent);
+    UE_LOG(LogTemp, Warning, TEXT("UIsdkControllerRigComponent::BindInputActions called. InputComponent is %s"), IsValid(InputComponent) ? TEXT("Valid") : TEXT("Invalid"));
+	if (!IsValid(ControllerVisualsComponent) || !IsValid(InputActions))
+	{
+		return;
+	}
 
-  // Configure pinch grab
-  if (IsValid(InputActions->PinchGrabAction))
-  {
-    EnhancedInputComponent->BindAction(
-        InputActions->PinchGrabAction,
-        ETriggerEvent::Started,
-        this,
-        &UIsdkControllerRigComponent::HandlePinchGrabStartedInput);
-    EnhancedInputComponent->BindAction(
-        InputActions->PinchGrabAction,
-        ETriggerEvent::Completed,
-        this,
-        &UIsdkControllerRigComponent::HandlePinchGrabFinishedInput);
-    EnhancedInputComponent->BindAction(
-        InputActions->PinchGrabAction,
-        ETriggerEvent::Canceled,
-        this,
-        &UIsdkControllerRigComponent::HandlePinchGrabFinishedInput);
-  }
+	ControllerVisualsComponent->BindInputActions(InputComponent);
 
-  PinchStrength = &EnhancedInputComponent->BindActionValue(InputActions->SelectStrengthAction);
+	// Configure pinch grab
+	if (!InputActions->PinchGrabAction.IsNone())
+	{
+		InputComponent->BindAction(InputActions->PinchGrabAction, EInputEvent::IE_Pressed, this, &UIsdkControllerRigComponent::HandlePinchGrabStartedInput);
+		InputComponent->BindAction(InputActions->PinchGrabAction, EInputEvent::IE_Released, this, &UIsdkControllerRigComponent::HandlePinchGrabFinishedInput);
+	}
 
-  // Configure palm grab
-  if (IsValid(InputActions->PalmGrabAction))
-  {
-    EnhancedInputComponent->BindAction(
-        InputActions->PalmGrabAction,
-        ETriggerEvent::Started,
-        this,
-        &UIsdkControllerRigComponent::HandlePalmGrabStartedInput);
-    EnhancedInputComponent->BindAction(
-        InputActions->PalmGrabAction,
-        ETriggerEvent::Completed,
-        this,
-        &UIsdkControllerRigComponent::HandlePalmGrabFinishedInput);
-    EnhancedInputComponent->BindAction(
-        InputActions->PalmGrabAction,
-        ETriggerEvent::Canceled,
-        this,
-        &UIsdkControllerRigComponent::HandlePalmGrabFinishedInput);
-  }
+	// Configure palm grab
+	if (!InputActions->PalmGrabAction.IsNone())
+	{
+		InputComponent->BindAction(InputActions->PalmGrabAction, EInputEvent::IE_Pressed, this, &UIsdkControllerRigComponent::HandlePalmGrabStartedInput);
+		InputComponent->BindAction(InputActions->PalmGrabAction, EInputEvent::IE_Released, this, &UIsdkControllerRigComponent::HandlePalmGrabFinishedInput);
+	}
 }
 
 FName UIsdkControllerRigComponent::GetThumbTipSocketName() const
@@ -219,12 +198,7 @@ UIsdkTrackedDataSourceRigComponent* UIsdkControllerRigComponent::GetVisuals() co
 
 float UIsdkControllerRigComponent::GetPinchStrength() const
 {
-  if (PinchStrength)
-  {
-    return PinchStrength->GetValue().Get<float>();
-  }
-
-  return 0.f;
+	return 0.0f;
 }
 
 UIsdkControllerRigComponentLeft::UIsdkControllerRigComponentLeft()

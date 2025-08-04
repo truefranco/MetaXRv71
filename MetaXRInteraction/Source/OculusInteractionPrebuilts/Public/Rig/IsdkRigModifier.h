@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  * All rights reserved.
  *
@@ -28,7 +28,7 @@
 #include "IsdkRigModifier.generated.h"
 
 struct FIsdkInteractorStateEvent;
-
+class UInputComponent;
 /**
  * @class UIsdkRigModifier
  * @brief Abstract class that is intended to modify Rig Components based on certain conditions
@@ -72,7 +72,7 @@ class OCULUSINTERACTIONPREBUILTS_API UIsdkRigModifier : public UObject
    * Must return the handles of any new InputActionBinding that was created, so that it can be
    * correctly unbound.
    */
-  virtual TArray<uint32> BindInputActions(UEnhancedInputComponent* EnhancedInputComponent)
+  virtual TArray<uint32> BindInputActions(UInputComponent* InputComponent)
   {
     return {};
   }

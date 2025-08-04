@@ -19,9 +19,9 @@
  */
 
 #include "Rig/IsdkControllerVisualsRigComponent.h"
+#include "Components/InputComponent.h"
+#include "Animation/AnimInstance.h"
 
-#include "EnhancedInputComponent.h"
-#include "InputAction.h"
 #include "IsdkContentAssetPaths.h"
 #include "IsdkControllerMeshComponent.h"
 #include "IsdkFunctionLibrary.h"
@@ -95,126 +95,6 @@ void UIsdkControllerVisualsRigComponent::GetInteractorSocket(
   }
 }
 
-void UIsdkControllerVisualsRigComponent::BindInputActions(
-    UEnhancedInputComponent* EnhancedInputComponent,
-    UIsdkInputActionsRigComponent* InputActionsRigComponent)
-{
-  BindBoolValue(
-      EnhancedInputComponent,
-      InputActionsRigComponent->AButtonDownAction,
-      [&](auto AnimInstance, bool bValue) { AnimInstance->SetAButtonDown(bValue); });
-
-  BindBoolValue(
-      EnhancedInputComponent,
-      InputActionsRigComponent->BButtonDownAction,
-      [&](auto AnimInstance, bool bValue) { AnimInstance->SetBButtonDown(bValue); });
-
-  BindBoolValue(
-      EnhancedInputComponent,
-      InputActionsRigComponent->XButtonDownAction,
-      [&](auto AnimInstance, bool bValue) { AnimInstance->SetXButtonDown(bValue); });
-
-  BindBoolValue(
-      EnhancedInputComponent,
-      InputActionsRigComponent->YButtonDownAction,
-      [&](auto AnimInstance, bool bValue) { AnimInstance->SetYButtonDown(bValue); });
-
-  BindBoolValue(
-      EnhancedInputComponent,
-      InputActionsRigComponent->AButtonTouchedAction,
-      [&](auto AnimInstance, bool bValue) { AnimInstance->SetAButtonTouched(bValue); });
-
-  BindBoolValue(
-      EnhancedInputComponent,
-      InputActionsRigComponent->BButtonTouchedAction,
-      [&](auto AnimInstance, bool bValue) { AnimInstance->SetBButtonTouched(bValue); });
-
-  BindBoolValue(
-      EnhancedInputComponent,
-      InputActionsRigComponent->XButtonTouchedAction,
-      [&](auto AnimInstance, bool bValue) { AnimInstance->SetXButtonTouched(bValue); });
-
-  BindBoolValue(
-      EnhancedInputComponent,
-      InputActionsRigComponent->YButtonTouchedAction,
-      [&](auto AnimInstance, bool bValue) { AnimInstance->SetYButtonTouched(bValue); });
-
-  BindBoolValue(
-      EnhancedInputComponent,
-      InputActionsRigComponent->LeftMenuButtonDownAction,
-      [&](auto AnimInstance, bool bValue) { AnimInstance->SetLeftMenuButtonDown(bValue); });
-
-  BindBoolValue(
-      EnhancedInputComponent,
-      InputActionsRigComponent->LeftFrontTriggerTouchedAction,
-      [&](auto AnimInstance, bool bValue) { AnimInstance->SetLeftFrontTriggerTouched(bValue); });
-
-  BindAxisValue(
-      EnhancedInputComponent,
-      InputActionsRigComponent->LeftFrontTriggerAxisAction,
-      [&](auto AnimInstance, float Value) { AnimInstance->SetLeftFrontTriggerAxisValue(Value); });
-
-  BindBoolValue(
-      EnhancedInputComponent,
-      InputActionsRigComponent->RightFrontTriggerTouchedAction,
-      [&](auto AnimInstance, bool bValue) { AnimInstance->SetRightFrontTriggerTouched(bValue); });
-
-  BindAxisValue(
-      EnhancedInputComponent,
-      InputActionsRigComponent->RightFrontTriggerAxisAction,
-      [&](auto AnimInstance, float Value) { AnimInstance->SetRightFrontTriggerAxisValue(Value); });
-
-  BindAxisValue(
-      EnhancedInputComponent,
-      InputActionsRigComponent->LeftGripTriggerAxisAction,
-      [&](auto AnimInstance, float Value) { AnimInstance->SetLeftGripTriggerAxisValue(Value); });
-
-  BindAxisValue(
-      EnhancedInputComponent,
-      InputActionsRigComponent->RightGripTriggerAxisAction,
-      [&](auto AnimInstance, float Value) { AnimInstance->SetRightGripTriggerAxisValue(Value); });
-
-  BindBoolValue(
-      EnhancedInputComponent,
-      InputActionsRigComponent->LeftThumbstickTouchedAction,
-      [&](auto AnimInstance, bool bValue) { AnimInstance->SetLeftThumbstickTouched(bValue); });
-
-  BindAxisValue(
-      EnhancedInputComponent,
-      InputActionsRigComponent->LeftThumbstickXAxisAction,
-      [&](auto AnimInstance, float Value) { AnimInstance->SetLeftThumbstickXAxisValue(Value); });
-
-  BindAxisValue(
-      EnhancedInputComponent,
-      InputActionsRigComponent->LeftThumbstickYAxisAction,
-      [&](auto AnimInstance, float Value) { AnimInstance->SetLeftThumbstickYAxisValue(Value); });
-
-  BindBoolValue(
-      EnhancedInputComponent,
-      InputActionsRigComponent->RightThumbstickTouchedAction,
-      [&](auto AnimInstance, bool bValue) { AnimInstance->SetRightThumbstickTouched(bValue); });
-
-  BindAxisValue(
-      EnhancedInputComponent,
-      InputActionsRigComponent->RightThumbstickXAxisAction,
-      [&](auto AnimInstance, float Value) { AnimInstance->SetRightThumbstickXAxisValue(Value); });
-
-  BindAxisValue(
-      EnhancedInputComponent,
-      InputActionsRigComponent->RightThumbstickYAxisAction,
-      [&](auto AnimInstance, float Value) { AnimInstance->SetRightThumbstickYAxisValue(Value); });
-
-  BindBoolValue(
-      EnhancedInputComponent,
-      InputActionsRigComponent->LeftPanelTouchedAction,
-      [&](auto AnimInstance, bool bValue) { AnimInstance->SetLeftPanelTouched(bValue); });
-
-  BindBoolValue(
-      EnhancedInputComponent,
-      InputActionsRigComponent->RightPanelTouchedAction,
-      [&](auto AnimInstance, bool bValue) { AnimInstance->SetRightPanelTouched(bValue); });
-}
-
 USkeletalMeshComponent* UIsdkControllerVisualsRigComponent::GetAnimatedHandMeshComponent()
 {
   return AnimatedHandMeshComponent;
@@ -278,128 +158,143 @@ void UIsdkControllerVisualsRigComponent::OnVisibilityUpdated(
   UpdateControllerMeshVisibility(bTrackedVisibility, ControllerHandBehavior);
 }
 
-void UIsdkControllerVisualsRigComponent::BindAxisValue(
-    UEnhancedInputComponent* EnhancedInputComponent,
-    const UInputAction* Action,
-    TFunction<void(UQuestControllerAnimInstance*, float)> Lambda) const
+void UIsdkControllerVisualsRigComponent::BindInputActions(UInputComponent* PlayerInputComponent)
 {
-  const auto ControllerAnimInstance = ControllerMeshComponent
-      ? Cast<UQuestControllerAnimInstance>(ControllerMeshComponent->GetAnimInstance())
-      : nullptr;
-  const auto HandAnimInstance = AnimatedHandMeshComponent
-      ? Cast<UQuestControllerAnimInstance>(AnimatedHandMeshComponent->GetAnimInstance())
-      : nullptr;
+  UE_LOG(LogTemp, Warning, TEXT("UIsdkControllerVisualsRigComponent::BindInputActions called. PlayerInputComponent is %s"), IsValid(PlayerInputComponent) ? TEXT("Valid") : TEXT("Invalid"));
+	if (!PlayerInputComponent)
+	{
+		return;
+	}
 
-  // Update on trigger event triggered
-  EnhancedInputComponent->BindActionInstanceLambda(
-      Action,
-      ETriggerEvent::Triggered,
-      [=](const FInputActionInstance& ActionInstance)
-      {
-        if (ControllerAnimInstance)
-        {
-          Lambda(ControllerAnimInstance, ActionInstance.GetValue().Get<float>());
-        }
-        if (HandAnimInstance)
-        {
-          Lambda(HandAnimInstance, ActionInstance.GetValue().Get<float>());
-        }
-      });
+	if (Handedness == EIsdkHandedness::Left)
+	{
+		PlayerInputComponent->BindAxis(TEXT("GrabAxisLeft"), this, &UIsdkControllerVisualsRigComponent::OnGripAxis);
+		PlayerInputComponent->BindAxis(TEXT("TriggerAxisLeft"), this, &UIsdkControllerVisualsRigComponent::OnTriggerAxis);
+		PlayerInputComponent->BindAxis(TEXT("MovementAxisLeft_X"), this, &UIsdkControllerVisualsRigComponent::OnThumbstickX);
+		PlayerInputComponent->BindAxis(TEXT("MovementAxisLeft_Y"), this, &UIsdkControllerVisualsRigComponent::OnThumbstickY);
 
-  // Update on trigger event completed
-  EnhancedInputComponent->BindActionInstanceLambda(
-      Action,
-      ETriggerEvent::Completed,
-      [=](const FInputActionInstance& ActionInstance)
-      {
-        if (ControllerAnimInstance)
-        {
-          Lambda(ControllerAnimInstance, 0.f);
-        }
-        if (HandAnimInstance)
-        {
-          Lambda(HandAnimInstance, 0.f);
-        }
-      });
+		PlayerInputComponent->BindAxis(TEXT("Left_HandPinchSelectStrength"), this, &UIsdkControllerVisualsRigComponent::OnHandPinchSelectStrength);
 
-  // Update on trigger event canceled
-  EnhancedInputComponent->BindActionInstanceLambda(
-      Action,
-      ETriggerEvent::Canceled,
-      [=](const FInputActionInstance& ActionInstance)
-      {
-        if (ControllerAnimInstance)
-        {
-          Lambda(ControllerAnimInstance, 0.f);
-        }
-        if (HandAnimInstance)
-        {
-          Lambda(HandAnimInstance, 0.f);
-        }
-      });
+		PlayerInputComponent->BindAction(TEXT("Oculus_X_Button"), IE_Pressed, this, &UIsdkControllerVisualsRigComponent::OnButtonXPressed);
+		PlayerInputComponent->BindAction(TEXT("Oculus_X_Button"), IE_Released, this, &UIsdkControllerVisualsRigComponent::OnButtonXReleased);
+		PlayerInputComponent->BindAction(TEXT("Oculus_Y_Button"), IE_Pressed, this, &UIsdkControllerVisualsRigComponent::OnButtonYPressed);
+		PlayerInputComponent->BindAction(TEXT("Oculus_Y_Button"), IE_Released, this, &UIsdkControllerVisualsRigComponent::OnButtonYReleased);
+
+		PlayerInputComponent->BindAction(TEXT("MenuToggleLeft"), IE_Pressed, this, &UIsdkControllerVisualsRigComponent::OnMenuTogglePressed);
+		PlayerInputComponent->BindAction(TEXT("MenuToggleLeft"), IE_Released, this, &UIsdkControllerVisualsRigComponent::OnMenuToggleReleased);
+
+		PlayerInputComponent->BindAction(TEXT("Oculus_X_Button_Touched"), IE_Pressed, this, &UIsdkControllerVisualsRigComponent::OnButtonXTouched);
+		PlayerInputComponent->BindAction(TEXT("Oculus_X_Button_Touched"), IE_Released, this, &UIsdkControllerVisualsRigComponent::OnButtonXUnTouched);
+		PlayerInputComponent->BindAction(TEXT("Oculus_Y_Button_Touched"), IE_Pressed, this, &UIsdkControllerVisualsRigComponent::OnButtonYTouched);
+		PlayerInputComponent->BindAction(TEXT("Oculus_Y_Button_Touched"), IE_Released, this, &UIsdkControllerVisualsRigComponent::OnButtonYUnTouched);
+		PlayerInputComponent->BindAction(TEXT("Oculus_Left_Thumbstick_Touched"), IE_Pressed, this, &UIsdkControllerVisualsRigComponent::OnThumbstickTouched);
+		PlayerInputComponent->BindAction(TEXT("Oculus_Left_Thumbstick_Touched"), IE_Released, this, &UIsdkControllerVisualsRigComponent::OnThumbstickUnTouched);
+		PlayerInputComponent->BindAction(TEXT("Oculus_Left_Trigger_Touched"), IE_Pressed, this, &UIsdkControllerVisualsRigComponent::OnTriggerTouched);
+		PlayerInputComponent->BindAction(TEXT("Oculus_Left_Trigger_Touched"), IE_Released, this, &UIsdkControllerVisualsRigComponent::OnTriggerUnTouched);
+
+		PlayerInputComponent->BindAction(TEXT("Left_Panel_Touched"), IE_Pressed, this, &UIsdkControllerVisualsRigComponent::OnPanelTouched);
+		PlayerInputComponent->BindAction(TEXT("Left_Panel_Touched"), IE_Released, this, &UIsdkControllerVisualsRigComponent::OnPanelUnTouched);
+
+		PlayerInputComponent->BindAction(TEXT("Left_HandPinchSelect"), IE_Pressed, this, &UIsdkControllerVisualsRigComponent::OnHandPinchSelectPressed);
+		PlayerInputComponent->BindAction(TEXT("Left_HandPinchSelect"), IE_Released, this, &UIsdkControllerVisualsRigComponent::OnHandPinchSelectReleased);
+		PlayerInputComponent->BindAction(TEXT("Left_HandPinchGrab"), IE_Pressed, this, &UIsdkControllerVisualsRigComponent::OnHandPinchGrabPressed);
+		PlayerInputComponent->BindAction(TEXT("Left_HandPinchGrab"), IE_Released, this, &UIsdkControllerVisualsRigComponent::OnHandPinchGrabReleased);
+		PlayerInputComponent->BindAction(TEXT("Left_HandPalmGrab"), IE_Pressed, this, &UIsdkControllerVisualsRigComponent::OnHandPalmGrabPressed);
+		PlayerInputComponent->BindAction(TEXT("Left_HandPalmGrab"), IE_Released, this, &UIsdkControllerVisualsRigComponent::OnHandPalmGrabReleased);
+	}
+	else // Right Hand
+	{
+		PlayerInputComponent->BindAxis(TEXT("GrabAxisRight"), this, &UIsdkControllerVisualsRigComponent::OnGripAxis);
+		PlayerInputComponent->BindAxis(TEXT("TriggerAxisRight"), this, &UIsdkControllerVisualsRigComponent::OnTriggerAxis);
+		PlayerInputComponent->BindAxis(TEXT("MovementAxisRight_X"), this, &UIsdkControllerVisualsRigComponent::OnThumbstickX);
+		PlayerInputComponent->BindAxis(TEXT("MovementAxisRight_Y"), this, &UIsdkControllerVisualsRigComponent::OnThumbstickY);
+
+		PlayerInputComponent->BindAxis(TEXT("Right_HandPinchSelectStrength"), this, &UIsdkControllerVisualsRigComponent::OnHandPinchSelectStrength);
+
+		PlayerInputComponent->BindAction(TEXT("Oculus_A_Button"), IE_Pressed, this, &UIsdkControllerVisualsRigComponent::OnButtonAPressed);
+		PlayerInputComponent->BindAction(TEXT("Oculus_A_Button"), IE_Released, this, &UIsdkControllerVisualsRigComponent::OnButtonAReleased);
+		PlayerInputComponent->BindAction(TEXT("Oculus_B_Button"), IE_Pressed, this, &UIsdkControllerVisualsRigComponent::OnButtonBPressed);
+		PlayerInputComponent->BindAction(TEXT("Oculus_B_Button"), IE_Released, this, &UIsdkControllerVisualsRigComponent::OnButtonBReleased);
+
+		PlayerInputComponent->BindAction(TEXT("Oculus_A_Button_Touched"), IE_Pressed, this, &UIsdkControllerVisualsRigComponent::OnButtonATouched);
+		PlayerInputComponent->BindAction(TEXT("Oculus_A_Button_Touched"), IE_Released, this, &UIsdkControllerVisualsRigComponent::OnButtonAUnTouched);
+		PlayerInputComponent->BindAction(TEXT("Oculus_B_Button_Touched"), IE_Pressed, this, &UIsdkControllerVisualsRigComponent::OnButtonBTouched);
+		PlayerInputComponent->BindAction(TEXT("Oculus_B_Button_Touched"), IE_Released, this, &UIsdkControllerVisualsRigComponent::OnButtonBUnTouched);
+		PlayerInputComponent->BindAction(TEXT("Oculus_Right_Thumbstick_Touched"), IE_Pressed, this, &UIsdkControllerVisualsRigComponent::OnThumbstickTouched);
+		PlayerInputComponent->BindAction(TEXT("Oculus_Right_Thumbstick_Touched"), IE_Released, this, &UIsdkControllerVisualsRigComponent::OnThumbstickUnTouched);
+		PlayerInputComponent->BindAction(TEXT("Oculus_Right_Trigger_Touched"), IE_Pressed, this, &UIsdkControllerVisualsRigComponent::OnTriggerTouched);
+		PlayerInputComponent->BindAction(TEXT("Oculus_Right_Trigger_Touched"), IE_Released, this, &UIsdkControllerVisualsRigComponent::OnTriggerUnTouched);
+
+		PlayerInputComponent->BindAction(TEXT("Right_Panel_Touched"), IE_Pressed, this, &UIsdkControllerVisualsRigComponent::OnPanelTouched);
+		PlayerInputComponent->BindAction(TEXT("Right_Panel_Touched"), IE_Released, this, &UIsdkControllerVisualsRigComponent::OnPanelUnTouched);
+
+		PlayerInputComponent->BindAction(TEXT("Right_HandPinchSelect"), IE_Pressed, this, &UIsdkControllerVisualsRigComponent::OnHandPinchSelectPressed);
+		PlayerInputComponent->BindAction(TEXT("Right_HandPinchSelect"), IE_Released, this, &UIsdkControllerVisualsRigComponent::OnHandPinchSelectReleased);
+		PlayerInputComponent->BindAction(TEXT("Right_HandPinchGrab"), IE_Pressed, this, &UIsdkControllerVisualsRigComponent::OnHandPinchGrabPressed);
+		PlayerInputComponent->BindAction(TEXT("Right_HandPinchGrab"), IE_Released, this, &UIsdkControllerVisualsRigComponent::OnHandPinchGrabReleased);
+		PlayerInputComponent->BindAction(TEXT("Right_HandPalmGrab"), IE_Pressed, this, &UIsdkControllerVisualsRigComponent::OnHandPalmGrabPressed);
+		PlayerInputComponent->BindAction(TEXT("Right_HandPalmGrab"), IE_Released, this, &UIsdkControllerVisualsRigComponent::OnHandPalmGrabReleased);
+	}
 }
 
-void UIsdkControllerVisualsRigComponent::BindBoolValue(
-    UEnhancedInputComponent* EnhancedInputComponent,
-    const UInputAction* Action,
-    TFunction<void(UQuestControllerAnimInstance*, bool)> Lambda) const
+// Implementations for the new handler functions
+void UIsdkControllerVisualsRigComponent::OnGripAxis(float Value)
 {
-  const auto ControllerAnimInstance =
-      Cast<UQuestControllerAnimInstance>(ControllerMeshComponent->GetAnimInstance());
-  const auto HandAnimInstance =
-      Cast<UQuestControllerAnimInstance>(AnimatedHandMeshComponent->GetAnimInstance());
-
-  // Update on trigger event triggered
-  EnhancedInputComponent->BindActionInstanceLambda(
-      Action,
-      ETriggerEvent::Triggered,
-      [=](const FInputActionInstance& ActionInstance)
-      {
-        const bool bValue = ActionInstance.GetValue().Get<bool>();
-        if (ControllerAnimInstance)
-        {
-          Lambda(ControllerAnimInstance, bValue);
-        }
-        if (HandAnimInstance)
-        {
-          Lambda(HandAnimInstance, bValue);
-        }
-      });
-
-  // Update on trigger event completed
-  EnhancedInputComponent->BindActionInstanceLambda(
-      Action,
-      ETriggerEvent::Completed,
-      [=](const FInputActionInstance& ActionInstance)
-      {
-        const bool bValue = ActionInstance.GetValue().Get<bool>();
-        if (ControllerAnimInstance)
-        {
-          Lambda(ControllerAnimInstance, bValue);
-        }
-        if (HandAnimInstance)
-        {
-          Lambda(HandAnimInstance, bValue);
-        }
-      });
-
-  // Update on trigger event canceled
-  EnhancedInputComponent->BindActionInstanceLambda(
-      Action,
-      ETriggerEvent::Canceled,
-      [=](const FInputActionInstance& ActionInstance)
-      {
-        const bool bValue = ActionInstance.GetValue().Get<bool>();
-        if (ControllerAnimInstance)
-        {
-          Lambda(ControllerAnimInstance, bValue);
-        }
-        if (HandAnimInstance)
-        {
-          Lambda(HandAnimInstance, bValue);
-        }
-      });
+	GripValue = Value;
 }
+
+void UIsdkControllerVisualsRigComponent::OnTriggerAxis(float Value)
+{
+	TriggerValue = Value;
+}
+
+void UIsdkControllerVisualsRigComponent::OnThumbstickX(float Value)
+{
+	ThumbstickXValue = Value;
+}
+
+void UIsdkControllerVisualsRigComponent::OnThumbstickY(float Value)
+{
+	ThumbstickYValue = Value;
+}
+
+void UIsdkControllerVisualsRigComponent::OnHandPinchSelectStrength(float value)
+{
+	HandPinchSelectStrength = value;
+}
+
+void UIsdkControllerVisualsRigComponent::OnButtonAPressed() { bButtonADown = true; }
+void UIsdkControllerVisualsRigComponent::OnButtonAReleased() { bButtonADown = false; }
+void UIsdkControllerVisualsRigComponent::OnButtonBPressed() { bButtonBDown = true; }
+void UIsdkControllerVisualsRigComponent::OnButtonBReleased() { bButtonBDown = false; }
+void UIsdkControllerVisualsRigComponent::OnButtonXPressed() { bButtonXDown = true; }
+void UIsdkControllerVisualsRigComponent::OnButtonXReleased() { bButtonXDown = false; }
+void UIsdkControllerVisualsRigComponent::OnButtonYPressed() { bButtonYDown = true; }
+void UIsdkControllerVisualsRigComponent::OnButtonYReleased() { bButtonYDown = false; }
+void UIsdkControllerVisualsRigComponent::OnButtonATouched() { bButtonATouched = true; }
+void UIsdkControllerVisualsRigComponent::OnButtonAUnTouched() { bButtonATouched = false; }
+void UIsdkControllerVisualsRigComponent::OnButtonBTouched() { bButtonBTouched = true; }
+void UIsdkControllerVisualsRigComponent::OnButtonBUnTouched() { bButtonBTouched = false; }
+void UIsdkControllerVisualsRigComponent::OnButtonXTouched() { bButtonXTouched = true; }
+void UIsdkControllerVisualsRigComponent::OnButtonXUnTouched() { bButtonXTouched = false; }
+void UIsdkControllerVisualsRigComponent::OnButtonYTouched() { bButtonYTouched = true; }
+void UIsdkControllerVisualsRigComponent::OnButtonYUnTouched() { bButtonYTouched = false; }
+void UIsdkControllerVisualsRigComponent::OnTriggerTouched() { bTriggerTouched = true; }
+void UIsdkControllerVisualsRigComponent::OnTriggerUnTouched() { bTriggerTouched = false; }
+void UIsdkControllerVisualsRigComponent::OnThumbstickTouched() { bThumbstickTouched = true; }
+void UIsdkControllerVisualsRigComponent::OnThumbstickUnTouched() { bThumbstickTouched = false; }
+void UIsdkControllerVisualsRigComponent::OnPanelTouched() { bPanelTouched = true; }
+void UIsdkControllerVisualsRigComponent::OnPanelUnTouched() { bPanelTouched = false; }
+
+void UIsdkControllerVisualsRigComponent::OnHandPinchSelectPressed() { bHandPinchSelect = true; }
+void UIsdkControllerVisualsRigComponent::OnHandPinchSelectReleased() { bHandPinchSelect = false; }
+void UIsdkControllerVisualsRigComponent::OnHandPinchGrabPressed() { bHandPinchGrab = true; }
+void UIsdkControllerVisualsRigComponent::OnHandPinchGrabReleased() { bHandPinchGrab = false; }
+void UIsdkControllerVisualsRigComponent::OnHandPalmGrabPressed() { bHandPalmGrab = true; }
+void UIsdkControllerVisualsRigComponent::OnHandPalmGrabReleased() { bHandPalmGrab = false; }
+
+void UIsdkControllerVisualsRigComponent::OnMenuTogglePressed() { bMenuToggle = true; }
+void UIsdkControllerVisualsRigComponent::OnMenuToggleReleased() { bMenuToggle = false; }
 
 void UIsdkControllerVisualsRigComponent::UpdateAnimatedHandMeshVisibility(
     bool bTrackedVisibility,
@@ -496,6 +391,7 @@ UIsdkControllerVisualsRigComponentLeft::UIsdkControllerVisualsRigComponentLeft()
 
   // Update procedural hand mesh defaults
   PoseableHandMeshComponent->SetSkeletalMesh(LeftHandMeshFinder.Object);
+
 }
 
 UIsdkControllerVisualsRigComponentRight::UIsdkControllerVisualsRigComponentRight()

@@ -26,8 +26,6 @@
 #include "StructTypes.h"
 #include "IsdkInputActionsRigComponent.generated.h"
 
-class UInputAction;
-
 /**
  *
  */
@@ -38,7 +36,6 @@ class OCULUSINTERACTIONPREBUILTS_API UIsdkInputActionsRigComponent : public UAct
  public:
   UIsdkInputActionsRigComponent();
 
-  // must be called from Target's constructor.
   void SetSubobjectPropertyDefaults(EIsdkHandedness InHandedness);
 
 #if WITH_EDITOR
@@ -46,89 +43,89 @@ class OCULUSINTERACTIONPREBUILTS_API UIsdkInputActionsRigComponent : public UAct
 #endif
 
   UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = InteractionSDK)
-  UInputAction* SelectAction;
+  FName SelectAction;
 
   UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = InteractionSDK)
-  UInputAction* SelectStrengthAction;
+  FName SelectStrengthAction;
 
   UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = InteractionSDK)
-  UInputAction* GrabSelectAction;
+  FName GrabSelectAction;
 
   UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = InteractionSDK)
-  UInputAction* GrabSelectStrengthAction;
+  FName GrabSelectStrengthAction;
 
   UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = InteractionSDK)
-  UInputAction* PinchGrabAction;
+  FName PinchGrabAction;
 
   UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = InteractionSDK)
-  UInputAction* PalmGrabAction;
+  FName PalmGrabAction;
 
   UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = InteractionSDK)
-  UInputAction* AButtonDownAction;
+  FName AButtonDownAction;
 
   UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = InteractionSDK)
-  UInputAction* BButtonDownAction;
+  FName BButtonDownAction;
 
   UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = InteractionSDK)
-  UInputAction* XButtonDownAction;
+  FName XButtonDownAction;
 
   UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = InteractionSDK)
-  UInputAction* YButtonDownAction;
+  FName YButtonDownAction;
 
   UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = InteractionSDK)
-  UInputAction* AButtonTouchedAction;
+  FName AButtonTouchedAction;
 
   UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = InteractionSDK)
-  UInputAction* BButtonTouchedAction;
+  FName BButtonTouchedAction;
 
   UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = InteractionSDK)
-  UInputAction* XButtonTouchedAction;
+  FName XButtonTouchedAction;
 
   UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = InteractionSDK)
-  UInputAction* YButtonTouchedAction;
+  FName YButtonTouchedAction;
 
   UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = InteractionSDK)
-  UInputAction* LeftMenuButtonDownAction;
+  FName LeftMenuButtonDownAction;
 
   UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = InteractionSDK)
-  UInputAction* LeftFrontTriggerTouchedAction;
+  FName LeftFrontTriggerTouchedAction;
 
   UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = InteractionSDK)
-  UInputAction* LeftFrontTriggerAxisAction;
+  FName LeftFrontTriggerAxisAction;
 
   UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = InteractionSDK)
-  UInputAction* RightFrontTriggerTouchedAction;
+  FName RightFrontTriggerTouchedAction;
 
   UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = InteractionSDK)
-  UInputAction* RightFrontTriggerAxisAction;
+  FName RightFrontTriggerAxisAction;
 
   UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = InteractionSDK)
-  UInputAction* LeftGripTriggerAxisAction;
+  FName LeftGripTriggerAxisAction;
 
   UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = InteractionSDK)
-  UInputAction* RightGripTriggerAxisAction;
+  FName RightGripTriggerAxisAction;
 
   UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = InteractionSDK)
-  UInputAction* LeftThumbstickTouchedAction;
+  FName LeftThumbstickTouchedAction;
 
   UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = InteractionSDK)
-  UInputAction* LeftThumbstickXAxisAction;
+  FName LeftThumbstickXAxisAction;
 
   UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = InteractionSDK)
-  UInputAction* LeftThumbstickYAxisAction;
+  FName LeftThumbstickYAxisAction;
 
   UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = InteractionSDK)
-  UInputAction* RightThumbstickTouchedAction;
+  FName RightThumbstickTouchedAction;
 
   UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = InteractionSDK)
-  UInputAction* RightThumbstickXAxisAction;
+  FName RightThumbstickXAxisAction;
 
   UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = InteractionSDK)
-  UInputAction* RightThumbstickYAxisAction;
+  FName RightThumbstickYAxisAction;
 
   UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = InteractionSDK)
-  UInputAction* LeftPanelTouchedAction;
+  FName LeftPanelTouchedAction;
 
   UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = InteractionSDK)
-  UInputAction* RightPanelTouchedAction;
+  FName RightPanelTouchedAction;
 };

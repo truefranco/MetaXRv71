@@ -46,24 +46,9 @@ FTransform UIsdkRayVisualFunctionLibrary::GetCursorTransformFromCollision(
   return FTransform(CursorRotation, CursorPosition);
 }
 
-UInputAction* UIsdkRayVisualFunctionLibrary::GetPinchStrengthIA(EIsdkHandedness Handedness)
+FName UIsdkRayVisualFunctionLibrary::GetPinchStrengthIA(EIsdkHandedness Handedness)
 {
-  UInputAction* InputAction = nullptr;
-  if (Handedness == EIsdkHandedness::Left)
-  {
-    InputAction = Cast<UInputAction>(StaticLoadObject(
-        UInputAction::StaticClass(),
-        nullptr,
-        IsdkContentAssetPaths::Inputs::IA_Left_HandPinchSelectStrength));
-  }
-  else
-  {
-    InputAction = Cast<UInputAction>(StaticLoadObject(
-        UInputAction::StaticClass(),
-        nullptr,
-        IsdkContentAssetPaths::Inputs::IA_Right_HandPinchSelectStrength));
-  }
-  return InputAction;
+	return FName();
 }
 
 void UIsdkRayVisualFunctionLibrary::UpdateRayVisualWithRayInteractor(

@@ -45,71 +45,7 @@ class IsdkContentAssetPaths
     static constexpr auto Interaction_BasicPoke_ButtonPress =
         TEXT("/OculusInteraction/Audio/Interaction_BasicPoke_ButtonPress");
   };
-  struct Inputs
-  {
-    static constexpr auto IA_Right_HandPinchSelectStrength =
-        TEXT("/OculusInteraction/Inputs/IA_Right_HandPinchSelectStrength");
-    static constexpr auto IA_Right_HandPinchSelect =
-        TEXT("/OculusInteraction/Inputs/IA_Right_HandPinchSelect");
-    static constexpr auto IA_Left_HandPinchSelectStrength =
-        TEXT("/OculusInteraction/Inputs/IA_Left_HandPinchSelectStrength");
-    static constexpr auto IA_Left_HandPinchSelect =
-        TEXT("/OculusInteraction/Inputs/IA_Left_HandPinchSelect");
-    static constexpr auto IA_Right_ControllerSelectStrength =
-        TEXT("/OculusInteraction/Inputs/IA_Right_ControllerSelectStrength");
-    static constexpr auto IA_Right_ControllerSelect =
-        TEXT("/OculusInteraction/Inputs/IA_Right_ControllerSelect");
-    static constexpr auto IA_Left_ControllerSelectStrength =
-        TEXT("/OculusInteraction/Inputs/IA_Left_ControllerSelectStrength");
-    static constexpr auto IA_Left_ControllerSelect =
-        TEXT("/OculusInteraction/Inputs/IA_Left_ControllerSelect");
-    static constexpr auto IA_Left_HandPinchGrab =
-        TEXT("/OculusInteraction/Inputs/IA_Left_HandPinchGrab");
-    static constexpr auto IA_Right_HandPinchGrab =
-        TEXT("/OculusInteraction/Inputs/IA_Right_HandPinchGrab");
-    static constexpr auto IA_Left_HandPalmGrab =
-        TEXT("/OculusInteraction/Inputs/IA_Left_HandPalmGrab");
-    static constexpr auto IA_Right_HandPalmGrab =
-        TEXT("/OculusInteraction/Inputs/IA_Right_HandPalmGrab");
-    static constexpr auto IA_AButton_Down = TEXT("/OculusInteraction/Inputs/IA_AButton_Down");
-    static constexpr auto IA_BButton_Down = TEXT("/OculusInteraction/Inputs/IA_BButton_Down");
-    static constexpr auto IA_XButton_Down = TEXT("/OculusInteraction/Inputs/IA_XButton_Down");
-    static constexpr auto IA_YButton_Down = TEXT("/OculusInteraction/Inputs/IA_YButton_Down");
-    static constexpr auto IA_AButton_Touched = TEXT("/OculusInteraction/Inputs/IA_AButton_Touched");
-    static constexpr auto IA_BButton_Touched = TEXT("/OculusInteraction/Inputs/IA_BButton_Touched");
-    static constexpr auto IA_XButton_Touched = TEXT("/OculusInteraction/Inputs/IA_XButton_Touched");
-    static constexpr auto IA_YButton_Touched = TEXT("/OculusInteraction/Inputs/IA_YButton_Touched");
-    static constexpr auto IA_Left_MenuButton_Down =
-        TEXT("/OculusInteraction/Inputs/IA_Left_MenuButton_Down");
-    static constexpr auto IA_Left_FrontTrigger_Touched =
-        TEXT("/OculusInteraction/Inputs/IA_Left_FrontTrigger_Touched");
-    static constexpr auto IA_Left_FrontTrigger_Axis =
-        TEXT("/OculusInteraction/Inputs/IA_Left_FrontTrigger_Axis");
-    static constexpr auto IA_Right_FrontTrigger_Touched =
-        TEXT("/OculusInteraction/Inputs/IA_Right_FrontTrigger_Touched");
-    static constexpr auto IA_Right_FrontTrigger_Axis =
-        TEXT("/OculusInteraction/Inputs/IA_Right_FrontTrigger_Axis");
-    static constexpr auto IA_Left_GripTrigger_Axis =
-        TEXT("/OculusInteraction/Inputs/IA_Left_GripTrigger_Axis");
-    static constexpr auto IA_Right_GripTrigger_Axis =
-        TEXT("/OculusInteraction/Inputs/IA_Right_GripTrigger_Axis");
-    static constexpr auto IA_Left_Thumbstick_Touched =
-        TEXT("/OculusInteraction/Inputs/IA_Left_Thumbstick_Touched");
-    static constexpr auto IA_Left_Thumbstick_XAxis =
-        TEXT("/OculusInteraction/Inputs/IA_Left_Thumbstick_XAxis");
-    static constexpr auto IA_Left_Thumbstick_YAxis =
-        TEXT("/OculusInteraction/Inputs/IA_Left_Thumbstick_YAxis");
-    static constexpr auto IA_Right_Thumbstick_Touched =
-        TEXT("/OculusInteraction/Inputs/IA_Right_Thumbstick_Touched");
-    static constexpr auto IA_Right_Thumbstick_XAxis =
-        TEXT("/OculusInteraction/Inputs/IA_Right_Thumbstick_XAxis");
-    static constexpr auto IA_Right_Thumbstick_YAxis =
-        TEXT("/OculusInteraction/Inputs/IA_Right_Thumbstick_YAxis");
-    static constexpr auto IA_Left_Panel_Touched =
-        TEXT("/OculusInteraction/Inputs/IA_Left_Panel_Touched");
-    static constexpr auto IA_Right_Panel_Touched =
-        TEXT("/OculusInteraction/Inputs/IA_Right_Panel_Touched");
-  };
+  
   struct Materials
   {
     static constexpr auto TextUnlit = TEXT("/OculusInteraction/Materials/TextUnlit");

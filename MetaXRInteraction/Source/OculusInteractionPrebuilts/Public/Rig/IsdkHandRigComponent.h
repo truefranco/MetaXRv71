@@ -21,7 +21,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "EnhancedInputComponent.h"
 #include "IsdkRigComponent.h"
 #include "Components/ActorComponent.h"
 #include "IsdkHandRigComponent.generated.h"
@@ -50,7 +49,7 @@ class OCULUSINTERACTIONPREBUILTS_API UIsdkHandRigComponent : public UIsdkRigComp
       float DeltaTime,
       ELevelTick TickType,
       FActorComponentTickFunction* ThisTickFunction) override;
-  virtual void BindInputActions(UEnhancedInputComponent* EnhancedInputComponent) override;
+  //virtual void BindInputActions(UInputComponent* InputComponent) override;
 
   virtual FVector GetPalmColliderOffset() const override;
   virtual USkinnedMeshComponent* GetPinchAttachMesh() const override;

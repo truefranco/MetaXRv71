@@ -53,7 +53,6 @@ public class OculusInteraction : ModuleRules
                 "Slate",
                 "SlateCore",
                 "UMG",
-                "EnhancedInput",
                 "GameplayTags",
 				"GeometricObjects",
 			    "GeometryAlgorithms",

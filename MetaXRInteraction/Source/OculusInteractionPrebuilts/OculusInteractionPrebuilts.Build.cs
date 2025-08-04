@@ -50,7 +50,6 @@ public class OculusInteractionPrebuilts : ModuleRules
                 "OculusInteractionLibrary",
                 "UMG",
 				"HeadMountedDisplay",
-                "EnhancedInput",
 				"GameplayTags"
             }
 		);

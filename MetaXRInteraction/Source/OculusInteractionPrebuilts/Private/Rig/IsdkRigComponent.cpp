@@ -27,7 +27,7 @@
 #include "Rig/IsdkRigModifier.h"
 #include "Engine/SkeletalMesh.h"
 #include "CollisionShape.h"
-#include "EnhancedInputComponent.h"
+#include "IsdkFunctionLibrary.h"
 #include "IsdkHandMeshComponent.h"
 #include "IsdkRuntimeSettings.h"
 #include "Interaction/IsdkPokeInteractor.h"
@@ -94,17 +94,20 @@ void UIsdkRigComponent::BeginPlay()
   // Subscribe to input action events
   if (bAutoBindInputActions)
   {
-    const auto FirstLocalPlayer = UGameplayStatics::GetPlayerController(this, 0);
+	  AActor* OwnerActor = GetOwner();
+	  if (OwnerActor)
+	  {
+		  OwnerActor->EnableInput(UGameplayStatics::GetPlayerController(this, 0));
+		  if (OwnerActor->InputComponent)
+		  {
+			  BindInputActions(OwnerActor->InputComponent);
 
-    AActor* OwnerActor = GetOwner();
-    OwnerActor->EnableInput(FirstLocalPlayer);
-    const auto EnhancedInputComponent = Cast<UEnhancedInputComponent>(OwnerActor->InputComponent);
-    BindInputActions(EnhancedInputComponent);
-
-    for (UIsdkRigModifier* ThisRigModifier : ActiveRigModifiers)
-    {
-      InputActionBindingHandles.Append(ThisRigModifier->BindInputActions(EnhancedInputComponent));
-    }
+			  for (UIsdkRigModifier* ThisRigModifier : ActiveRigModifiers)
+			  {
+				  ThisRigModifier->BindInputActions(OwnerActor->InputComponent);
+			  }
+		  }
+	  }
   }
 }
 
@@ -122,15 +125,11 @@ void UIsdkRigComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
   ActiveRigModifiers.Empty();
 
   // Remove bindings that were created.
-  AActor* OwnerActor = GetOwner();
-  const auto EnhancedInputComponent = Cast<UEnhancedInputComponent>(OwnerActor->InputComponent);
-  if (IsValid(EnhancedInputComponent))
+  const auto Delegate = UIsdkFunctionLibrary::GetControllerHandBehaviorDelegate(GetWorld());
+
+  if (Delegate)
   {
-    for (auto InputActionBindingHandle : InputActionBindingHandles)
-    {
-      EnhancedInputComponent->RemoveBindingByHandle(InputActionBindingHandle);
-    }
-    InputActionBindingHandles.Empty();
+	  Delegate->RemoveAll(this);
   }
 }
 

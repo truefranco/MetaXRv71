@@ -24,7 +24,6 @@
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "DataSources/IsdkIHmdDataSource.h"
 #include "StructTypes.h"
-#include "InputAction.h"
 #include "IsdkHandData.h"
 #include "IsdkRayVisual.h"
 #include "IsdkRayVisualFunctionLibrary.generated.h"
@@ -72,7 +71,7 @@ class OCULUSINTERACTIONPREBUILTS_API UIsdkRayVisualFunctionLibrary final
    * @param Handedness Handedness for the desired pinch strength
    * @return UInputAction* Data asset containing input parameters, including pinch strength
    */
-  static UInputAction* GetPinchStrengthIA(EIsdkHandedness Handedness);
+  static FName GetPinchStrengthIA(EIsdkHandedness Handedness);
 
   /**
    * @brief Propagate state changes from the Ray Interactor to the Ray Visual, updating state and

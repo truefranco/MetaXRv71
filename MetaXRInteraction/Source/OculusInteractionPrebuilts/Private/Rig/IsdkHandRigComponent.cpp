@@ -20,7 +20,6 @@
 
 #include "Rig/IsdkHandRigComponent.h"
 
-#include "EnhancedInputComponent.h"
 #include "IsdkHandData.h"
 #include "IsdkHandMeshComponent.h"
 #include "IsdkRuntimeSettings.h"
@@ -116,33 +115,6 @@ void UIsdkHandRigComponent::TickComponent(
   }
 }
 
-void UIsdkHandRigComponent::BindInputActions(UEnhancedInputComponent* EnhancedInputComponent)
-{
-  PinchStrength = &EnhancedInputComponent->BindActionValue(InputActions->SelectStrengthAction);
-
-  // If we don't have access to meta XR (we're using OpenXR), the pinch input action won't work, so
-  // we'll fall back to using the pinch grab recognizer.
-  if (!(IsdkXRUtils::IsUsingOpenXR() && PinchGrabRecognizer) &&
-      IsValid(InputActions->PinchGrabAction))
-  {
-    EnhancedInputComponent->BindAction(
-        InputActions->PinchGrabAction,
-        ETriggerEvent::Triggered,
-        this,
-        &UIsdkHandRigComponent::HandlePinchGrabStarted);
-    EnhancedInputComponent->BindAction(
-        InputActions->PinchGrabAction,
-        ETriggerEvent::Completed,
-        this,
-        &UIsdkHandRigComponent::HandlePinchGrabFinished);
-    EnhancedInputComponent->BindAction(
-        InputActions->PinchGrabAction,
-        ETriggerEvent::Canceled,
-        this,
-        &UIsdkHandRigComponent::HandlePinchGrabFinished);
-  }
-}
-
 FVector UIsdkHandRigComponent::GetPalmColliderOffset() const
 {
   return HandPalmColliderOffset;
@@ -201,12 +173,11 @@ float UIsdkHandRigComponent::GetPinchStrength() const
     return PinchGrabRecognizer->GetPinchStrength();
   }
 
-  if (PinchStrength)
+  if (PinchGrabRecognizer)
   {
-    return PinchStrength->GetValue().Get<float>();
+	  return PinchGrabRecognizer->GetPinchStrength();
   }
-
-  return 0.f;
+  return 0.0f;
 }
 
 UIsdkHandVisualsRigComponent* UIsdkHandRigComponent::GetHandVisuals() const

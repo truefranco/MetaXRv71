@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  * All rights reserved.
  *
@@ -38,10 +38,10 @@ void FOculusInteractionPrebuiltsModule::StartupModule()
             "OculusXR Modules not found at startup - skipping IsdkDataSourcesMetaXR. subscribing to OnModulesChanged."));
 
     ModuleChangeMetaXRDelegateHandle = FModuleManager::Get().OnModulesChanged().AddLambda(
-        [OculusXRInputModuleName = FName(OculusXRInputModuleName),
-         OculusXRHMDModuleName = FName(OculusXRHMDModuleName)](FName Name, EModuleChangeReason)
+        [OculusInputModuleName = FName(OculusXRInputModuleName),
+         OculusHMDModuleName = FName(OculusXRHMDModuleName)](FName Name, EModuleChangeReason)
         {
-          if (Name == OculusXRInputModuleName || Name == OculusXRHMDModuleName)
+          if (Name == OculusInputModuleName || Name == OculusHMDModuleName)
           {
             UE_LOG(LogOculusInteractionPrebuilts, Log, TEXT("Module Loaded: %s"), *Name.ToString());
 
@@ -56,7 +56,7 @@ void FOculusInteractionPrebuiltsModule::StartupModule()
         LogOculusInteractionPrebuilts,
         Log,
         TEXT(
-            "OculusXR Modules not found at startup - skipping IsdkDataSourcesOpenXR. subscribing to OnModulesChanged."));
+            "OculusVR Modules not found at startup - skipping IsdkDataSourcesOpenXR. subscribing to OnModulesChanged."));
 
     ModuleChangeOpenXRDelegateHandle = FModuleManager::Get().OnModulesChanged().AddLambda(
         [OculusXRInputModuleName = FName(OpenXRHandTrackingModuleName)](

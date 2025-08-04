@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  * All rights reserved.
  *
@@ -38,7 +38,7 @@ class FOculusInteractionPrebuiltsModule : public IModuleInterface
   FDelegateHandle ModuleChangeMetaXRDelegateHandle{};
   FDelegateHandle ModuleChangeOpenXRDelegateHandle{};
 
-  inline static constexpr auto* OculusXRInputModuleName = TEXT("OculusXRInput");
-  inline static constexpr auto* OculusXRHMDModuleName = TEXT("OculusXRHMD");
+  inline static constexpr auto* OculusXRInputModuleName = TEXT("OculusInput");
+  inline static constexpr auto* OculusXRHMDModuleName = TEXT("OculusHMD");
   inline static constexpr auto* OpenXRHandTrackingModuleName = TEXT("OpenXRHandTracking");
 };

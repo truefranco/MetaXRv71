@@ -41,7 +41,7 @@ class UIsdkGrabberComponent;
 class UIsdkHandFingerPinchGrabRecognizer;
 class UIsdkRigModifier;
 class UIsdkTrackedDataSourceRigComponent;
-class UEnhancedInputComponent;
+class UInputComponent;
 class IIsdkIHmdDataSource;
 enum class EIsdkHandBones : uint8;
 
@@ -315,7 +315,7 @@ class OCULUSINTERACTIONPREBUILTS_API UIsdkRigComponent : public USceneComponent
    */
   virtual USkinnedMeshComponent* GetPinchAttachMesh() const;
 
-  virtual void BindInputActions(UEnhancedInputComponent* EnhancedInputComponent) {}
+  virtual void BindInputActions(UInputComponent* InputComponent) {}
 
   /**
    * @brief Initializes defaults which rely on handeness, which is only valid when called from a
@@ -427,11 +427,6 @@ class OCULUSINTERACTIONPREBUILTS_API UIsdkRigComponent : public USceneComponent
    */
   UPROPERTY()
   TArray<UIsdkRigModifier*> ActiveRigModifiers;
-
-  /**
-   * Array of input indices currently bound to the UEnhancedInputComponent
-   */
-  TArray<uint32> InputActionBindingHandles;
 
   /**
    * The HMD data source used for propagating data to this rig component

@@ -21,11 +21,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "EnhancedInputComponent.h"
 #include "IsdkRigComponent.h"
 #include "Subsystem/IsdkITrackingDataSubsystem.h"
 #include "IsdkControllerRigComponent.generated.h"
 
+class UInputComponent;
 enum class EControllerHandBehavior : uint8;
 
 /**
@@ -118,11 +118,6 @@ class OCULUSINTERACTIONPREBUILTS_API UIsdkControllerRigComponent : public UIsdkR
   UIsdkControllerVisualsRigComponent* ControllerVisualsComponent;
 
   /**
-   * Unreal Engine input binding struct used for PinchStrength. Normally nullptr on a controller.
-   */
-  FEnhancedInputActionValueBinding* PinchStrength = nullptr;
-
-  /**
    * @brief Returns the FName of the bone representing the thumb tip.Used to attach pinch colliders
    *
    * @return FName Fully qualified name of the bone joint representing the thumb tip
@@ -130,7 +125,7 @@ class OCULUSINTERACTIONPREBUILTS_API UIsdkControllerRigComponent : public UIsdkR
   virtual FName GetThumbTipSocketName() const override;
 
  private:
-  virtual void BindInputActions(UEnhancedInputComponent* EnhancedInputComponent) override;
+  virtual void BindInputActions(UInputComponent* InputComponent) override;
   virtual TSubclassOf<AActor> FindBPFromPath(const FString& Path);
 
   UFUNCTION()

@@ -49,26 +49,12 @@
 			"Name": "IsdkDataSourcesMetaXR",
 			"Type": "Runtime",
 			"LoadingPhase": "None"
-		},
-		{
-			"Name": "IsdkDataSourcesOpenXR",
-			"Type": "Runtime",
-			"LoadingPhase": "None"
 		}
 	],
 	"Plugins": [
 		{
-			"Name": "EnhancedInput",
+			"Name": "OculusVR",
 			"Enabled": true
-		},
-		{
-			"Name": "OpenXRHandTracking",
-			"Enabled": true,
-			"Optional": true,
-			"SupportedTargetPlatforms": [
-				"Win64",
-				"Android"
-			]
 		},
 		{
 			"Name": "Niagara",

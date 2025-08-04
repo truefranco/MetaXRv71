@@ -489,7 +489,8 @@ void UIsdkHandMeshComponent::UpdateApiHandPositionFrame(
     ExternalHandPositionFrame& ApiHandPositionFrame) const
 {
   // Set Wrist Position
-  const auto ApiWristPosition = StructTypesUtils::Convert((FVector3f)GetComponentLocation());
+FVector3d TempComponentLocation = GetComponentLocation();
+  const auto ApiWristPosition = StructTypesUtils::Convert(TempComponentLocation);
   ApiHandPositionFrame.setWristData(&ApiWristPosition);
 
   // Set Joint Positions
@@ -501,8 +502,8 @@ void UIsdkHandMeshComponent::UpdateApiHandPositionFrame(
   {
     const int BoneIndex = MappedBoneIndices[BoneId];
     const auto WristSpaceTransform = CSPose.GetComponentSpaceTransform(BoneIndex);
-
-    ApiJointLocations[BoneId] = StructTypesUtils::Convert((FVector3d)WristSpaceTransform.GetLocation());
+	FVector3d TempLocation = WristSpaceTransform.GetLocation();
+    ApiJointLocations[BoneId] = StructTypesUtils::Convert(TempLocation);
   }
 
   ApiHandPositionFrame.setJointData(ApiJointLocations.data(), ApiJointLocations.size());

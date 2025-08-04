@@ -23,15 +23,12 @@
 #include "CoreMinimal.h"
 #include "IsdkRigComponent.h"
 #include "IsdkTrackedDataSourceRigComponent.h"
-#include "Templates/Function.h"
 #include "IsdkControllerVisualsRigComponent.generated.h"
 
 class UIsdkHandMeshComponent;
 class UIsdkXRRigSettingsComponent;
 class UIsdkInputActionsRigComponent;
 class UIsdkControllerMeshComponent;
-class UEnhancedInputComponent;
-class UInputAction;
 class UQuestControllerAnimInstance;
 class UPoseableMeshComponent;
 enum class EControllerHandBehavior : uint8;
@@ -102,9 +99,7 @@ class OCULUSINTERACTIONPREBUILTS_API UIsdkControllerVisualsRigComponent
    * @param EnhancedInputComponent Component to bind the input actions to
    * @param InputActionsRigComponent The RigComponent from which the inputs are being bound
    */
-  void BindInputActions(
-      UEnhancedInputComponent* EnhancedInputComponent,
-      UIsdkInputActionsRigComponent* InputActionsRigComponent);
+  void BindInputActions(class UInputComponent* PlayerInputComponent);
 
   /**
    * @brief Returns a pointer to the Animated Mesh Component associated with this Rig Component
@@ -161,20 +156,93 @@ class OCULUSINTERACTIONPREBUILTS_API UIsdkControllerVisualsRigComponent
    */
   virtual void OnVisibilityUpdated(bool bTrackedVisibility, bool bSyntheticVisibility) override;
 
- private:
-  // A helper to update a float value corresponding to an input action on any significant change in
-  // state
-  void BindAxisValue(
-      UEnhancedInputComponent* EnhancedInputComponent,
-      const UInputAction* Action,
-      TFunction<void(UQuestControllerAnimInstance*, float)> Lambda) const;
+  //~ Begin Legacy Input Handlers
+  void OnGripAxis(float Value);
+  void OnTriggerAxis(float Value);
+  void OnThumbstickX(float Value);
+  void OnThumbstickY(float Value);
+  void OnHandPinchSelectStrength(float value);
 
-  // A helper to update a boolean value corresponding to an input action on any significant change
-  // in state
-  void BindBoolValue(
-      UEnhancedInputComponent* EnhancedInputComponent,
-      const UInputAction* Action,
-      TFunction<void(UQuestControllerAnimInstance*, bool)> Lambda) const;
+  void OnButtonAPressed();
+  void OnButtonAReleased();
+  void OnButtonBPressed();
+  void OnButtonBReleased();
+  void OnButtonXPressed();
+  void OnButtonXReleased();
+  void OnButtonYPressed();
+  void OnButtonYReleased();
+
+  void OnButtonATouched();
+  void OnButtonAUnTouched();
+  void OnButtonBTouched();
+  void OnButtonBUnTouched();
+  void OnButtonXTouched();
+  void OnButtonXUnTouched();
+  void OnButtonYTouched();
+  void OnButtonYUnTouched();
+  void OnTriggerTouched();
+  void OnTriggerUnTouched();
+  void OnThumbstickTouched();
+  void OnThumbstickUnTouched();
+  void OnPanelTouched();
+  void OnPanelUnTouched();
+  void OnHandPinchSelectPressed();
+  void OnHandPinchSelectReleased();
+  void OnHandPinchGrabPressed();
+  void OnHandPinchGrabReleased();
+  void OnHandPalmGrabPressed();
+  void OnHandPalmGrabReleased();
+  void OnMenuTogglePressed();
+  void OnMenuToggleReleased();
+  //~ End Legacy Input Handlers
+
+	//~ Begin Input State Variables
+  UPROPERTY(BlueprintReadOnly, Category = "Input State")
+  float GripValue;
+  UPROPERTY(BlueprintReadOnly, Category = "Input State")
+  float TriggerValue;
+  UPROPERTY(BlueprintReadOnly, Category = "Input State")
+  float ThumbstickXValue;
+  UPROPERTY(BlueprintReadOnly, Category = "Input State")
+  float ThumbstickYValue;
+  UPROPERTY(BlueprintReadOnly, Category = "Input State")
+  float HandPinchSelectStrength;
+
+  UPROPERTY(BlueprintReadOnly, Category = "Input State")
+  bool bButtonADown;
+  UPROPERTY(BlueprintReadOnly, Category = "Input State")
+  bool bButtonBDown;
+  UPROPERTY(BlueprintReadOnly, Category = "Input State")
+  bool bButtonXDown;
+  UPROPERTY(BlueprintReadOnly, Category = "Input State")
+  bool bButtonYDown;
+
+  UPROPERTY(BlueprintReadOnly, Category = "Input State")
+  bool bButtonATouched;
+  UPROPERTY(BlueprintReadOnly, Category = "Input State")
+  bool bButtonBTouched;
+  UPROPERTY(BlueprintReadOnly, Category = "Input State")
+  bool bButtonXTouched;
+  UPROPERTY(BlueprintReadOnly, Category = "Input State")
+  bool bButtonYTouched;
+  UPROPERTY(BlueprintReadOnly, Category = "Input State")
+  bool bTriggerTouched;
+  UPROPERTY(BlueprintReadOnly, Category = "Input State")
+  bool bThumbstickTouched;
+
+  UPROPERTY(BlueprintReadOnly, Category = "Input State")
+  bool bPanelTouched;
+  UPROPERTY(BlueprintReadOnly, Category = "Input State")
+  bool bHandPinchSelect;
+  UPROPERTY(BlueprintReadOnly, Category = "Input State")
+  bool bHandPinchGrab;
+  UPROPERTY(BlueprintReadOnly, Category = "Input State")
+  bool bHandPalmGrab;
+  UPROPERTY(BlueprintReadOnly, Category = "Input State")
+  bool bMenuToggle;
+
+
+ private:
 
   void UpdateAnimatedHandMeshVisibility(
       bool bTrackedVisibility,
