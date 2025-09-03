@@ -4,6 +4,8 @@
 	SceneSoftwareOcclusion.cpp
 =============================================================================*/
 
+#ifdef WITH_OCULUS_BRANCH
+
 #include "SceneSoftwareOcclusion.h"
 #include "EngineGlobals.h"
 #include "SceneRendering.h"
@@ -13,8 +15,6 @@
 #include "Async/TaskGraphInterfaces.h"
 #include "Math/Vector.h"
 #include "OccluderMeshAssetUserData.h"
-
-#ifdef WITH_OCULUS_BRANCH
 
 DECLARE_STATS_GROUP(TEXT("Software Occlusion"), STATGROUP_SoftwareOcclusion, STATCAT_Advanced);
 DECLARE_CYCLE_STAT(TEXT("(RT) Gather Time"), STAT_SoftwareOcclusionGather, STATGROUP_SoftwareOcclusion);
