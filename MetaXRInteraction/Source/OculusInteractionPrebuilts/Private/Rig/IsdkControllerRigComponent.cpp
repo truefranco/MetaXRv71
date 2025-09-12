@@ -20,8 +20,6 @@
 
 #include "Rig/IsdkControllerRigComponent.h"
 #include "EnhancedInputComponent.h"
-#include "IsdkContentAssetPaths.h"
-#include "IsdkControllerMeshComponent.h"
 #include "IsdkFunctionLibrary.h"
 #include "IsdkHandMeshComponent.h"
 #include "IsdkRuntimeSettings.h"
@@ -30,6 +28,7 @@
 #include "UObject/ConstructorHelpers.h"
 #include "Components/SkinnedMeshComponent.h"
 #include "Components/SkeletalMeshComponent.h"
+#include "Utilities/IsdkXRUtils.h"
 
 UIsdkControllerRigComponent::UIsdkControllerRigComponent()
     : UIsdkControllerRigComponent(EIsdkHandedness::Left)
@@ -62,7 +61,23 @@ FVector UIsdkControllerRigComponent::GetPalmColliderOffset() const
     return HandPalmColliderOffset;
   }
 
-  return ControllerPalmColliderOffset;
+  return IsdkXRUtils::IsOpenXrTrackingSystem() ? FVector(1, 0, -2) : ControllerPalmColliderOffset;
+}
+
+FVector UIsdkControllerRigComponent::GetPinchColliderOffset() const
+{
+  const auto ControllerHandBehavior = UIsdkFunctionLibrary::GetControllerHandBehavior(GetWorld());
+  const bool bUseHandOffset =
+      ControllerHandBehavior == EControllerHandBehavior::HandsOnlyAnimated ||
+      ControllerHandBehavior == EControllerHandBehavior::HandsOnlyProcedural;
+
+  if (bUseHandOffset)
+  {
+    return FVector::ZeroVector;
+  }
+
+  return IsdkXRUtils::IsOpenXrTrackingSystem() ? IsdkXRUtils::OXR::ControllerPinchOffset
+                                               : FVector::ZeroVector;
 }
 
 USkinnedMeshComponent* UIsdkControllerRigComponent::GetPinchAttachMesh() const

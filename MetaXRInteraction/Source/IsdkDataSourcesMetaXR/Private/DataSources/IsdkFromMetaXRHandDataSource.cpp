@@ -97,6 +97,7 @@ UIsdkFromMetaXRHandDataSource* UIsdkFromMetaXRHandDataSource::MakeMetaXRHandData
     OculusHandComponent->SetVisibility(false);
     OculusHandComponent->bHiddenInGame = true;
     Actor->FinishAddComponent(OculusHandComponent, true, FTransform::Identity);
+
     DataSourceComponent->OculusXrHandComponent = OculusHandComponent;
   }
   else
@@ -207,8 +208,6 @@ void UIsdkFromMetaXRHandDataSource::ReadHandData()
     RelativePointerPose = FIsdkOculusXRHelper::GetPointerPose(Handedness, MotionController);
     bIsLastGoodPointerPoseValid = !RelativePointerPose.Equals(FTransform());
 
-    const bool bIsOpenXrSystem = IsdkXRUtils::IsUsingOpenXR();
-
     // set the wrist bone pose
     TArray<FTransform>& JointPoses = HandData->GetJointPoses();
 
@@ -217,22 +216,13 @@ void UIsdkFromMetaXRHandDataSource::ReadHandData()
     const bool bIsLeft = Handedness == EIsdkHandedness::Left;
     const FQuat OVRToOXRRotation =
         bIsLeft ? IsdkXRUtils::OVR::OVRToOXRLeft : IsdkXRUtils::OVR::OVRToOXRRight;
-
-    // Different MetaXR plugin XrApi values require different rotation correction
-    FQuat InvWristRotation;
-    if (!bIsOpenXrSystem)
-    {
-      InvWristRotation = bIsLeft ? IsdkXRUtils::OVR::HandRootInvFixupRotationLeft
-                                 : IsdkXRUtils::OVR::HandRootInvFixupRotationRight;
-    }
-    else
-    {
-      InvWristRotation = FQuat::MakeFromEuler(FVector(0, -90, -90));
-    }
+    const FQuat InvWristRotation = bIsLeft ? IsdkXRUtils::OVR::HandRootInvFixupRotationLeft
+                                           : IsdkXRUtils::OVR::HandRootInvFixupRotationRight;
+    const FQuat MetacarpalRotation =
+        bIsLeft ? FQuat(FVector::UnitX(), HALF_PI) : FQuat(FVector::UnitX(), -HALF_PI);
 
     // set the bone poses
     FTransform WristPose = FTransform::Identity;
-
     JointPoses[1] = WristPose;
 
     for (const auto& Bone : BoneMap)
@@ -244,6 +234,11 @@ void UIsdkFromMetaXRHandDataSource::ReadHandData()
             Bone.OVRBoneName, EBoneSpaces::Type::ComponentSpace);
         Pose.SetRotation(Pose.GetRotation() * OVRToOXRRotation);
         Pose.SetScale3D(FVector::One());
+      }
+      else
+      {
+        const FQuat YRot = FQuat(FVector::UnitY(), Bone.OXRRotation);
+        Pose = FTransform(MetacarpalRotation * YRot, Bone.OXRWristOffset);
       }
       Pose = Pose * FTransform(InvWristRotation);
       JointPoses[Bone.OXRBoneIndex] = Pose;
@@ -283,23 +278,10 @@ void UIsdkFromMetaXRHandDataSource::ReadHandData()
 FTransform UIsdkFromMetaXRHandDataSource::GetRootPose_Implementation()
 {
   FTransform MotionTransform = MotionController->GetComponentTransform();
-
-  // Different MetaXR plugin XrApi values require different rotation correction
-  const bool bIsOpenXrSystem = IsdkXRUtils::IsUsingOpenXR();
-  if (!bIsOpenXrSystem)
-  {
-    const FQuat WristRotation = Handedness == EIsdkHandedness::Left
-        ? IsdkXRUtils::OVR::HandRootFixupRotationLeft
-        : IsdkXRUtils::OVR::HandRootFixupRotationRight;
-    MotionTransform.SetRotation(MotionTransform.GetRotation() * WristRotation);
-  }
-  else
-  {
-    const FQuat FixupRotation = Handedness == EIsdkHandedness::Left
-        ? FQuat::MakeFromEuler(FVector(90, 0, 90))
-        : FQuat::MakeFromEuler(FVector(90, 0, 90));
-    MotionTransform.SetRotation(MotionTransform.GetRotation() * FixupRotation);
-  }
+  const FQuat WristRotation = Handedness == EIsdkHandedness::Left
+      ? IsdkXRUtils::OVR::HandRootFixupRotationLeft
+      : IsdkXRUtils::OVR::HandRootFixupRotationRight;
+  MotionTransform.SetRotation(MotionTransform.GetRotation() * WristRotation);
   return MotionTransform;
 }
 

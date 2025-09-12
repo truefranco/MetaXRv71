@@ -18,33 +18,18 @@
  * limitations under the License.
  */
 
-using System.Linq;
-using System.IO;
-using UnrealBuildTool;
-using EpicGames.Core;
+#pragma once
 
-public class IsdkDataSourcesMetaXR : ModuleRules
+#include "CoreMinimal.h"
+#include "AssetTypeActions_Base.h"
+
+/**
+ */
+class FIsdkHandPoseDetectionProfileAssetTypeActions : public FAssetTypeActions_Base
 {
-    public IsdkDataSourcesMetaXR(ReadOnlyTargetRules Target) : base(Target)
-    {
-        IncludeOrderVersion = EngineIncludeOrderVersion.Unreal5_4;
-        PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
-
-        PublicDependencyModuleNames.AddRange(
-            new[]
-            {
-                "Core",
-                "CoreUObject",
-                "Engine",
-                "Projects",
-                "HeadMountedDisplay",
-                "InputCore",
-                "Slate",
-                "SlateCore",
-                "UMG",
-                "OculusInteraction",
-                "XRBase"
-            }
-        );
-    }
-}
+ public:
+  UClass* GetSupportedClass() const override;
+  FText GetName() const override;
+  FColor GetTypeColor() const override;
+  uint32 GetCategories() override;
+};

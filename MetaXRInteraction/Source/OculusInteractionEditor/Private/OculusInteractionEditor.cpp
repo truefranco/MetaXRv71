@@ -27,7 +27,7 @@
 #include "Widgets/Notifications/SNotificationList.h"
 #include "IsdkHandPoseVisualizer.h"
 #include "Interaction/Grabbable/IsdkHandGrabPose.h"
-
+#include "HandPoseDetection/IsdkHandPoseDetectionProfile.h"
 #include "UnrealEdGlobals.h"
 #include "Editor/UnrealEdEngine.h"
 
@@ -69,6 +69,11 @@ void FOculusInteractionEditor::StartupModule()
   IsdkHandPoseDataAssetTypeActions = MakeShared<FIsdkHandPoseDataAssetTypeActions>();
   FAssetToolsModule::GetModule().Get().RegisterAssetTypeActions(
       IsdkHandPoseDataAssetTypeActions.ToSharedRef());
+
+  IsdkHandPoseDetectionProfileAssetTypeActions =
+      MakeShared<FIsdkHandPoseDetectionProfileAssetTypeActions>();
+  FAssetToolsModule::GetModule().Get().RegisterAssetTypeActions(
+      IsdkHandPoseDetectionProfileAssetTypeActions.ToSharedRef());
 
   // Wait for editor to be initialized before performing version check logic to avoid any potential
   // module load timing issues

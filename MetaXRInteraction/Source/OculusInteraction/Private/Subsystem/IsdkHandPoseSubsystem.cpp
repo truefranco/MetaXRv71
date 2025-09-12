@@ -32,6 +32,8 @@
 #include "IsdkHandPoseData.h"
 #include "Utilities/IsdkXRUtils.h"
 #include "IsdkChecks.h"
+#include "HandPoseDetection/IsdkHandFingerRecognizer.h"
+#include "HandPoseDetection/IsdkHandThumbRecognizer.h"
 #include "Runtime/Launch/Resources/Version.h"
 
 namespace isdk
@@ -92,6 +94,9 @@ void UIsdkHandPoseSubsystem::Tick(float InDeltaTime)
       i--;
     }
   }
+
+  // Check for Hand Pose Detections
+  DetectRegisteredPoses(InDeltaTime);
 
   // Handle Pose Transform Debug Drawing when enabled (this is not currently intended to be
   // performant)
@@ -740,5 +745,767 @@ bool UIsdkHandPoseSubsystem::ShouldCreateNewActorPoseVariation(
       }
     }
   }
+  return true;
+}
+
+bool UIsdkHandPoseSubsystem::SetHandPoseDetectionProfileFromMesh(
+    UIsdkHandPoseDetectionProfile* ProfileIn,
+    UIsdkHandMeshComponent* MeshComponentIn,
+    float BaseTolerances,
+    TArray<EIsdkFingerType> FingersToIgnore,
+    bool bIgnoreThumb,
+    FName PoseName)
+{
+  if (!IsValid(MeshComponentIn))
+  {
+    UE_LOG(
+        LogOculusInteraction,
+        Error,
+        TEXT(
+            "UIsdkHandPoseSubsystem::SetHandPoseDetectionProfileFromMesh - Hand Mesh was invalid!"));
+    return false;
+  }
+  // Register Hand Mesh
+  if (!RegisterHandMeshForDetection(MeshComponentIn))
+  {
+    UE_LOG(
+        LogOculusInteraction,
+        Error,
+        TEXT(
+            "UIsdkHandPoseSubsystem::SetHandPoseDetectionProfileFromMesh - Hand Mesh registration failed!"));
+    return false;
+  }
+  // Get Results
+  if (!HandMeshComponentResults.Contains(MeshComponentIn))
+  {
+    UE_LOG(
+        LogOculusInteraction,
+        Error,
+        TEXT(
+            "UIsdkHandPoseSubsystem::SetHandPoseDetectionProfileFromMesh - Results struct not created for hand mesh!"));
+    return false;
+  }
+  FIsdkHandPoseRecognizerResults& NewResults = HandMeshComponentResults[MeshComponentIn];
+  GetHandMeshDetectionResults(MeshComponentIn, NewResults, 0.33f);
+
+  // If no tolerances were set, use defined defaults
+  if (BaseTolerances == 0.f)
+  {
+    BaseTolerances = HandPoseDetectionDigitCalcTolerance;
+  }
+
+  ProfileIn->PoseDetectionName = PoseName;
+  ProfileIn->ProfileFingerTargets.Empty();
+
+  // Fingers
+  for (auto& OuterElem : NewResults.FingersResults)
+  {
+    const EIsdkFingerType& FingerType = OuterElem.Key;
+    const FIsdkHandPoseRecognizerFingerResult& FingerResult = OuterElem.Value;
+    if (FingersToIgnore.Contains(FingerType))
+    {
+      continue;
+    }
+    FIsdkHandPoseDetectionFingerTarget NewFingerTarget;
+    for (auto& InnerElem : FingerResult.FingerResults)
+    {
+      const EIsdkDetection_FingerCalcType& CalcType = InnerElem.Key;
+      const float CalcValue = InnerElem.Value;
+      NewFingerTarget.FingerCalcTargets.Add(CalcType, CalcValue);
+      NewFingerTarget.FingerCalcTolerances.Add(CalcType, BaseTolerances);
+    }
+    ProfileIn->ProfileFingerTargets.Add(FingerType, NewFingerTarget);
+  }
+
+  // Thumb
+  if (!bIgnoreThumb)
+  {
+    FIsdkHandPoseDetectionThumbTarget NewThumbTarget;
+    for (auto& OuterElem : NewResults.ThumbResults)
+    {
+      const EIsdkDetection_ThumbCalcType& CalcType = OuterElem.Key;
+      const float CalcValue = OuterElem.Value;
+      NewThumbTarget.ThumbCalcTargets.Add(CalcType, CalcValue);
+      NewThumbTarget.ThumbCalcTolerances.Add(CalcType, BaseTolerances);
+    }
+    ProfileIn->ProfileThumbTarget = NewThumbTarget;
+  }
+
+  return true;
+}
+
+bool UIsdkHandPoseSubsystem::CreateHandPoseDetectionProfileFromMesh(
+    UIsdkHandMeshComponent* MeshComponentIn,
+    float BaseTolerances,
+    TArray<EIsdkFingerType> FingersToIgnore,
+    bool bIgnoreThumb,
+    FName PoseName,
+    UIsdkHandPoseDetectionProfile*& ProfileOut)
+{
+  if (!IsValid(MeshComponentIn))
+  {
+    UE_LOG(
+        LogOculusInteraction,
+        Error,
+        TEXT(
+            "UIsdkHandPoseSubsystem::CreateHandPoseDetectionProfileFromMesh - Hand Mesh was invalid!"));
+    return false;
+  }
+  ProfileOut = NewObject<UIsdkHandPoseDetectionProfile>(this);
+  return SetHandPoseDetectionProfileFromMesh(
+      ProfileOut, MeshComponentIn, BaseTolerances, FingersToIgnore, bIgnoreThumb, PoseName);
+}
+
+bool UIsdkHandPoseSubsystem::RegisterHandPoseDetection(
+    UIsdkHandPoseDetectionProfile* ProfileIn,
+    UIsdkHandMeshComponent* MeshComponentIn)
+{
+  if (!IsValid(MeshComponentIn))
+  {
+    UE_LOG(
+        LogOculusInteraction,
+        Error,
+        TEXT("UIsdkHandPoseSubsystem::RegisterHandPoseDetection - MeshComponentIn was invalid"));
+    return false;
+  }
+
+  if (!IsValid(ProfileIn))
+  {
+    UE_LOG(
+        LogOculusInteraction,
+        Error,
+        TEXT("UIsdkHandPoseSubsystem::RegisterHandPoseDetection - ProfileIn was invalid"));
+    return false;
+  }
+
+  uint32 ProfileIdx = RegisteredDetectionProfiles.IndexOfByKey(ProfileIn);
+
+  if (ProfileIdx == INDEX_NONE)
+  {
+    RegisteredDetectionProfiles.Add(ProfileIn);
+    ProfileIdx = RegisteredDetectionProfiles.Num() - 1;
+    // Setup new results struct so we're not making a new one each tick
+    FIsdkHandPoseRecognizerResults DeltaResults;
+    DetectionProfileDeltaResults.Add(DeltaResults);
+  }
+
+  // Map Hand Mesh with Profile if not already done
+  if (RegisteredMeshComponentProfileMap.Contains(MeshComponentIn))
+  {
+    if (!RegisteredMeshComponentProfileMap[MeshComponentIn].ProfileIndices.Contains(ProfileIdx))
+    {
+      RegisteredMeshComponentProfileMap[MeshComponentIn].ProfileIndices.Add(ProfileIdx);
+    }
+    else
+    {
+      // We've already registered this profile with this handmesh, and thus all the recognizers
+      // should already be in place
+      return true;
+    }
+  }
+  else
+  {
+    FIsdkHandPoseDetectionMeshToProfile NewMeshProfile;
+    NewMeshProfile.ProfileIndices.Add(ProfileIdx);
+    RegisteredMeshComponentProfileMap.Add(MeshComponentIn, {NewMeshProfile});
+  }
+
+  MeshComponentIn->TryGetApiIHandPositionFrame();
+
+  // Check if we need to create new Recognizers
+  if (RegisteredMeshComponentMap.Contains(MeshComponentIn))
+  {
+    FIsdkHandPoseDetectionMeshGroup& ThisComponentGroup =
+        RegisteredMeshComponentMap[MeshComponentIn];
+    // Key: FingerType Value: FingerTarget
+    for (auto& Elem : ProfileIn->ProfileFingerTargets)
+    {
+      const EIsdkFingerType FingerType = Elem.Key;
+      if (!ThisComponentGroup.FingerRecognizerGroups.Contains(FingerType))
+      {
+        // Create recognizers for mesh and finger type
+        CreateFingerRecognizers(MeshComponentIn, FingerType);
+      }
+    }
+    if (ProfileIn->ProfileThumbTarget.ThumbCalcTargets.Num() > 0)
+    {
+      if (ThisComponentGroup.ThumbRecognizerGroup.ThumbCalcToRecognizerIndex.Num() == 0)
+      {
+        // create thumb recognizers for mesh
+        CreateThumbRecognizers(MeshComponentIn);
+      }
+    }
+  }
+  else
+  {
+    // Brand new mesh, create all recognizers needed by the profile
+
+    for (auto& Elem : ProfileIn->ProfileFingerTargets)
+    {
+      const EIsdkFingerType FingerType = Elem.Key;
+      CreateFingerRecognizers(MeshComponentIn, FingerType);
+    }
+    if (ProfileIn->ProfileThumbTarget.ThumbCalcTargets.Num() > 0)
+    {
+      CreateThumbRecognizers(MeshComponentIn);
+    }
+  }
+  bHandPoseDetectionEnabled = true;
+  return true;
+}
+
+bool UIsdkHandPoseSubsystem::UnregisterHandPoseDetection(
+    UIsdkHandPoseDetectionProfile* ProfileIn,
+    UIsdkHandMeshComponent* MeshComponentIn)
+{
+  if (!IsValid(ProfileIn))
+  {
+    UE_LOG(
+        LogOculusInteraction,
+        Error,
+        TEXT("UIsdkHandPoseSubsystem::UnregisterHandPoseDetection - ProfileIn was invalid"));
+    return false;
+  }
+  if (!IsValid(MeshComponentIn))
+  {
+    UE_LOG(
+        LogOculusInteraction,
+        Error,
+        TEXT("UIsdkHandPoseSubsystem::UnregisterHandPoseDetection - MeshComponentIn was invalid"));
+    return false;
+  }
+
+  const uint32 ProfileIdx = RegisteredDetectionProfiles.IndexOfByKey(ProfileIn);
+
+  if (ProfileIdx == INDEX_NONE)
+  {
+    UE_LOG(
+        LogOculusInteraction,
+        Error,
+        TEXT("UIsdkHandPoseSubsystem::UnregisterHandPoseDetection - Profile index not found"));
+    return false;
+  }
+
+  if (!RegisteredMeshComponentProfileMap.Contains(MeshComponentIn))
+  {
+    UE_LOG(
+        LogOculusInteraction,
+        Error,
+        TEXT(
+            "UIsdkHandPoseSubsystem::UnregisterHandPoseDetection - Mesh Component not found in profile map"));
+    return false;
+  }
+  if (!RegisteredMeshComponentProfileMap[MeshComponentIn].ProfileIndices.Contains(ProfileIdx))
+  {
+    UE_LOG(
+        LogOculusInteraction,
+        Error,
+        TEXT(
+            "UIsdkHandPoseSubsystem::UnregisterHandPoseDetection - Given profile is not registered for that hand mesh"));
+    return false;
+  }
+
+  // Remove this profile from those registered with this mesh component
+  RegisteredMeshComponentProfileMap[MeshComponentIn].ProfileIndices.Remove(ProfileIdx);
+
+  // Null out the profile object, but don't remove it so we maintain the other indices
+  RegisteredDetectionProfiles[ProfileIdx] = nullptr;
+
+  // Empty the results as well
+  DetectionProfileDeltaResults[ProfileIdx].FingersResults.Empty();
+  DetectionProfileDeltaResults[ProfileIdx].ThumbResults.Empty();
+
+  return true;
+}
+
+bool UIsdkHandPoseSubsystem::RegisterHandMeshForDetection(UIsdkHandMeshComponent* MeshComponentIn)
+{
+  if (!IsValid(MeshComponentIn))
+  {
+    UE_LOG(
+        LogOculusInteraction,
+        Error,
+        TEXT("UIsdkHandPoseSubsystem::RegisterHandMeshForDetection - MeshComponentIn was invalid"));
+    return false;
+  }
+
+  // Map Hand Mesh with Profile if not already done
+  if (RegisteredMeshComponentProfileMap.Contains(MeshComponentIn) &&
+      HandMeshComponentResults.Contains(MeshComponentIn))
+  {
+    return true;
+  }
+  else
+  {
+    // Empty Profile
+    FIsdkHandPoseDetectionMeshToProfile NewMeshProfile;
+    RegisteredMeshComponentProfileMap.Add(MeshComponentIn, {NewMeshProfile});
+    FIsdkHandPoseRecognizerResults NewResultsStruct;
+
+    HandMeshComponentResults.Add(MeshComponentIn, NewResultsStruct);
+  }
+
+  MeshComponentIn->TryGetApiIHandPositionFrame();
+  // Brand new mesh, create all recognizers needed by the profile
+
+  for (int i = 0; i < 4; i++)
+  {
+    const EIsdkFingerType ThisFingerType = (EIsdkFingerType)i;
+    CreateFingerRecognizers(MeshComponentIn, ThisFingerType);
+  }
+  CreateThumbRecognizers(MeshComponentIn);
+
+  bHandPoseDetectionEnabled = true;
+  return true;
+}
+
+bool UIsdkHandPoseSubsystem::UnregisterHandMeshForDetection(UIsdkHandMeshComponent* MeshComponentIn)
+{
+  if (!IsValid(MeshComponentIn))
+  {
+    UE_LOG(
+        LogOculusInteraction,
+        Error,
+        TEXT(
+            "UIsdkHandPoseSubsystem::UnregisterHandMeshForDetection - MeshComponentIn was invalid"));
+    return false;
+  }
+
+  if (!RegisteredMeshComponentProfileMap.Contains(MeshComponentIn) ||
+      !RegisteredMeshComponentMap.Contains(MeshComponentIn) ||
+      !HandMeshComponentResults.Contains(MeshComponentIn))
+  {
+    UE_LOG(
+        LogOculusInteraction,
+        Error,
+        TEXT(
+            "UIsdkHandPoseSubsystem::UnregisterHandMeshForDetection - MeshComponentIn not found in one/all of caches"));
+    return false;
+  }
+
+  // Nullify all of its mesh component recognizers
+  // Fingers
+  FIsdkHandPoseDetectionMeshGroup& MeshGroup = RegisteredMeshComponentMap[MeshComponentIn];
+  for (auto& FingerElem : MeshGroup.FingerRecognizerGroups)
+  {
+    FIsdkHandPoseFingerRecognizerGroup& RecognizerGroup = FingerElem.Value;
+    for (auto& FingerGroupElem : RecognizerGroup.FingerCalcToRecognizerIndex)
+    {
+      const uint32 RecognizerIdx = FingerGroupElem.Value;
+      if (!FingerRecognizers.IsValidIndex(RecognizerIdx))
+      {
+        UE_LOG(
+            LogOculusInteraction,
+            Error,
+            TEXT(
+                "UIsdkHandPoseSubsystem::UnregisterHandMeshForDetection - Registered finger recognizer index not found in array"));
+        return false;
+      }
+
+      // Null out the recognizer, maintaining order for others
+      FingerRecognizers[RecognizerIdx] = nullptr;
+    }
+  }
+  // Thumb
+  for (auto& ThumbElem : MeshGroup.ThumbRecognizerGroup.ThumbCalcToRecognizerIndex)
+  {
+    const uint32 RecognizerIdx = ThumbElem.Value;
+    if (!ThumbRecognizers.IsValidIndex(RecognizerIdx))
+    {
+      UE_LOG(
+          LogOculusInteraction,
+          Error,
+          TEXT(
+              "UIsdkHandPoseSubsystem::UnregisterHandMeshForDetection - Registered thumb recognizer index not found in array"));
+      return false;
+    }
+    // Null out the recognizer, maintaining order for others
+    ThumbRecognizers[RecognizerIdx] = nullptr;
+  }
+
+  FIsdkHandPoseDetectionMeshToProfile& MeshProfiles =
+      RegisteredMeshComponentProfileMap[MeshComponentIn];
+
+  // Find if the profiles we would remove are still referenced by other mesh components
+  for (const uint32 ThisIdx : MeshProfiles.ProfileIndices)
+  {
+    if (!RegisteredDetectionProfiles.IsValidIndex(ThisIdx))
+    {
+      UE_LOG(
+          LogOculusInteraction,
+          Error,
+          TEXT(
+              "UIsdkHandPoseSubsystem::UnregisterHandMeshForDetection - Registered profile index not actually found in cache"));
+      return false;
+    }
+    bool bProfileInUseElsewhere = false;
+    for (auto& ProfileElem : RegisteredMeshComponentProfileMap)
+    {
+      if (ProfileElem.Key == MeshComponentIn)
+      {
+        continue;
+      }
+      FIsdkHandPoseDetectionMeshToProfile& ThisProfile = ProfileElem.Value;
+      if (ThisProfile.ProfileIndices.Contains(ThisIdx))
+      {
+        bProfileInUseElsewhere = true;
+        break;
+      }
+    }
+    // Any profiles that were only referenced by this mesh component are good to null out
+    // (maintaining indices for others)
+    if (!bProfileInUseElsewhere)
+    {
+      RegisteredDetectionProfiles[ThisIdx] = nullptr;
+    }
+  }
+
+  // Now that we've made it this far, remove all mesh component references
+
+  // Remove from component map
+  RegisteredMeshComponentMap.Remove(MeshComponentIn);
+
+  // Remove from Profile Map
+  RegisteredMeshComponentProfileMap.Remove(MeshComponentIn);
+
+  // Remove from Results Cache
+  HandMeshComponentResults.Remove(MeshComponentIn);
+
+  return true;
+}
+
+void UIsdkHandPoseSubsystem::DetectRegisteredPoses(float& DeltaTime)
+{
+  if (bHandPoseDetectionEnabled)
+  {
+    for (auto& Elem : RegisteredMeshComponentProfileMap)
+    {
+      UIsdkHandMeshComponent* ThisHandMesh = Elem.Key;
+      FIsdkHandPoseDetectionMeshToProfile& MeshProfile = Elem.Value;
+      if (!IsValid(ThisHandMesh))
+      {
+        UE_LOG(
+            LogOculusInteraction,
+            Warning,
+            TEXT("UIsdkHandPoseSubsystem::DetectRegisteredPoses - MeshComponent was invalid"));
+        continue;
+      }
+      if (!HandMeshComponentResults.Contains(ThisHandMesh))
+      {
+        continue;
+      }
+      if (!GetHandMeshDetectionResults(
+              ThisHandMesh, HandMeshComponentResults[ThisHandMesh], DeltaTime))
+      {
+        continue;
+      }
+      for (uint32 ProfileIdx : MeshProfile.ProfileIndices)
+      {
+        if (RegisteredDetectionProfiles.IsValidIndex(ProfileIdx) &&
+            IsValid(RegisteredDetectionProfiles[ProfileIdx]))
+        {
+          UIsdkHandPoseDetectionProfile* ThisProfile = RegisteredDetectionProfiles[ProfileIdx];
+          if (!IsValid(ThisProfile) || !DetectionProfileDeltaResults.IsValidIndex(ProfileIdx))
+          {
+            continue;
+          }
+          bool bPoseDetected = false;
+          if (!GetProfileDeltasFromResults(
+                  ThisProfile,
+                  HandMeshComponentResults[ThisHandMesh],
+                  bDebugHandPoseDetection,
+                  bPoseDetected,
+                  DetectionProfileDeltaResults[ProfileIdx]))
+          {
+            continue;
+          }
+          if (bPoseDetected)
+          {
+            HandPoseDetectionDelegate.Broadcast(
+                ThisProfile->PoseDetectionName, ThisProfile, ThisHandMesh);
+          }
+        }
+      }
+    }
+  }
+}
+
+bool UIsdkHandPoseSubsystem::GetHandMeshDetectionResults(
+    UIsdkHandMeshComponent* MeshComponentIn,
+    FIsdkHandPoseRecognizerResults& ResultsOut,
+    const float DeltaTime)
+{
+  if (!IsValid(MeshComponentIn))
+  {
+    UE_LOG(
+        LogOculusInteraction,
+        Warning,
+        TEXT("UIsdkHandPoseSubsystem::GetHandMeshDetectionResults - MeshComponent was invalid"));
+    return false;
+  }
+  if (!RegisteredMeshComponentMap.Contains(MeshComponentIn))
+  {
+    UE_LOG(
+        LogOculusInteraction,
+        Warning,
+        TEXT(
+            "UIsdkHandPoseSubsystem::GetHandMeshDetectionResults - MeshComponent found but not registered"));
+    return false;
+  }
+
+  FIsdkHandPoseDetectionMeshGroup& MeshGroup = RegisteredMeshComponentMap[MeshComponentIn];
+  ResultsOut.FingersResults.Empty();
+  ResultsOut.ThumbResults.Empty();
+  // Fingers
+  for (auto& OuterElem : MeshGroup.FingerRecognizerGroups)
+  {
+    const EIsdkFingerType FingerType = OuterElem.Key;
+    const FIsdkHandPoseFingerRecognizerGroup& RecognizerGroup = OuterElem.Value;
+    FIsdkHandPoseRecognizerFingerResult NewFingerResult;
+    for (auto& InnerElem : RecognizerGroup.FingerCalcToRecognizerIndex)
+    {
+      const EIsdkDetection_FingerCalcType& FingerCalcType = InnerElem.Key;
+      const uint32& RecognizerIndex = InnerElem.Value;
+      UIsdkHandFingerRecognizer* ThisFingerRecognizer = nullptr;
+      if (FingerRecognizers.IsValidIndex(RecognizerIndex))
+      {
+        ThisFingerRecognizer = FingerRecognizers[RecognizerIndex];
+      }
+      if (!IsValid(ThisFingerRecognizer))
+      {
+        continue;
+      }
+      ThisFingerRecognizer->UpdateState(DeltaTime);
+      const float RawValue = ThisFingerRecognizer->GetRawValue();
+      NewFingerResult.FingerResults.Add(FingerCalcType, RawValue);
+    }
+    ResultsOut.FingersResults.Add(FingerType, NewFingerResult);
+  }
+
+  // Thumb
+  FIsdkHandPoseThumbRecognizerGroup& ThumbGroup = MeshGroup.ThumbRecognizerGroup;
+
+  for (auto& OuterElem : ThumbGroup.ThumbCalcToRecognizerIndex)
+  {
+    const EIsdkDetection_ThumbCalcType& ThumbCalcType = OuterElem.Key;
+    const uint32& RecognizerIndex = OuterElem.Value;
+    UIsdkHandThumbRecognizer* ThisThumbRecognizer = nullptr;
+    if (ThumbRecognizers.IsValidIndex(RecognizerIndex))
+    {
+      ThisThumbRecognizer = ThumbRecognizers[RecognizerIndex];
+    }
+    if (!IsValid(ThisThumbRecognizer))
+    {
+      continue;
+    }
+    ThisThumbRecognizer->UpdateState(DeltaTime);
+    const float RawValue = ThisThumbRecognizer->GetRawValue();
+    ResultsOut.ThumbResults.Add(ThumbCalcType, RawValue);
+  }
+  return (ResultsOut.FingersResults.Num() > 0 || ResultsOut.ThumbResults.Num() > 0);
+}
+
+bool UIsdkHandPoseSubsystem::CreateFingerRecognizers(
+    UIsdkHandMeshComponent* MeshIn,
+    EIsdkFingerType FingerType)
+{
+  if (!IsValid(MeshIn))
+  {
+    return false;
+  }
+
+  if (!RegisteredMeshComponentMap.Contains(MeshIn))
+  {
+    const FIsdkHandPoseDetectionMeshGroup NewMeshGroup;
+    RegisteredMeshComponentMap.Add(MeshIn, NewMeshGroup);
+  }
+  FIsdkHandPoseDetectionMeshGroup& MeshGroup = RegisteredMeshComponentMap[MeshIn];
+  // Only create the recognizers if they don't already exist
+  if (!MeshGroup.FingerRecognizerGroups.Contains(FingerType))
+  {
+    FIsdkHandPoseFingerRecognizerGroup NewFingerRecognizerGroup;
+    MeshGroup.FingerRecognizerGroups.Add(FingerType, NewFingerRecognizerGroup);
+
+    for (const EIsdkDetection_FingerCalcType FingerCalcType : FingerCalcTypes)
+    {
+      UIsdkHandFingerRecognizer* NewFingerRecognizer = NewObject<UIsdkHandFingerRecognizer>(this);
+      NewFingerRecognizer->CalcType = FingerCalcType;
+      NewFingerRecognizer->FingerType = FingerType;
+      NewFingerRecognizer->HandMesh = MeshIn;
+      FingerRecognizers.Add(NewFingerRecognizer);
+      MeshGroup.FingerRecognizerGroups[FingerType].FingerCalcToRecognizerIndex.Add(
+          FingerCalcType, FingerRecognizers.Num() - 1);
+    }
+  }
+  return true;
+}
+
+bool UIsdkHandPoseSubsystem::CreateThumbRecognizers(UIsdkHandMeshComponent* MeshIn)
+{
+  if (!IsValid(MeshIn))
+  {
+    return false;
+  }
+  if (!RegisteredMeshComponentMap.Contains(MeshIn))
+  {
+    const FIsdkHandPoseDetectionMeshGroup NewMeshGroup;
+    RegisteredMeshComponentMap.Add(MeshIn, NewMeshGroup);
+  }
+  FIsdkHandPoseDetectionMeshGroup& MeshGroup = RegisteredMeshComponentMap[MeshIn];
+  // Only create the recognizers if they don't already exist
+  if (MeshGroup.ThumbRecognizerGroup.ThumbCalcToRecognizerIndex.Num() == 0)
+  {
+    for (const EIsdkDetection_ThumbCalcType ThumbCalcType : ThumbCalcTypes)
+    {
+      UIsdkHandThumbRecognizer* NewThumbRecognizer = NewObject<UIsdkHandThumbRecognizer>(this);
+      NewThumbRecognizer->CalcType = ThumbCalcType;
+      NewThumbRecognizer->HandMesh = MeshIn;
+      ThumbRecognizers.Add(NewThumbRecognizer);
+      MeshGroup.ThumbRecognizerGroup.ThumbCalcToRecognizerIndex.Add(
+          ThumbCalcType, ThumbRecognizers.Num() - 1);
+    }
+  }
+
+  return true;
+}
+
+bool UIsdkHandPoseSubsystem::GetProfileDeltasFromResults(
+    UIsdkHandPoseDetectionProfile* ProfileIn,
+    FIsdkHandPoseRecognizerResults& ResultsIn,
+    bool bGenerateFullDeltas,
+    bool& bResultsWithinTolerances,
+    FIsdkHandPoseRecognizerResults& DeltaResultsOut)
+{
+  if (!IsValid(ProfileIn))
+  {
+    return false;
+  }
+  bResultsWithinTolerances = true;
+
+  DeltaResultsOut.FingersResults.Empty();
+  DeltaResultsOut.ThumbResults.Empty();
+  // FINGERS
+  for (auto& OuterElem : ProfileIn->ProfileFingerTargets)
+  {
+    const EIsdkFingerType& FingerType = OuterElem.Key;
+    const FIsdkHandPoseDetectionFingerTarget& FingerTargets = OuterElem.Value;
+
+    if (!ResultsIn.FingersResults.Contains(FingerType))
+    {
+      UE_LOG(
+          LogOculusInteraction,
+          Warning,
+          TEXT(
+              "UIsdkHandPoseSubsystem::GetProfileDeltasFromResults - Results don't contain expected fingertype %d"),
+          (uint8)FingerType);
+      bResultsWithinTolerances = false;
+      return false;
+    }
+    for (auto& InnerElem : FingerTargets.FingerCalcTargets)
+    {
+      const EIsdkDetection_FingerCalcType& CalcType = InnerElem.Key;
+      if (!FingerTargets.FingerCalcTolerances.Contains(CalcType))
+      {
+        bResultsWithinTolerances = false;
+        return false;
+      }
+      const float& FingerTarget = InnerElem.Value;
+      const float& FingerTolerance = FingerTargets.FingerCalcTolerances[CalcType];
+      const FIsdkHandPoseRecognizerFingerResult& ThisFingerResult =
+          ResultsIn.FingersResults[FingerType];
+      if (!ResultsIn.FingersResults[FingerType].FingerResults.Contains(CalcType))
+      {
+        UE_LOG(
+            LogOculusInteraction,
+            Warning,
+            TEXT(
+                "UIsdkHandPoseSubsystem::GetProfileDeltasFromResults - Results don't contain expected finger calculation type %d"),
+            (uint8)CalcType);
+        bResultsWithinTolerances = false;
+        return false;
+      }
+      const float& FingerResult = ResultsIn.FingersResults[FingerType].FingerResults[CalcType];
+      const float ProfileResultDelta = FingerTarget - FingerResult;
+
+      if (bGenerateFullDeltas)
+      {
+        if (!DeltaResultsOut.FingersResults.Contains(FingerType))
+        {
+          FIsdkHandPoseRecognizerFingerResult NewFingerResultOut;
+          DeltaResultsOut.FingersResults.Add(FingerType, NewFingerResultOut);
+        }
+        DeltaResultsOut.FingersResults[FingerType].FingerResults.Add(CalcType, ProfileResultDelta);
+      }
+
+      if (FMath::Abs(ProfileResultDelta) > FingerTolerance)
+      {
+        bResultsWithinTolerances = false;
+        if (!bGenerateFullDeltas)
+        {
+          break;
+        }
+      }
+    }
+    // No need to proceed, we're already outside of tolerance, so we're bailing on the rest
+    if (!bResultsWithinTolerances && !bGenerateFullDeltas)
+    {
+      break;
+    }
+  }
+  // THUMB
+
+  // No need to proceed, we're already outside of tolerance, so we're bailing on the rest
+  if (!bResultsWithinTolerances && !bGenerateFullDeltas)
+  {
+    return true;
+  }
+
+  FIsdkHandPoseDetectionThumbTarget& ProfileThumbTarget = ProfileIn->ProfileThumbTarget;
+  for (auto& Elem : ProfileThumbTarget.ThumbCalcTargets)
+  {
+    const EIsdkDetection_ThumbCalcType& CalcType = Elem.Key;
+    const float& ThumbTarget = Elem.Value;
+
+    if (!ProfileThumbTarget.ThumbCalcTolerances.Contains(CalcType))
+    {
+      UE_LOG(
+          LogOculusInteraction,
+          Warning,
+          TEXT(
+              "UIsdkHandPoseSubsystem::GetProfileDeltasFromResults - Results don't contain expected thumb tolerances for calculation type %d"),
+          (uint8)CalcType);
+      bResultsWithinTolerances = false;
+      return false;
+    }
+    if (!ResultsIn.ThumbResults.Contains(CalcType))
+    {
+      UE_LOG(
+          LogOculusInteraction,
+          Warning,
+          TEXT(
+              "UIsdkHandPoseSubsystem::GetProfileDeltasFromResults - Results don't contain expected thumb calculation type %d"),
+          (uint8)CalcType);
+      bResultsWithinTolerances = false;
+      return false;
+    }
+    const float& ThumbResult = ResultsIn.ThumbResults[CalcType];
+    const float& ThumbTolerance = ProfileThumbTarget.ThumbCalcTolerances[CalcType];
+    const float ProfileResultDelta = ThumbTarget - ThumbResult;
+
+    if (bGenerateFullDeltas)
+    {
+      DeltaResultsOut.ThumbResults.Add(CalcType, ProfileResultDelta);
+    }
+
+    if (FMath::Abs(ProfileResultDelta) > ThumbTolerance)
+    {
+      bResultsWithinTolerances = false;
+      if (!bGenerateFullDeltas)
+      {
+        break;
+      }
+    }
+  }
+
   return true;
 }

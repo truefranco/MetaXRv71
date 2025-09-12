@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  * All rights reserved.
  *
@@ -33,7 +33,6 @@
 
 #include "Rig/IsdkControllerRigComponent.h"
 #include "Rig/IsdkHandVisualsRigComponent.h"
-#include "Components/SkeletalMeshComponent.h"
 #include "IsdkTestFakes.generated.h"
 
 UCLASS()
@@ -638,7 +637,7 @@ class UIsdkFakeTrackedDataSourceRigComponent : public UIsdkTrackedDataSourceRigC
 
   virtual USceneComponent* GetTrackedVisual() const
   {
-    return static_cast<USceneComponent*>(FakeMeshComponent.Get());
+    return FakeMeshComponent;
   }
   virtual USceneComponent* GetSyntheticVisual() const
   {
@@ -649,7 +648,7 @@ class UIsdkFakeTrackedDataSourceRigComponent : public UIsdkTrackedDataSourceRigC
       FName& OutSocketName,
       EIsdkHandBones HandBone) const override
   {
-    OutSocketComponent = static_cast<USceneComponent*>(FakeMeshComponent.Get());
+    OutSocketComponent = FakeMeshComponent;
     OutSocketName = NAME_None;
   }
 

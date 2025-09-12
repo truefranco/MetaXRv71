@@ -152,8 +152,7 @@ UIsdkDataSourcesOpenXRSubsystem::GetOrCreateHmdDataSourceComponent_Implementatio
 
 bool UIsdkDataSourcesOpenXRSubsystem::IsEnabled_Implementation()
 {
-  // Use OpenXR Subsystem if Meta XR Plugin is not enabled
-  return !FModuleManager::Get().IsModuleLoaded(TEXT("OculusXRHMD"));
+  return IsdkXRUtils::IsOpenXrTrackingSystem();
 }
 
 EControllerHandBehavior UIsdkDataSourcesOpenXRSubsystem::GetControllerHandBehavior()

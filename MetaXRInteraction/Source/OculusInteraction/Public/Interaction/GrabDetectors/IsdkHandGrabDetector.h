@@ -85,6 +85,17 @@ class OCULUSINTERACTION_API UIsdkHandGrabDetector : public UIsdkGrabDetector
   void UpdatePalmOffset(const FVector& InPalmOffset);
 
   /**
+   * Set the amount by which the default pinch grab collider should be
+   * offset from its attach parent.  Used particularly to account for
+   * discrepancies between hand and controller offsets from the motion
+   * controller root.
+   *
+   * @param InPinchOffset - The amount by which to offset the default pinch grab
+   *   collider from its attach parent.
+   */
+  void UpdatePinchOffset(const FVector& InPinchOffset);
+
+  /**
    * Update the attach parent of all pinch colliders.  Called whenever grab state changes.
    * This stabilizes the motion when grabbing, such that after being grabbed, motion continues
    * relative to the hand/controller root, rather than being relative to the thumb tip.
@@ -117,13 +128,11 @@ class OCULUSINTERACTION_API UIsdkHandGrabDetector : public UIsdkGrabDetector
   float PinchColliderRadius = 1.2f;
 
   /* Radius of the to set when initializing for the palm grab overlap collider */
-  UPROPERTY(
-      BlueprintReadOnly,
-      EditAnywhere,
-      meta = (EditCondition = "bAllowPalmGrab == true", EditConditionHides),
-      Category = InteractionSDK)
+  UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = InteractionSDK)
   float PalmColliderRadius = 4.0f;
+
   FVector DefaultPalmColliderOffset = FVector::ZeroVector;
+  FVector DefaultPinchColliderOffset = FVector::ZeroVector;
 
   /**
    * The collision object type of the default colliders used to detect grabbables

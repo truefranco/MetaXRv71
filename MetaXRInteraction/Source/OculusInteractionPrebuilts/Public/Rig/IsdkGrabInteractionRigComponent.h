@@ -66,6 +66,7 @@ class OCULUSINTERACTIONPREBUILTS_API UIsdkGrabInteractionRigComponent : public U
   void UpdateMeshDependencies(
       const FVector& PalmColliderOffset,
       USkinnedMeshComponent* InPinchAttachMesh,
+      const FVector& PinchColliderOffset,
       const FName& InThumbTipSocketName);
 
   // A reference to the grab component we'll bind input to

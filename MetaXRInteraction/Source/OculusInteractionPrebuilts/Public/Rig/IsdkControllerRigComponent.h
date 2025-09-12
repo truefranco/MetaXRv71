@@ -105,6 +105,16 @@ class OCULUSINTERACTIONPREBUILTS_API UIsdkControllerRigComponent : public UIsdkR
   virtual FVector GetPalmColliderOffset() const override;
 
   /**
+   * @brief Returns the current offset for the pinch collider
+   *
+   * Referencing the ControllerHandBehavior state, returns the
+   * local space offset for the collider used to detect pinch grabs
+   *
+   * @return FVector Local space offset for pinch grab collider
+   */
+  virtual FVector GetPinchColliderOffset() const override;
+
+  /**
    * @brief Returns the hand mesh associated with this controller rig
    * @return USkinnedMeshComponent Hand mesh associated with pinch interactions for this rig
    * component

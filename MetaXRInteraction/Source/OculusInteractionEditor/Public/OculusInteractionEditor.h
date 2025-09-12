@@ -24,6 +24,7 @@
 #include "Modules/ModuleInterface.h"
 #include "Modules/ModuleManager.h"
 #include "IsdkHandPoseDataActions.h"
+#include "IsdkHandPoseDetectionProfileActions.h"
 
 DECLARE_LOG_CATEGORY_EXTERN(LogOculusInteractionEditor, Log, All);
 
@@ -58,4 +59,6 @@ class IOculusInteractionEditor : public IModuleInterface
   }
 
   TSharedPtr<FIsdkHandPoseDataAssetTypeActions> IsdkHandPoseDataAssetTypeActions;
+  TSharedPtr<FIsdkHandPoseDetectionProfileAssetTypeActions>
+      IsdkHandPoseDetectionProfileAssetTypeActions;
 };

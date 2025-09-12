@@ -99,7 +99,8 @@ void UIsdkFromOpenXRControllerDataSource::GetPointerPose_Implementation(
   IsValid &= IsRootPoseConnected->GetResolvedValue();
   if (IsValid)
   {
-    PointerPose = RelativePointerPose * MotionController->GetComponentTransform();
+    const FTransform ToPointerFromRoot = IsdkXRUtils::OXR::ControllerRelativePointerTransform;
+    PointerPose = ToPointerFromRoot * MotionController->GetComponentTransform();
   }
 }
 
@@ -109,15 +110,13 @@ void UIsdkFromOpenXRControllerDataSource::GetRelativePointerPose_Implementation(
 {
   IsValid = bIsLastGoodPointerPoseValid;
   IsValid &= IsRootPoseConnected->GetResolvedValue();
-  if (IsValid)
-  {
-    PointerRelativePose = RelativePointerPose;
-  }
+  PointerRelativePose = FTransform::Identity;
 }
 
 FTransform UIsdkFromOpenXRControllerDataSource::GetRootPose_Implementation()
 {
-  return MotionController->GetComponentTransform();
+  FTransform ToRootFromController = IsdkXRUtils::OXR::ControllerRelativeRootTransform;
+  return ToRootFromController * MotionController->GetComponentTransform();
 }
 
 bool UIsdkFromOpenXRControllerDataSource::IsRootPoseValid_Implementation()
@@ -142,7 +141,6 @@ void UIsdkFromOpenXRControllerDataSource::ReadControllerData()
   {
     IsRootPoseHighConfidence->SetValue(false);
   }
-  RelativePointerPose = FTransform{IsdkXRUtils::OXR::ControllerRelativePointerOffset};
   bIsLastGoodPointerPoseValid = true;
 }
 

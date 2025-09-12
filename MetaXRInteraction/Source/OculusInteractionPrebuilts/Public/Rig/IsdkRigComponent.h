@@ -22,7 +22,6 @@
 
 #include "CoreMinimal.h"
 #include "GameplayTagContainer.h"
-#include "Interaction/Pointable/IsdkInteractionPointerEvent.h"
 #include "Subsystem/IsdkWidgetSubsystem.h"
 #include "IsdkRigComponent.generated.h"
 
@@ -307,6 +306,12 @@ class OCULUSINTERACTIONPREBUILTS_API UIsdkRigComponent : public USceneComponent
    * @return FVector Local space offset for palm grab collider. Returns identity in base class.
    */
   virtual FVector GetPalmColliderOffset() const;
+
+  /**
+   * @brief Returns the current offset for the pinch collider
+   * @return FVector Local space offset for pinch grab collider. Returns identity in base class.
+   */
+  virtual FVector GetPinchColliderOffset() const;
 
   /**
    * @brief Returns the hand mesh associated with this controller rig

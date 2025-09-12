@@ -259,7 +259,7 @@ class OCULUSINTERACTION_API UIsdkHandMeshComponent : public UPoseableMeshCompone
   void UpdateSkeleton();
   void UpdateApiHandPositionFrame(isdk::api::ExternalHandPositionFrame& ApiHandPositionFrame) const;
 
-  void DrawTransformAxis(const FTransform& Pose, float InThickness = 0.3f) const;
+  void DrawTransformAxis(const FTransform& Pose) const;
   void DrawDebugSkeleton() const;
   FTransform ApplyRootPoseOffset(FTransform OriginalTransform);
 

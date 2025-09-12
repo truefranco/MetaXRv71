@@ -153,3 +153,32 @@ EIsdkHandBones UIsdkHandData::GetChildBoneInChain(const EIsdkHandBones BoneIn) c
   }
   return EIsdkHandBones::EHandBones_MAX;
 }
+
+const FTransform& UIsdkHandData::GetFingerJointPose(
+    const EIsdkFingerType FingerType,
+    const EIsdkFingerJoint FingerJoint) const
+{
+  const uint32 FingerJointIdx =
+      (uint32)EIsdkHandBones::HandIndex0 + ((uint32)FingerType * 5) + (uint32)FingerJoint;
+  if (JointPoses.IsValidIndex(FingerJointIdx))
+  {
+    return JointPoses[FingerJointIdx];
+  }
+  return FTransform::Identity;
+}
+
+const FTransform& UIsdkHandData::GetThumbJointPose(const EIsdkFingerJoint ThumbJoint) const
+{
+  if (ThumbJoint == EIsdkFingerJoint::Intermediate)
+  {
+    // UELOG
+    return FTransform::Identity;
+  }
+  const uint32 ThumbJointIdx = (uint32)EIsdkHandBones::HandThumb1 + (uint32)ThumbJoint -
+      (ThumbJoint > EIsdkFingerJoint::Intermediate ? 1 : 0);
+  if (JointPoses.IsValidIndex(ThumbJointIdx))
+  {
+    return JointPoses[ThumbJointIdx];
+  }
+  return FTransform::Identity;
+}

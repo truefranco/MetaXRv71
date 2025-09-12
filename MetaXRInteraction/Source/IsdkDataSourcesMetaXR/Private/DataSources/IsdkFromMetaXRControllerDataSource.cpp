@@ -124,27 +124,6 @@ void UIsdkFromMetaXRControllerDataSource::TickComponent(
     IsRootPoseHighConfidence->SetValue(false);
   }
 
-  const bool bIsOpenXrSystem = IsdkXRUtils::IsUsingOpenXR();
-  FName DesiredSourceName;
-  if (bIsOpenXrSystem)
-  {
-    if (bIsHoldingAController)
-    {
-      DesiredSourceName = Handedness == EIsdkHandedness::Left ? IsdkXRUtils::LeftAimSourceName
-                                                              : IsdkXRUtils::RightAimSourceName;
-    }
-    else
-    {
-      DesiredSourceName = Handedness == EIsdkHandedness::Left ? IsdkXRUtils::LeftSourceName
-                                                              : IsdkXRUtils::RightSourceName;
-    }
-
-    if (MotionController->GetTrackingMotionSource() != DesiredSourceName)
-    {
-      MotionController->SetTrackingMotionSource(DesiredSourceName);
-    }
-  }
-
 #if !UE_BUILD_SHIPPING
   DebugLog();
 #endif
@@ -158,7 +137,7 @@ void UIsdkFromMetaXRControllerDataSource::ReadControllerData()
   // either "is the palm pointing towards the HMD" or the value before the hand tracking was lost.
   // Which means it is currently unrealiable, and that is why it is not used here.
 
-  RelativePointerPose = FTransform(IsdkXRUtils::OVR::ControllerRelativePointerOffset);
+  RelativePointerPose = IsdkXRUtils::OVR::ControllerRelativePointerTransform;
   IsRootPoseHighConfidence->SetValue(true);
 }
 
@@ -212,13 +191,13 @@ FTransform UIsdkFromMetaXRControllerDataSource::GetRootPose_Implementation()
 
   if (PoseType == EIsdkXRControllerDrivenHandPoseType::None)
   {
-    return MotionController->GetComponentTransform();
+    const auto ToRootFromController = IsdkXRUtils::OVR::ControllerRelativeRootTransform;
+    return ToRootFromController * MotionController->GetComponentTransform();
   }
 
   FTransform ToControllerFromWorld = MotionController->GetComponentTransform();
   const auto ToPointerFromController =
       FIsdkOculusXRHelper::GetPointerPose(Handedness, MotionController);
-
   const FTransform ToRootFromPointer = {
       FRotator(0.f, 0.f, 0.f),
       -IsdkXRUtils::OVR::ControllerRelativePointerOffset,

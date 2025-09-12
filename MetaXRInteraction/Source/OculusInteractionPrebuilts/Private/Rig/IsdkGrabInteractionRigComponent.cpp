@@ -153,6 +153,7 @@ void UIsdkGrabInteractionRigComponent::BindDataSources(
 void UIsdkGrabInteractionRigComponent::UpdateMeshDependencies(
     const FVector& PalmColliderOffset,
     USkinnedMeshComponent* InPinchAttachMesh,
+    const FVector& PinchColliderOffset,
     const FName& InThumbTipSocketName)
 {
   PinchAttachMesh = InPinchAttachMesh;
@@ -161,6 +162,8 @@ void UIsdkGrabInteractionRigComponent::UpdateMeshDependencies(
   Grabber->GetHandGrabDetector()->UpdatePalmOffset(PalmColliderOffset);
   Grabber->GetHandGrabDetector()->UpdatePinchCollidersAttachment(
       InPinchAttachMesh, InThumbTipSocketName);
+
+  Grabber->GetHandGrabDetector()->UpdatePinchOffset(PinchColliderOffset);
 }
 
 void UIsdkGrabInteractionRigComponent::HandleRigPinchSelect(UIsdkRigComponent* IsdkRigComponent)

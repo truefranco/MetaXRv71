@@ -515,7 +515,7 @@ bool UIsdkHandMeshComponent::IsDataSourceJointsValid() const
   return IsValid(Obj) && IIsdkIHandJoints::Execute_IsHandJointDataValid(Obj);
 }
 
-void UIsdkHandMeshComponent::DrawTransformAxis(const FTransform& Pose, float InThickness) const
+void UIsdkHandMeshComponent::DrawTransformAxis(const FTransform& Pose) const
 {
   static const FColor XColor = FColor::Red;
   static const FColor YColor = FColor::Green;
@@ -527,9 +527,9 @@ void UIsdkHandMeshComponent::DrawTransformAxis(const FTransform& Pose, float InT
   const FVector ZAxisOffset = JointOrigin + Pose.GetUnitAxis(EAxis::Z);
 
   constexpr auto Depth = ESceneDepthPriorityGroup::SDPG_Foreground;
-  DrawDebugLine(GetWorld(), JointOrigin, XAxisOffset, XColor, false, 0.0, Depth, InThickness);
-  DrawDebugLine(GetWorld(), JointOrigin, YAxisOffset, YColor, false, 0.0, Depth, InThickness);
-  DrawDebugLine(GetWorld(), JointOrigin, ZAxisOffset, ZColor, false, 0.0, Depth, InThickness);
+  DrawDebugLine(GetWorld(), JointOrigin, XAxisOffset, XColor, false, 0.0, Depth, 0.3);
+  DrawDebugLine(GetWorld(), JointOrigin, YAxisOffset, YColor, false, 0.0, Depth, 0.3);
+  DrawDebugLine(GetWorld(), JointOrigin, ZAxisOffset, ZColor, false, 0.0, Depth, 0.3);
 
   UE_VLOG_SEGMENT(
       GetOwner(), LogOculusInteraction, Verbose, JointOrigin, XAxisOffset, XColor, TEXT_EMPTY);
@@ -546,25 +546,21 @@ void UIsdkHandMeshComponent::DrawDebugSkeleton() const
     const auto RootPose = IsDataSourceRootPoseValid()
         ? IIsdkIRootPose::Execute_GetRootPose(RootPoseDataSource.GetObject())
         : FTransform(FQuat(FVector::UnitX(), HALF_PI)) * GetComponentTransform();
-    DrawTransformAxis(RootPose, 0.5f);
 
-    const auto HandData = IIsdkIHandJoints::Execute_GetHandData(JointsDataSource.GetObject());
-
-    const TArray<FTransform>& JointTransforms = HandData->GetJointPoses();
-    const TArray<float>& JointRadii = HandData->GetJointRadii();
+    const TArray<FTransform>& JointPoses =
+        IIsdkIHandJoints::Execute_GetHandData(JointsDataSource.GetObject())->GetJointPoses();
 
     const FTransform WristPose =
-        JointTransforms[static_cast<uint8>(EIsdkHandBones::HandWristRoot)] * RootPose;
+        JointPoses[static_cast<uint8>(EIsdkHandBones::HandWristRoot)] * RootPose;
     DrawTransformAxis(WristPose);
 
     const FTransform PalmPose =
-        JointTransforms[static_cast<uint8>(EIsdkHandBones::HandPalm)] * WristPose;
+        JointPoses[static_cast<uint8>(EIsdkHandBones::HandPalm)] * WristPose;
     DrawTransformAxis(PalmPose);
 
-    for (int JointIndex = 2; JointIndex < JointTransforms.Num(); JointIndex++)
+    for (int JointIndex = 2; JointIndex < JointPoses.Num(); JointIndex++)
     {
-      // Draw the bone transform at its root
-      const FTransform Pose = JointTransforms[JointIndex] * WristPose;
+      const FTransform Pose = JointPoses[JointIndex] * WristPose;
       DrawTransformAxis(Pose);
     }
 
@@ -621,14 +617,14 @@ void UIsdkHandMeshComponent::DrawDebugSkeleton() const
       const auto BoneStartIndex = Pair.Key;
       const auto BoneEndIndex = Pair.Value;
 
-      if (BoneStartIndex < 0 || BoneStartIndex >= JointTransforms.Num() || BoneEndIndex < 0 ||
-          BoneEndIndex >= JointTransforms.Num())
+      if (BoneStartIndex < 0 || BoneStartIndex >= JointPoses.Num() || BoneEndIndex < 0 ||
+          BoneEndIndex >= JointPoses.Num())
       {
         continue;
       }
 
-      const auto SegmentStart = (JointTransforms[BoneStartIndex] * WristPose).GetLocation();
-      const auto SegmentEnd = (JointTransforms[BoneEndIndex] * WristPose).GetLocation();
+      const auto SegmentStart = (JointPoses[BoneStartIndex] * WristPose).GetLocation();
+      const auto SegmentEnd = (JointPoses[BoneEndIndex] * WristPose).GetLocation();
       DrawDebugLine(
           GetWorld(),
           SegmentStart,

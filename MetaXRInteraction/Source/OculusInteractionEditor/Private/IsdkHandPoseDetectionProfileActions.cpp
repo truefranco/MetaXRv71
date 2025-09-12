@@ -18,33 +18,25 @@
  * limitations under the License.
  */
 
-using System.Linq;
-using System.IO;
-using UnrealBuildTool;
-using EpicGames.Core;
+#include "IsdkHandPoseDetectionProfileActions.h"
+#include "HandPoseDetection/IsdkHandPoseDetectionProfile.h"
 
-public class IsdkDataSourcesMetaXR : ModuleRules
+UClass* FIsdkHandPoseDetectionProfileAssetTypeActions::GetSupportedClass() const
 {
-    public IsdkDataSourcesMetaXR(ReadOnlyTargetRules Target) : base(Target)
-    {
-        IncludeOrderVersion = EngineIncludeOrderVersion.Unreal5_4;
-        PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
+  return UIsdkHandPoseDetectionProfile::StaticClass();
+}
 
-        PublicDependencyModuleNames.AddRange(
-            new[]
-            {
-                "Core",
-                "CoreUObject",
-                "Engine",
-                "Projects",
-                "HeadMountedDisplay",
-                "InputCore",
-                "Slate",
-                "SlateCore",
-                "UMG",
-                "OculusInteraction",
-                "XRBase"
-            }
-        );
-    }
+FText FIsdkHandPoseDetectionProfileAssetTypeActions::GetName() const
+{
+  return INVTEXT("ISDK Hand Pose Detection Profile");
+}
+
+FColor FIsdkHandPoseDetectionProfileAssetTypeActions::GetTypeColor() const
+{
+  return FColor::Purple;
+}
+
+uint32 FIsdkHandPoseDetectionProfileAssetTypeActions::GetCategories()
+{
+  return EAssetTypeCategories::Misc;
 }

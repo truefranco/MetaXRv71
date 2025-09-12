@@ -118,6 +118,15 @@ void UIsdkHandGrabDetector::UpdatePalmOffset(const FVector& InPalmOffset)
   }
 }
 
+void UIsdkHandGrabDetector::UpdatePinchOffset(const FVector& InPinchOffset)
+{
+  DefaultPinchColliderOffset = InPinchOffset;
+  if (IsValid(PinchCollider))
+  {
+    PinchCollider->SetRelativeLocation(DefaultPinchColliderOffset);
+  }
+}
+
 void UIsdkHandGrabDetector::DrawDebugVisuals() const
 {
   if (bDisableDebugVisuals)

@@ -171,6 +171,20 @@ enum class EIsdkHandGrabPoseOrientation : uint8
   WristFacingUp
 };
 
+/**
+ * 
+ */
+UENUM(BlueprintType)
+enum class EIsdkDigitType : uint8
+{
+  Unknown,
+  Index,
+  Middle,
+  Ring,
+  Pinky,
+  Thumb
+};
+
 USTRUCT(BlueprintType)
 struct FIsdkHandGrabPoseProperties
 {

@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  * All rights reserved.
  *
@@ -18,33 +18,7 @@
  * limitations under the License.
  */
 
-using System.Linq;
-using System.IO;
-using UnrealBuildTool;
-using EpicGames.Core;
+#include "HandPoseDetection/IsdkHandPoseDetectionProfile.h"
+#include "IsdkHandMeshComponent.h"
 
-public class IsdkDataSourcesMetaXR : ModuleRules
-{
-    public IsdkDataSourcesMetaXR(ReadOnlyTargetRules Target) : base(Target)
-    {
-        IncludeOrderVersion = EngineIncludeOrderVersion.Unreal5_4;
-        PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
-
-        PublicDependencyModuleNames.AddRange(
-            new[]
-            {
-                "Core",
-                "CoreUObject",
-                "Engine",
-                "Projects",
-                "HeadMountedDisplay",
-                "InputCore",
-                "Slate",
-                "SlateCore",
-                "UMG",
-                "OculusInteraction",
-                "XRBase"
-            }
-        );
-    }
-}
+UIsdkHandPoseDetectionProfile::UIsdkHandPoseDetectionProfile() {}

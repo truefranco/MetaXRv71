@@ -27,28 +27,23 @@
 
 namespace IsdkXRUtils
 {
-const FName OpenXRName = TEXT("OpenXR");
+const FName OpenXRTrackingSystemName = TEXT("OpenXR");
+const FName OculusXrTrackingSystemName = TEXT("OculusXRHMD");
 static const FName LeftSourceName("Left");
 static const FName RightSourceName("Right");
 static const FName LeftAimSourceName("LeftAim");
 static const FName RightAimSourceName("RightAim");
 
-inline bool IsUsingOpenXR()
+inline bool IsOpenXrTrackingSystem()
 {
   const IXRTrackingSystem* XRTrackingSystem = GEngine->XRSystem.Get();
-  return XRTrackingSystem && XRTrackingSystem->GetSystemName() == OpenXRName;
+  return XRTrackingSystem && XRTrackingSystem->GetSystemName() == OpenXRTrackingSystemName;
 }
 
-inline bool IsUsingOculusXR()
+inline bool IsOculusXrTrackingSystem()
 {
-  FString XrApi;
-  const bool bValueFound = GConfig->GetString(
-      TEXT("/Script/OculusXRHMD.OculusXRHMDRuntimeSettings"), TEXT("XrApi"), XrApi, GEngineIni);
-
-  // Default value is to use OVR Plugin as the XRApi.  The value will not be present in config
-  // unless it has been manually changed, so we are using the OVR if the value is not found or if
-  // the value corresponds to the OVR option.
-  return XrApi.Equals(FString("OVRPluginOpenXR")) || !bValueFound;
+  const IXRTrackingSystem* XRTrackingSystem = GEngine->XRSystem.Get();
+  return XRTrackingSystem && XRTrackingSystem->GetSystemName() == OculusXrTrackingSystemName;
 }
 
 namespace OXR
@@ -63,7 +58,9 @@ const FVector HandRootWristOffsetLeft = FVector(-0.089, -0.131, 4.917);
 const FVector HandRootWristOffsetRight = FVector(0.089, -0.131, 4.917);
 const FVector HandRelativePointerOffset = FVector(5, 0, 0);
 // OpenXR controller constants
-const FVector ControllerRelativePointerOffset = FVector(4.0, 0, 0);
+const FTransform ControllerRelativePointerTransform = FTransform(FVector(-0.7, 0, 0));
+const FVector ControllerPinchOffset = FVector(4.5, 0, 0);
+const FTransform ControllerRelativeRootTransform = FTransform(FVector(-4.1, 0, 0));
 } // namespace OXR
 
 namespace OVR
@@ -81,6 +78,8 @@ const FQuat OVRToOXRLeft = FQuat(FVector::UnitY(), -UE_HALF_PI) * FQuat(FVector:
 const FQuat OVRToOXRRight = FQuat(FVector::UnitY(), UE_HALF_PI);
 // OVR controller constants
 const FVector ControllerRelativePointerOffset = FVector(5.5, 0, 0);
+const FTransform ControllerRelativePointerTransform = FTransform(FVector(FVector(4.5, 0, 0)));
+const FTransform ControllerRelativeRootTransform = FTransform(FVector(1, 0, 0));
 } // namespace OVR
 
 } // namespace IsdkXRUtils

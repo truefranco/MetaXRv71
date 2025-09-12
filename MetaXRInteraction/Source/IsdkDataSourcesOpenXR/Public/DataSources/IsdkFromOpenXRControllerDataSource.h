@@ -181,7 +181,6 @@ class ISDKDATASOURCESOPENXR_API UIsdkFromOpenXRControllerDataSource
   void DebugLog();
 #endif
 
-  FTransform RelativePointerPose = FTransform::Identity;
   FTransform LastGoodRootPose = FTransform::Identity;
 
   // Indicates whether the root pose was read from input (true), or if it is garbage (false)

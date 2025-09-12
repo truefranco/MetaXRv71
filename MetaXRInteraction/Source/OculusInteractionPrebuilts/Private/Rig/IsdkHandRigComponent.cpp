@@ -122,7 +122,7 @@ void UIsdkHandRigComponent::BindInputActions(UEnhancedInputComponent* EnhancedIn
 
   // If we don't have access to meta XR (we're using OpenXR), the pinch input action won't work, so
   // we'll fall back to using the pinch grab recognizer.
-  if (!(IsdkXRUtils::IsUsingOpenXR() && PinchGrabRecognizer) &&
+  if (!(IsdkXRUtils::IsOpenXrTrackingSystem() && PinchGrabRecognizer) &&
       IsValid(InputActions->PinchGrabAction))
   {
     EnhancedInputComponent->BindAction(
@@ -170,7 +170,7 @@ void UIsdkHandRigComponent::UpdateComponentDataSources()
     AddTickPrerequisiteComponent(HandVisualsComponent->TrackedHandVisual);
   }
 
-  if (IsdkXRUtils::IsUsingOpenXR() && PinchGrabRecognizer)
+  if (IsdkXRUtils::IsOpenXrTrackingSystem() && PinchGrabRecognizer)
   {
     PinchGrabRecognizer->HandVisual = HandVisualsComponent->TrackedHandVisual;
     PinchGrabRecognizer->FingerType = EIsdkFingerType::Index;
@@ -196,7 +196,7 @@ void UIsdkHandRigComponent::UpdateComponentDataSources()
 
 float UIsdkHandRigComponent::GetPinchStrength() const
 {
-  if (IsdkXRUtils::IsUsingOpenXR() && PinchGrabRecognizer)
+  if (IsdkXRUtils::IsOpenXrTrackingSystem() && PinchGrabRecognizer)
   {
     return PinchGrabRecognizer->GetPinchStrength();
   }

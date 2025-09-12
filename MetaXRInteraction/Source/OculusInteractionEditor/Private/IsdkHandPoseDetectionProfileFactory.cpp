@@ -18,33 +18,22 @@
  * limitations under the License.
  */
 
-using System.Linq;
-using System.IO;
-using UnrealBuildTool;
-using EpicGames.Core;
+#include "IsdkHandPoseDetectionProfileFactory.h"
+#include "HandPoseDetection/IsdkHandPoseDetectionProfile.h"
 
-public class IsdkDataSourcesMetaXR : ModuleRules
+UIsdkHandPoseDetectionProfileFactory::UIsdkHandPoseDetectionProfileFactory()
 {
-    public IsdkDataSourcesMetaXR(ReadOnlyTargetRules Target) : base(Target)
-    {
-        IncludeOrderVersion = EngineIncludeOrderVersion.Unreal5_4;
-        PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
+  SupportedClass = UIsdkHandPoseDetectionProfile::StaticClass();
+  bCreateNew = true;
+}
 
-        PublicDependencyModuleNames.AddRange(
-            new[]
-            {
-                "Core",
-                "CoreUObject",
-                "Engine",
-                "Projects",
-                "HeadMountedDisplay",
-                "InputCore",
-                "Slate",
-                "SlateCore",
-                "UMG",
-                "OculusInteraction",
-                "XRBase"
-            }
-        );
-    }
+UObject* UIsdkHandPoseDetectionProfileFactory::FactoryCreateNew(
+    UClass* Class,
+    UObject* InParent,
+    FName Name,
+    EObjectFlags Flags,
+    UObject* Context,
+    FFeedbackContext* Warn)
+{
+  return NewObject<UIsdkHandPoseDetectionProfile>(InParent, Class, Name, Flags, Context);
 }

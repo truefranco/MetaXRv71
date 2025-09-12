@@ -1,7 +1,7 @@
 {
 	"FileVersion": 3,
 	"Version": 1,
-	"VersionName": "1.77.0",
+	"VersionName": "1.78.0",
 	"FriendlyName": "Meta Interaction SDK",
 	"Description": "An SDK for creation of rich VR interactions using tracked controllers and hands.",
 	"Category": "Virtual Reality",

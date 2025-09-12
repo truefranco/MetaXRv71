@@ -21,6 +21,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "StructTypes.h"
 #include "IsdkHandData.generated.h"
 
 UENUM(BlueprintType)
@@ -224,6 +225,16 @@ class OCULUSINTERACTION_API UIsdkHandData : public UObject
     return FTransform::Identity;
   }
 
+  //
+  UFUNCTION(BlueprintPure, Category = InteractionSDK)
+  const FTransform& GetFingerJointPose(
+      const EIsdkFingerType FingerType,
+      const EIsdkFingerJoint FingerJoint) const;
+
+  //
+  UFUNCTION(BlueprintPure, Category = InteractionSDK)
+  const FTransform& GetThumbJointPose(const EIsdkFingerJoint ThumbJoint) const;
+
   /**
    * @brief Retrieves all of the current joint radii as index of floats. Const UFUNCTION version of
    * GetJointRadii() intended for Blueprints or other const use cases.
@@ -322,6 +333,9 @@ class OCULUSINTERACTION_API UIsdkHandData : public UObject
   {
     OutboundBoneMapping = OutboundMap;
   }
+
+  UPROPERTY(BlueprintReadWrite, VisibleAnywhere, Category = InteractionSDK)
+  EIsdkHandedness Handedness = EIsdkHandedness::Left;
 
  private:
   UPROPERTY()

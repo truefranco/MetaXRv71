@@ -22,7 +22,6 @@
 
 #include "IsdkDataSourcesMetaXR.h"
 #include "IsdkDataSourcesMetaXRSubsystem.h"
-#include "IXRTrackingSystem.h"
 #include "XRMotionControllerBase.h"
 
 FTransform FIsdkOculusXRHelper::GetPointerPose(

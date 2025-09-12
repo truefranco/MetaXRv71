@@ -30,6 +30,7 @@
 #include "EnhancedInputComponent.h"
 #include "IsdkHandMeshComponent.h"
 #include "IsdkRuntimeSettings.h"
+#include "OculusInteractionPrebuiltsLog.h"
 #include "Interaction/IsdkPokeInteractor.h"
 #include "Interaction/IsdkGrabberComponent.h"
 #include "Materials/Material.h"
@@ -98,8 +99,18 @@ void UIsdkRigComponent::BeginPlay()
 
     AActor* OwnerActor = GetOwner();
     OwnerActor->EnableInput(FirstLocalPlayer);
-    const auto EnhancedInputComponent = Cast<UEnhancedInputComponent>(OwnerActor->InputComponent);
-    BindInputActions(EnhancedInputComponent);
+    const auto EnhancedInputComponent = OwnerActor->FindComponentByClass<UEnhancedInputComponent>();
+    if (EnhancedInputComponent)
+    {
+      BindInputActions(EnhancedInputComponent);
+    }
+    else
+    {
+      UE_LOG(
+          LogOculusInteractionPrebuilts,
+          Error,
+          TEXT("No EnhancedInputComponent found on Actor with a UIsdkRigComponent"))
+    }
 
     for (UIsdkRigModifier* ThisRigModifier : ActiveRigModifiers)
     {
@@ -319,7 +330,10 @@ void UIsdkRigComponent::UpdateComponentDataSources()
       DataSources, HmdDataSource, InteractorAttachComponent, InteractorAttachSocket);
 
   GrabInteraction->UpdateMeshDependencies(
-      GetPalmColliderOffset(), GetPinchAttachMesh(), GetThumbTipSocketName());
+      GetPalmColliderOffset(),
+      GetPinchAttachMesh(),
+      GetPinchColliderOffset(),
+      GetThumbTipSocketName());
 }
 
 void UIsdkRigComponent::RegisterInteractorWidgetIndices()
@@ -342,6 +356,11 @@ void UIsdkRigComponent::UnregisterInteractorWidgetIndices()
 }
 
 FVector UIsdkRigComponent::GetPalmColliderOffset() const
+{
+  return FVector::ZeroVector;
+}
+
+FVector UIsdkRigComponent::GetPinchColliderOffset() const
 {
   return FVector::ZeroVector;
 }

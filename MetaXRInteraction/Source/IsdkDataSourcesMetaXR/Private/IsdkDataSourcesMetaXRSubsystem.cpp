@@ -182,8 +182,9 @@ UIsdkDataSourcesMetaXRSubsystem::GetOrCreateHmdDataSourceComponent_Implementatio
 
 bool UIsdkDataSourcesMetaXRSubsystem::IsEnabled_Implementation()
 {
-  // Use MetaXR Subsystem if Meta XR Plugin is enabled
-  return FIsdkOculusXRHelper::IsOculusXrLoaded();
+  const bool bIsOculusXrLoaded = FIsdkOculusXRHelper::IsOculusXrLoaded();
+  const bool bOculusXrEnabled = IsdkXRUtils::IsOculusXrTrackingSystem();
+  return bIsOculusXrLoaded && bOculusXrEnabled;
 }
 
 EControllerHandBehavior UIsdkDataSourcesMetaXRSubsystem::GetControllerHandBehavior()
