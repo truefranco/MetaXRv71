@@ -97,6 +97,9 @@ public:
 	OCULUSXRHMD_API static bool IsSimulatorActivated();
 	OCULUSXRHMD_API static void ToggleOpenXRRuntime();
 	OCULUSXRHMD_API static bool IsSimulatorInstalled();
+	OCULUSXRHMD_API static void CheckForXRSimUpdate();
+	OCULUSXRHMD_API static void UpdateXRSimToLatest();
+	OCULUSXRHMD_API static bool CanUpdatedToLatest();
 
 	// FMetaXRSES
 	OCULUSXRHMD_API static void LaunchEnvironment(int32 EnvironmentIndex);

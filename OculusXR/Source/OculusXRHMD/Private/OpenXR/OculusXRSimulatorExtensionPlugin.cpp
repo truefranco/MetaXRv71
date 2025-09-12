@@ -10,9 +10,6 @@ namespace OculusXR
 {
 	bool FXRSimulatorExtensionPlugin::GetCustomLoader(PFN_xrGetInstanceProcAddr* OutGetProcAddr)
 	{
-#if PLATFORM_WINDOWS
-		FMetaXRSimulator::TryActivateOnStartup();
-#endif // PLATFORM_WINDOWS
 		return false;
 	}
 

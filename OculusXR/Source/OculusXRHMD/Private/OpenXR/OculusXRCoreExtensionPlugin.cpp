@@ -46,6 +46,25 @@ namespace OculusXR
 #endif // PLATFORM_ANDROID
 	}
 
+	const void* FCoreExtensionPlugin::OnCreateInstance(class IOpenXRHMDModule* InModule, const void* InNext)
+	{
+		// We need to use GConfig to get the bCompositesDepth setting here because UOculusXRHMDRuntimeSettings isn't available at this point
+		check(GConfig);
+#if PLATFORM_ANDROID
+		bool bCompositeDepth = false;
+		GConfig->GetBool(TEXT("/Script/OculusXRHMD.OculusXRHMDRuntimeSettings"), TEXT("bCompositeDepthMobile"), bCompositeDepth, GEngineIni);
+#else  // PLATFORM_ANDROID
+		bool bCompositeDepth = true;
+		GConfig->GetBool(TEXT("/Script/OculusXRHMD.OculusXRHMDRuntimeSettings"), TEXT("bCompositesDepth"), bCompositeDepth, GEngineIni);
+#endif // PLATFORM_ANDROID
+		if (IConsoleVariable* DepthLayerCVar = IConsoleManager::Get().FindConsoleVariable(TEXT("xr.OpenXRAllowDepthLayer")))
+		{
+			DepthLayerCVar->Set(static_cast<int>(bCompositeDepth));
+		}
+
+		return InNext;
+	}
+
 	const void* FCoreExtensionPlugin::OnCreateSession(XrInstance InInstance, XrSystemId InSystem, const void* InNext)
 	{
 		check(IsInGameThread());

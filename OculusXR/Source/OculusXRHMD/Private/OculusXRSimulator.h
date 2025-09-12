@@ -15,16 +15,42 @@ DEFINE_LOG_CATEGORY_STATIC(LogMetaXRSim, Log, All);
 class FMetaXRSimulator
 {
 public:
-	static bool IsSimulatorActivated();
-	static void ToggleOpenXRRuntime();
-	static void TryActivateOnStartup();
-	static FString GetPackagePath();
-	static bool IsSimulatorInstalled();
+	static FMetaXRSimulator& Get()
+	{
+		static FMetaXRSimulator instance;
+		return instance;
+	}
+	FMetaXRSimulator(const FMetaXRSimulator&) = delete;
+	FMetaXRSimulator& operator=(const FMetaXRSimulator&) = delete;
+
+	bool IsSimulatorActivated();
+	void ToggleOpenXRRuntime();
+	FString GetPackagePath() const;
+	bool IsSimulatorInstalled();
+	TArray<FString> GetInstalledVersions() const;
+	void FetchAvailableVersions();
+	void InstallLatestVersion();
+	bool IsLatestVersionInstalled();
 
 private:
-	static FString GetSimulatorJsonPath();
-	static void InstallSimulator(const TFunction<void()>& OnSuccess);
-	static FString GetVersion();
-	static void UnzipSimulator(const FString& Path, const FString& TargetPath, const TSharedPtr<SNotificationItem>& Notification, const TFunction<void()>& OnSuccess);
+	struct FMetaXRSimulatorVersion
+	{
+		FString DownloadUrl;
+		FString Version;
+		double UrlValidity;
+	};
+
+	void SpawnNotificationToUpdateIfAvailable();
+	FMetaXRSimulator();
+	~FMetaXRSimulator() = default;
+	FString GetSimulatorJsonPath();
+	void InstallSimulator(const FString& URL, const FString& Version, const TFunction<void()>& OnSuccess);
+	static FString GetPluginVersion();
+	void UnzipSimulator(const FString& Path, const FString& TargetPath, const TSharedPtr<SNotificationItem>& Notification, const TFunction<void()>& OnSuccess);
+
+	const FString InstallationPath;
+
+	TArray<FMetaXRSimulatorVersion> AvailableVersions;
+	TOptional<FMetaXRSimulatorVersion> MaxAvailableVersion;
 };
 #endif

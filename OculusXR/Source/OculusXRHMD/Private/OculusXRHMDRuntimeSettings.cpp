@@ -8,6 +8,7 @@
 // UOculusXRHMDRuntimeSettings
 
 #include "OculusXRHMD_Settings.h"
+#include "OculusXRSimulator.h"
 
 #include "DeviceProfiles/DeviceProfile.h"
 #include "DeviceProfiles/DeviceProfileManager.h"
@@ -167,6 +168,14 @@ void UOculusXRHMDRuntimeSettings::PostEditChangeProperty(struct FPropertyChanged
 			UpdateSinglePropertyInConfigFile(GetClass()->FindPropertyByName(GET_MEMBER_NAME_CHECKED(UOculusXRHMDRuntimeSettings, bSupportEyeTrackedFoveatedRendering)), GetDefaultConfigFilename());
 		}
 
+		if (PropertyChangedEvent.Property->GetFName() == GET_MEMBER_NAME_CHECKED(UOculusXRHMDRuntimeSettings, bCompositesDepth))
+		{
+			if (IConsoleVariable* DepthLayerCVar = IConsoleManager::Get().FindConsoleVariable(TEXT("xr.OpenXRAllowDepthLayer")))
+			{
+				DepthLayerCVar->Set(static_cast<int>(bCompositesDepth));
+			}
+		}
+
 		if (PropertyChangedEvent.Property->GetFName() == GET_MEMBER_NAME_CHECKED(UOculusXRHMDRuntimeSettings, SupportedDevices))
 		{
 			if (PropertyChangedEvent.ChangeType == EPropertyChangeType::ArrayAdd)
@@ -198,6 +207,12 @@ void UOculusXRHMDRuntimeSettings::PostEditChangeProperty(struct FPropertyChanged
 		}
 	}
 }
+
+TArray<FString> UOculusXRHMDRuntimeSettings::GetMetaXRSimulatorInstalledVersions() const
+{
+	return FMetaXRSimulator::Get().GetInstalledVersions();
+}
+
 #endif // WITH_EDITOR
 
 void UOculusXRHMDRuntimeSettings::PostInitProperties()

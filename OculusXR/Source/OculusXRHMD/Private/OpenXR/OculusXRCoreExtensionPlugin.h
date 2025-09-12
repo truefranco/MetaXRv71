@@ -17,6 +17,7 @@ namespace OculusXR
 		virtual bool IsStandaloneStereoOnlyDevice() override;
 		virtual bool GetOptionalExtensions(TArray<const ANSICHAR*>& OutExtensions) override;
 		virtual bool GetSpectatorScreenController(FHeadMountedDisplayBase* InHMDBase, TUniquePtr<FDefaultSpectatorScreenController>& OutSpectatorScreenController) override;
+		virtual const void* OnCreateInstance(class IOpenXRHMDModule* InModule, const void* InNext) override;
 		virtual const void* OnCreateSession(XrInstance InInstance, XrSystemId InSystem, const void* InNext) override;
 	};
 

@@ -327,7 +327,7 @@ namespace OculusXRHMD
 		virtual void MarkTextureForUpdate(uint32 LayerId) override;
 		virtual IStereoLayers::FLayerDesc GetDebugCanvasLayerDesc(class UTextureRenderTarget2D* Texture) override;
 		virtual void GetAllocatedTexture(uint32 LayerId, FTextureRHIRef& Texture, FTextureRHIRef& LeftTexture) override;
-		//virtual bool ShouldCopyDebugLayersToSpectatorScreen() const { return true; }
+		//virtual bool ShouldCopyDebugLayersToSpectatorScreen() const override { return true; }
 		virtual void PushLayerState(bool) override
 		{ /* Todo */
 		}
@@ -585,9 +585,12 @@ namespace OculusXRHMD
 
 		void LoadFromSettings();
 		void LogEnabledFeatures() const;
+		EOculusXRFoveatedRenderingMethod GetFoveatedRenderingMethod() const;
+		EOculusXRFoveatedRenderingLevel GetFoveatedRenderingLevel() const;
+		bool GetDynamicFoveatedRendering() const;
+
 		void DoSessionShutdown();
 
-	protected:
 		void UpdateHMDWornState();
 		EHMDWornState::Type HMDWornState = EHMDWornState::Unknown;
 

@@ -80,7 +80,15 @@ FOculusXRHMDModule::FOculusXRHMDModule()
 
 void FOculusXRHMDModule::StartupModule()
 {
-	IHeadMountedDisplayModule::StartupModule();
+	// IHeadMountedDisplayModule::StartupModule() registers the HMD module, so if we're using OpenXR and want the OpenXR module to be the active HMD module,
+	// just don't call the parent function here and it'll prevent this HMD module from being registered. We still want to run the rest of the function since
+	// some OpenXR plugins still startup here.
+	FString XrApi;
+	if (!GConfig->GetString(TEXT("/Script/OculusXRHMD.OculusXRHMDRuntimeSettings"), TEXT("XrApi"), XrApi, GEngineIni) || XrApi.Equals(FString("OVRPluginOpenXR")))
+	{
+		IHeadMountedDisplayModule::StartupModule();
+	}
+
 	FString PluginShaderDir = FPaths::Combine(IPluginManager::Get().FindPlugin(TEXT("OculusXR"))->GetBaseDir(), TEXT("Shaders"));
 	AddShaderSourceDirectoryMapping(TEXT("/Plugin/OculusXR"), PluginShaderDir);
 
@@ -100,6 +108,17 @@ void FOculusXRHMDModule::StartupModule()
 #endif // !UE_VERSION_OLDER_THAN(5, 4, 0)
 
 	ExtensionPluginManager.StartupOpenXRPlugins();
+
+	static const auto OpenXRAcquireModeCVar = IConsoleManager::Get().FindConsoleVariable(TEXT("xr.OpenXRAcquireMode"));
+	if (OpenXRAcquireModeCVar)
+	{
+		// Override the swapchain acquire mode. 1 = Acquire on any thread, 2 = Only acquire on RHI thread
+		// All platforms require this for openxr to enable:
+		// 	Proper target selection for stereolayer copying
+		// 	Proper target selection for depth
+		const int32_t AcquireOnAnyThread = 1;
+		OpenXRAcquireModeCVar->Set(AcquireOnAnyThread);
+	}
 }
 
 void FOculusXRHMDModule::ShutdownModule()
@@ -199,11 +218,14 @@ bool FOculusXRHMDModule::PreInit()
 #endif // !PLATFORM_ANDROID
 
 			// Determine Preinit flag based on platform
-			ovrpPreinitializeFlags PreinitFlag = ovrpPreinitializeFlags::ovrpPreinitializeFlag_None;
+			uint32_t PreinitFlags = 0;
 #if WITH_EDITOR && PLATFORM_WINDOWS
-			PreinitFlag = ovrpPreinitializeFlags::ovrpPreinitializeFlag_DisableLogSystemError;
+			PreinitFlags |= ovrpPreinitializeFlag_DisableLogSystemError;
 #endif
-			if (OVRP_FAILURE(PluginWrapper.PreInitialize5(Activity, PreinitApiType, PreinitFlag)))
+
+			PreinitFlags |= ovrpPreinitializeFlag_SkipRetryHMDConnection;
+
+			if (OVRP_FAILURE(PluginWrapper.PreInitialize5(Activity, PreinitApiType, (ovrpPreinitializeFlags)PreinitFlags)))
 			{
 				UE_LOG(LogHMD, Log, TEXT("Failed initializing OVRPlugin %s"), TEXT(OVRP_VERSION_STR));
 #if WITH_EDITOR && PLATFORM_WINDOWS
@@ -452,7 +474,7 @@ bool FOculusXRHMDModule::IsStandaloneStereoOnlyDevice()
 bool FOculusXRHMDModule::IsSimulatorActivated()
 {
 #if PLATFORM_WINDOWS
-	return FMetaXRSimulator::IsSimulatorActivated();
+	return FMetaXRSimulator::Get().IsSimulatorActivated();
 #else
 	return false;
 #endif
@@ -461,7 +483,31 @@ bool FOculusXRHMDModule::IsSimulatorActivated()
 bool FOculusXRHMDModule::IsSimulatorInstalled()
 {
 #if PLATFORM_WINDOWS
-	return FMetaXRSimulator::IsSimulatorInstalled();
+	return FMetaXRSimulator::Get().IsSimulatorInstalled();
+#else
+	return false;
+#endif
+}
+
+void FOculusXRHMDModule::CheckForXRSimUpdate()
+{
+#if PLATFORM_WINDOWS
+	FMetaXRSimulator::Get().FetchAvailableVersions();
+#endif
+}
+
+void FOculusXRHMDModule::UpdateXRSimToLatest()
+{
+#if PLATFORM_WINDOWS
+	FMetaXRSimulator::Get()
+		.InstallLatestVersion();
+#endif
+}
+
+bool FOculusXRHMDModule::CanUpdatedToLatest()
+{
+#if PLATFORM_WINDOWS
+	return !FMetaXRSimulator::Get().IsLatestVersionInstalled();
 #else
 	return false;
 #endif
@@ -470,7 +516,7 @@ bool FOculusXRHMDModule::IsSimulatorInstalled()
 void FOculusXRHMDModule::ToggleOpenXRRuntime()
 {
 #if PLATFORM_WINDOWS
-	FMetaXRSimulator::ToggleOpenXRRuntime();
+	FMetaXRSimulator::Get().ToggleOpenXRRuntime();
 #endif
 }
 

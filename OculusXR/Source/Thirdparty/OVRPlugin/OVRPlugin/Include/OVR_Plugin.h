@@ -829,7 +829,7 @@ OVRP_EXPORT ovrpResult ovrp_SendEvent(const char* eventName, const char* param);
 
 OVRP_EXPORT ovrpResult ovrp_SendEvent2(const char* eventName, const char* param, const char* source);
 
-OVRP_EXPORT ovrpResult ovrp_SendUnifiedEvent(
+OVRP_EXPORT ovrpResult ovrp_SendUnifiedEvent( // For OVRP_1_109_0 Only
     ovrpBool isEssential,
     const char* productType,
     const char* eventName,
@@ -841,6 +841,20 @@ OVRP_EXPORT ovrpResult ovrp_SendUnifiedEvent(
     const char* event_target,
     const char* error_msg,
     const char* is_internal);
+
+OVRP_EXPORT ovrpResult ovrp_SendUnifiedEventV2( // For OVRP_1_110_0+
+    ovrpBool isEssential,
+    const char* productType,
+    const char* eventName,
+    const char* event_metadata_json,
+    const char* project_name,
+    const char* event_entrypoint,
+    const char* project_guid,
+    const char* event_type,
+    const char* event_target,
+    const char* error_msg,
+    const char* is_internal_build,
+    const char* batch_mode);
 
 OVRP_EXPORT ovrpResult ovrp_AddCustomMetadata(const char* metadataName, const char* metadataParam);
 
@@ -1357,20 +1371,12 @@ OVRP_EXPORT ovrpResult ovrp_GetLowPowerModeEnabled(ovrpBool* enabled);
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+OVRP_EXPORT ovrpResult ovrp_CreateMarkerTrackerAsync(const ovrpMarkerTrackerCreateInfo* createInfo, ovrpFuture* future);
+OVRP_EXPORT ovrpResult
+ovrp_CreateMarkerTrackerComplete(ovrpFuture future, ovrpMarkerTrackerCreateCompletion* completion);
+OVRP_EXPORT ovrpResult ovrp_DestroyMarkerTracker(ovrpMarkerTracker tracker);
+OVRP_EXPORT ovrpResult ovrp_GetSpaceMarkerPayload(ovrpSpace space, ovrpSpaceMarkerPayload* payload);
+OVRP_EXPORT ovrpResult ovrp_GetMarkerTrackingSupported(ovrpBool* supportsMarkerTracking);
 
 
 
@@ -1391,10 +1397,9 @@ OVRP_EXPORT ovrpResult ovrp_CancelFuture(ovrpFuture future);
 OVRP_EXPORT ovrpResult ovrp_GetGroupId(ovrpUuid* groupId);
 OVRP_EXPORT ovrpResult ovrp_SetExternalLayerDynresEnabled(ovrpBool enabled);
 
-
-
-
-
+// XR_METAX2_debug_utils_region_profiling
+OVRP_EXPORT ovrpResult ovrp_BeginProfilingRegion(const char* regionName);
+OVRP_EXPORT ovrpResult ovrp_EndProfilingRegion();
 
 
 
@@ -1413,7 +1418,36 @@ OVRP_EXPORT ovrpResult ovrp_SendMicrogestureHint();
 
 OVRP_EXPORT ovrpResult ovrp_GetStationaryReferenceSpaceId(ovrpUuid* generationId);
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 OVRP_EXPORT void ovrp_AllowVisibilityMask(ovrpBool enabled);
+
 #ifdef __cplusplus
 }
 #endif

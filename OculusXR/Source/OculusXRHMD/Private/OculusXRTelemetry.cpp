@@ -54,10 +54,10 @@ namespace OculusXRTelemetry
 #endif
 	}
 
-	FString GetProjectId()
+	TTuple<FString, FString> GetProjectIdAndName()
 	{
 		const UGeneralProjectSettings& ProjectSettings = *GetDefault<UGeneralProjectSettings>();
-		return ProjectSettings.ProjectID.ToString();
+		return MakeTuple(ProjectSettings.ProjectID.ToString(), ProjectSettings.ProjectName);
 	}
 
 	bool IsConsentGiven()

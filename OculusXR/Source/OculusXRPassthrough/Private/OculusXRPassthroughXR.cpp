@@ -355,6 +355,7 @@ namespace XRPassthrough
 				uint32 LayerIdA = XLayers[XLayerIndex]->GetDesc().GetLayerId();
 				uint32 LayerIdB = Layers_RenderThread[LayerIndex_RenderThread]->GetDesc().GetLayerId();
 				PRAGMA_ENABLE_DEPRECATION_WARNINGS
+
 				if (LayerIdA < LayerIdB) // If a layer was inserted in the middle of existing ones
 				{
 					if (XLayers[XLayerIndex]->Initialize_RenderThread(InSession))
@@ -437,10 +438,10 @@ namespace XRPassthrough
 						{
 							PRAGMA_DISABLE_DEPRECATION_WARNINGS
 							UE_LOG(LogOculusXRPassthrough, Log, TEXT("FOculusXRPassthroughEventHandling - Passthrough Layer #%d resumed"), Layer->GetDesc().GetLayerId());
+
 							// Send event
 							OculusXRPassthrough::FOculusXRPassthroughEventDelegates::OculusPassthroughLayerResumed.Broadcast(Layer->GetDesc().GetLayerId());
 							PRAGMA_ENABLE_DEPRECATION_WARNINGS
-
 							break;
 						}
 					}

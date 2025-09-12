@@ -295,7 +295,7 @@ void UMRUKSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 			UOculusXRFunctionLibrary::RegisterOpenXrEventHandler(OpenXrEventHandler, this);
 		}
 
-		MRUKShared::MrukResult result = MRUKShared::GetInstance()->AnchorStoreCreate(OpenXrInstance, OpenXrSession, OpenXrInstanceProcAddr, OpenXrBaseSpace);
+		MRUKShared::MrukResult result = MRUKShared::GetInstance()->AnchorStoreCreate(OpenXrInstance, OpenXrSession, OpenXrInstanceProcAddr, OpenXrBaseSpace, NULL, 0);
 		if (result != MRUKShared::MRUK_SUCCESS)
 		{
 			UE_LOG(LogMRUK, Error, TEXT("Failed to initialize anchor store. It will not be possible to load anchors: %d"), result);

@@ -112,16 +112,18 @@ FString ToOculusXR(MRUKShared::MrukLabel Label)
 			return "GLOBAL_MESH";
 		case MRUKShared::MRUK_LABEL_INVISIBLE_WALL_FACE:
 			return "INVISIBLE_WALL_FACE";
-		case MRUKShared::MRUK_LABEL_CHAIR:
-			return "CHAIR";
 		case MRUKShared::MRUK_LABEL_UNKNOWN:
 			return "UNKNOWN";
 		case MRUKShared::MRUK_LABEL_INNER_WALL_FACE:
 			return "INNER_WALL_FACE";
-		case MRUKShared::MRUK_LABEL_OTHER_ROOM_FACE:
-			return "OTHER_ROOM_FACE";
-		case MRUKShared::MRUK_LABEL_OPENING:
-			return "OPENING";
+		case MRUKShared::MRUK_LABEL_TABLETOP:
+			return "TABLETOP";
+		case MRUKShared::MRUK_LABEL_SITTING_AREA:
+			return "SITTING_AREA";
+		case MRUKShared::MRUK_LABEL_SLEEPING_AREA:
+			return "SLEEPING_AREA";
+		case MRUKShared::MRUK_LABEL_STORAGE_TOP:
+			return "STORAGE_TOP";
 		default:
 			return "UNKNOWN";
 	}

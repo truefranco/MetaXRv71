@@ -35,12 +35,14 @@
 #include "OculusXRPassthroughLayerComponent.h"
 #include "SExternalImageReference.h"
 #include "AndroidRuntimeSettings.h"
+#include "SHyperlinkLaunchURL.h"
 #include "SourceControlHelpers.h"
 #include "Framework/Notifications/NotificationManager.h"
 #include "Interfaces/IProjectManager.h"
 #include "Widgets/Notifications/SNotificationList.h"
 #include "Editor/EditorPerformanceSettings.h"
 #include "HAL/FileManager.h"
+#include "Widgets/Input/SHyperlink.h"
 
 #define LOCTEXT_NAMESPACE "OculusXREditor"
 
@@ -111,6 +113,15 @@ void FOculusXREditorModule::StartupModule()
 				return FOculusXRHMDModule::IsSimulatorActivated();
 			}));
 
+		PluginCommands->MapAction(
+			FOculusToolCommands::Get().CheckForUpdateXRSim,
+			FExecuteAction::CreateRaw(this, &FOculusXREditorModule::CheckForXRSimUpdate));
+
+		PluginCommands->MapAction(
+			FOculusToolCommands::Get().UpdateXRSim,
+			FExecuteAction::CreateRaw(this, &FOculusXREditorModule::UpdateXRSimToLatest),
+			FCanExecuteAction::CreateRaw(this, &FOculusXREditorModule::CanUpdatedToLatest));
+
 		int32 numRooms = FOculusToolCommands::Get().RoomCommands.Num();
 		for (int ii = 0; ii < numRooms; ++ii)
 		{
@@ -125,6 +136,10 @@ void FOculusXREditorModule::StartupModule()
 			FOculusToolCommands::Get().StopServer,
 			FExecuteAction::CreateRaw(this, &FOculusXREditorModule::StopSESServer),
 			FCanExecuteAction());
+
+		PluginCommands->MapAction(
+			FOculusToolCommands::Get().OpenSettings,
+			FExecuteAction::CreateRaw(this, &FOculusXREditorModule::OpenPluginSettings));
 
 		FLevelEditorModule& LevelEditorModule = FModuleManager::LoadModuleChecked<FLevelEditorModule>("LevelEditor");
 
@@ -178,6 +193,8 @@ void FOculusXREditorModule::StartupModule()
 
 		FPropertyChangedEvent DisabledMaxResolutionEvent(EditorPerformanceSettings->GetClass()->FindPropertyByName(GET_MEMBER_NAME_CHECKED(UEditorPerformanceSettings, MaxViewportRenderingResolution)), EPropertyChangeType::ValueSet);
 		EditorPerformanceSettings->PostEditChangeProperty(DisabledMaxResolutionEvent);
+
+		CheckForXRSimUpdate();
 	}
 }
 
@@ -256,6 +273,11 @@ void FOculusXREditorModule::PluginOpenSetupToolWindow()
 	IOculusXRProjectSetupToolModule::Get().ShowProjectSetupTool("Meta Menu");
 }
 
+void FOculusXREditorModule::OpenPluginSettings() const
+{
+	FModuleManager::LoadModuleChecked<ISettingsModule>("Settings").ShowViewer("Project", "Plugins", "OculusXR");
+}
+
 void FOculusXREditorModule::PluginOpenPlatWindow()
 {
 	FGlobalTabmanager::Get()->TryInvokeTab(OculusPlatToolTabName);
@@ -264,6 +286,21 @@ void FOculusXREditorModule::PluginOpenPlatWindow()
 void FOculusXREditorModule::ToggleOpenXRRuntime()
 {
 	FOculusXRHMDModule::ToggleOpenXRRuntime();
+}
+
+void FOculusXREditorModule::CheckForXRSimUpdate()
+{
+	FOculusXRHMDModule::CheckForXRSimUpdate();
+}
+
+void FOculusXREditorModule::UpdateXRSimToLatest()
+{
+	FOculusXRHMDModule::UpdateXRSimToLatest();
+}
+
+bool FOculusXREditorModule::CanUpdatedToLatest()
+{
+	return FOculusXRHMDModule::CanUpdatedToLatest();
 }
 
 void FOculusXREditorModule::LaunchRoom(int32 index)
@@ -335,6 +372,11 @@ TSharedRef<SWidget> FOculusXREditorModule::CreateXrSimToolbarEntryMenu(TSharedPt
 	MenuBuilder.AddMenuEntry(FOculusToolCommands::Get().ToggleMetaXRSim);
 	MenuBuilder.EndSection();
 
+	MenuBuilder.BeginSection("Meta XR Simulator Update", LOCTEXT("MetaXR Simulator Update", "Update"));
+	MenuBuilder.AddMenuEntry(FOculusToolCommands::Get().CheckForUpdateXRSim);
+	MenuBuilder.AddMenuEntry(FOculusToolCommands::Get().UpdateXRSim);
+	MenuBuilder.EndSection();
+
 	MenuBuilder.BeginSection("SES", LOCTEXT("SES", "SES"));
 	MenuBuilder.AddSubMenu(
 		LOCTEXT("Synthetic Environment Server", "Synthetic Environment Server"),
@@ -342,6 +384,8 @@ TSharedRef<SWidget> FOculusXREditorModule::CreateXrSimToolbarEntryMenu(TSharedPt
 		FNewMenuDelegate::CreateRaw(this, &FOculusXREditorModule::CreateSESSubMenus));
 	MenuBuilder.EndSection();
 
+	MenuBuilder.AddMenuSeparator();
+	MenuBuilder.AddMenuEntry(FOculusToolCommands::Get().OpenSettings);
 	return MenuBuilder.MakeWidget();
 }
 
@@ -563,6 +607,60 @@ void FOculusXRHMDSettingsDetailsCustomization::CustomizeDetails(IDetailLayoutBui
 						]
 				]
 		];
+
+	IDetailCategoryBuilder& XRSimCategoryBuilder = DetailLayout.EditCategory("Meta XR Simulator", FText::GetEmpty(), ECategoryPriority::Important);
+	
+	XRSimCategoryBuilder.AddCustomRow(LOCTEXT("MetaXRSimulatorInfo", "Meta XR Simulator Info"))
+	                    .WholeRowContent()
+	[
+		SNew(SVerticalBox)
+		+ SVerticalBox::Slot().AutoHeight().Padding(2)
+		[
+			SNew(SHorizontalBox)
+			+ SHorizontalBox::Slot().AutoWidth()
+			[
+				SNew(STextBlock)
+					.Font(IDetailLayoutBuilder::GetDetailFont())
+					.AutoWrapText(true)
+					.Justification(ETextJustify::Center)
+					.Text(LOCTEXT("MetaXRSimulatorDescText", "Meta XR Simulator is a lightweight Extended Reality (XR) runtime built to speed up XR application development and testing on your development machine. Navigate to the documentation page to learn more."))
+			]
+		]
+		+ SVerticalBox::Slot().AutoHeight().Padding(2)
+		[
+			SNew(SHorizontalBox)
+			+ SHorizontalBox::Slot().AutoWidth()
+			[
+				SNew(SHyperlink)
+				.Text(LOCTEXT("MetaXRSimDocPage", "Meta XR Simulator Documentation"))
+				.Style(FAppStyle::Get(), "Common.GotoNativeCodeHyperlink")
+				.ToolTipText(LOCTEXT("MetaXRSimDocPageTooltip", "Opens a page that describes how to get started with Meta XR Simulator. "))
+				.OnNavigate_Lambda([this]() { FPlatformProcess::LaunchURL(TEXT("https://developers.meta.com/horizon/documentation/unreal/xrsim-getting-started"), nullptr, nullptr); })
+			]
+		]
+		+ SVerticalBox::Slot().AutoHeight().Padding(2)
+		[
+			SNew(SHorizontalBox)
+			+ SHorizontalBox::Slot().AutoWidth()
+			[
+				SNew(SButton)
+				.Text(LOCTEXT("MetaXRSimOpenInstallDir", "Open Installation Directory"))
+				.VAlign(VAlign_Center)
+				.OnClicked_Lambda([this]()
+				{
+					const auto& XRSimInstallDir = FPaths::Combine(FPlatformMisc::GetEnvironmentVariable(TEXT("LOCALAPPDATA")), TEXT("MetaXR"), TEXT("MetaXRSimulator"));
+					if (FPaths::DirectoryExists(XRSimInstallDir)) {
+						FPlatformProcess::ExploreFolder(*XRSimInstallDir);
+					} else
+					{
+						UE_LOG(LogTemp, Warning, TEXT("Installation Directory (%s) does not exist."), *XRSimInstallDir);
+					}
+
+					return FReply::Handled();
+				})
+			]
+		]
+	];
 	/* clang-format on */
 }
 

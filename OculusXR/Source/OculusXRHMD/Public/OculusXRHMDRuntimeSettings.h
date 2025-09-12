@@ -59,12 +59,20 @@ public:
 	UPROPERTY(config, EditAnywhere, Category = General, meta = (EditCondition = "XrApi == EOculusXRXrApi::NativeOpenXR"))
 	bool bThumbstickDpadEmulationEnabled;
 
+	/** Preferred version for XR Simulator */
+	UPROPERTY(Config, EditAnywhere, Category = "Meta XR Simulator", meta = (GetOptions = GetMetaXRSimulatorInstalledVersions, DisplayName = "Meta XR Simulator Version"))
+	FString OculusXRSimulatorPreferredVersion;
+
+	/** Whether to spawn notification if new version is available */
+	UPROPERTY(config, EditAnywhere, Category = "Meta XR Simulator", meta = (ToolTip = "Spawn notification if new version is available"))
+	bool bNotifyWhenNewVersionIsAvailable = true;
+
 	/** Whether Dash is supported by the app, which will keep the app in foreground when the User presses the oculus button (needs the app to handle input focus loss!) */
 	UPROPERTY(config, EditAnywhere, Category = PC)
 	bool bSupportsDash;
 
 	/** Whether the app's depth buffer is shared with the Rift Compositor, for layer (including Dash) compositing, PTW, and potentially more. */
-	UPROPERTY(config, EditAnywhere, Category = PC)
+	UPROPERTY(config, EditAnywhere, Category = PC, meta = (ConfigRestartRequired = true))
 	bool bCompositesDepth;
 
 	/** Computes mipmaps for the eye buffers every frame, for a higher quality distortion */
@@ -267,6 +275,9 @@ private:
 #if WITH_EDITOR
 	virtual bool CanEditChange(const FProperty* InProperty) const override;
 	virtual void PostEditChangeProperty(struct FPropertyChangedEvent& PropertyChangedEvent) override;
+
+	UFUNCTION()
+	TArray<FString> GetMetaXRSimulatorInstalledVersions() const;
 #endif // WITH_EDITOR
 	virtual void PostInitProperties() override;
 

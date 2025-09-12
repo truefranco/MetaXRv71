@@ -3,17 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-
 #include "OpenXR/IOculusXRExtensionPlugin.h"
 
 #if WITH_EDITOR
-   #include "Settings/LevelEditorPlaySettings.h"
-   class ULevelEditorPlaySettings;
+#include "Settings/LevelEditorPlaySettings.h"
+class ULevelEditorPlaySettings;
 #endif
 
 DECLARE_LOG_CATEGORY_EXTERN(LogOculusMultiPlayerStateExtensionPlugin, Log, All);
-
-
 
 namespace OculusXR
 {

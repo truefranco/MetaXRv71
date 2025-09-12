@@ -29,7 +29,7 @@
 // Note: OVRP_MINOR_VERSION == OCULUS_SDK_VERSION + 32
 
 #define OVRP_MAJOR_VERSION 1
-#define OVRP_MINOR_VERSION 109
+#define OVRP_MINOR_VERSION 110
 #define OVRP_PATCH_VERSION 0
 
 #define OVRP_VERSION OVRP_MAJOR_VERSION, OVRP_MINOR_VERSION, OVRP_PATCH_VERSION
@@ -226,6 +226,9 @@ typedef enum {
   /// Enable support for custom alpha blend factors. If this is enabled, the only environment blend mode that will be
   /// supported is Opaque.
   ovrpPreinitializeFlag_UseAlphaBlendFactors = (1 << 5),
+
+  /// Allow engines the capability to avoid unnecessary retry delays on startup
+  ovrpPreinitializeFlag_SkipRetryHMDConnection = (1 << 6),
 
   ovrpPreinitializeFlag_EnumSize = 0x7fffffff
 } ovrpPreinitializeFlags;
@@ -2545,10 +2548,6 @@ typedef enum ovrpEventType_ {
 
 
 
-
-
-
-
   ovrpEventType_ReferenceSpaceChangePending = 1160,
 } ovrpEventType;
 
@@ -2966,18 +2965,16 @@ typedef enum {
   ovrpSpaceComponentType_SemanticLabels = 5,
   ovrpSpaceComponentType_RoomLayout = 6,
   ovrpSpaceComponentType_SpaceContainer = 7,
-
-
-
-
-
-
+  ovrpSpaceComponentType_MarkerPayload = 1000576000,
   ovrpSpaceComponentType_TriangleMesh = 1000269000,
 
 
 
   // XR_META_dynamic_object_tracker
   ovrpSpaceComponentType_DynamicObject = 1000288007,
+
+
+
 
 
 
@@ -3844,59 +3841,33 @@ typedef struct ovrpQplAnnotation_ {
 
 
 
+typedef ovrpUInt64 ovrpMarkerTracker;
 
+typedef enum { ovrpMarkerType_QRCode = 1, ovrpMarkerType_MaxEnum = 0x7FFFFFFF } ovrpMarkerType;
 
+typedef enum {
+  ovrpSpaceMarkerPayloadType_InvalidQRCode = 1,
+  ovrpSpaceMarkerPayloadType_StringQRCode = 2,
+  ovrpSpaceMarkerPayloadType_BinaryQRCode = 3,
+  ovrpSpaceMarkerPayloadType_MaxEnum = 0x7FFFFFFF
+} ovrpSpaceMarkerPayloadType;
 
+typedef struct ovrpMarkerTrackerCreateInfo_ {
+  ovrpUInt32 markerTypeCount;
+  const ovrpMarkerType* markerTypes;
+} ovrpMarkerTrackerCreateInfo;
 
+typedef struct ovrpMarkerTrackerCreateCompletion_ {
+  ovrpResult futureResult;
+  ovrpMarkerTracker markerTracker;
+} ovrpMarkerTrackerCreateCompletion;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+typedef struct ovrpSpaceMarkerPayload_ {
+  ovrpUInt32 bufferCapacityInput;
+  ovrpUInt32 bufferCountOutput;
+  ovrpByte* buffer;
+  ovrpSpaceMarkerPayloadType payloadType;
+} ovrpSpaceMarkerPayload;
 
 
 
@@ -3992,6 +3963,21 @@ typedef struct ovrpEventDataReferenceSpaceChangePending_ {
 typedef enum {
   ovrpAllowRecentering = 1 << 0,
 } ovrpExternalSpaceFlags;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 #ifdef __clang__
 #pragma clang diagnostic pop

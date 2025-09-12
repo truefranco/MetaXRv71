@@ -532,6 +532,12 @@ EOculusXRAnchorResult::Type FOculusXRAnchorFunctionsOVR::ShareAnchors(const TArr
 	groupUuids.Reserve(Groups.Num());
 	for (auto& it : Groups)
 	{
+		if (it == FOculusXRUUID::Zero)
+		{
+			UE_LOG(LogOculusXRAnchors, Error, TEXT("Anchor sharing failed. One or more group targets provided had a UUID value of zero."));
+			return EOculusXRAnchorResult::Failure_InvalidParameter;
+		}
+
 		ovrpUuid uuid;
 		FMemory::Memcpy(uuid.data, it.UUIDBytes);
 		groupUuids.Add(uuid);

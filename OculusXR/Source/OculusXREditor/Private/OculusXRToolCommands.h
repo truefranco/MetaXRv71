@@ -33,7 +33,10 @@ public:
 	TSharedPtr<FUICommandInfo> ToggleIterativeCookOnTheFly;
 	TSharedPtr<FUICommandInfo> OpenPlatWindow;
 	TSharedPtr<FUICommandInfo> ToggleMetaXRSim;
+	TSharedPtr<FUICommandInfo> CheckForUpdateXRSim;
+	TSharedPtr<FUICommandInfo> UpdateXRSim;
 	TSharedPtr<FUICommandInfo> StopServer;
+	TSharedPtr<FUICommandInfo> OpenSettings;
 
 	TArray<TSharedPtr<FUICommandInfo>> RoomCommands;
 

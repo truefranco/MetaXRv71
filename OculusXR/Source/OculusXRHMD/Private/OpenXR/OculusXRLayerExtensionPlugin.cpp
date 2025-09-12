@@ -6,7 +6,7 @@
 #include "IHeadMountedDisplay.h"
 #include "IOpenXRHMD.h"
 #include "IOpenXRHMDModule.h"
-#include "OculusXRHMD_DynamicResolutionState.h"
+#include "OculusXROpenXRDynamicResolutionState.h"
 #include "OculusXRHMDRuntimeSettings.h"
 #include "OculusXROpenXRUtilities.h"
 #include "OculusXRXRFunctions.h"
@@ -110,7 +110,7 @@ namespace OculusXR
 					DynamicResOperationCVar->Set(2);
 				}
 
-				GEngine->ChangeDynamicResolutionStateAtNextFrame(MakeShareable(new OculusXRHMD::FDynamicResolutionState(Settings_GameThread)));
+				GEngine->ChangeDynamicResolutionStateAtNextFrame(MakeShareable(new OculusXR::FOpenXRDynamicResolutionState(Settings_GameThread)));
 
 				const float MaxPixelDensity = Settings_GameThread->GetPixelDensityMax();
 
@@ -149,7 +149,15 @@ namespace OculusXR
 
 				if (Hmd->GetHMDMonitorInfo(MonitorInfo))
 				{
-					float PixelDensity = RecommendedImageHeight_GameThread == 0 ? Hmd->GetPixelDenity() : static_cast<float>(RecommendedImageHeight_GameThread) / MonitorInfo.ResolutionY;
+					static auto PixelDensityCVar = IConsoleManager::Get().FindConsoleVariable(TEXT("xr.SecondaryScreenPercentage.HMDRenderTarget"));
+					if (PixelDensityCVar != nullptr)
+					{
+						// Set pixel density to dynamic resolutions's max so default target is sized to this
+						// FOpenXRDynamicResolutionState driver will only scale down to the current recommmended resolution
+						PixelDensityCVar->Set(Settings_GameThread->GetPixelDensityMax() * 100.0f);
+					}
+
+					float PixelDensity = RecommendedImageHeight_GameThread == 0 ? 1.0f : static_cast<float>(RecommendedImageHeight_GameThread) / (MonitorInfo.ResolutionY);
 
 					static const auto CVarOculusDynamicPixelDensity = IConsoleManager::Get().FindTConsoleVariableDataFloat(TEXT("r.Oculus.DynamicResolution.PixelDensity"));
 					const float PixelDensityCVarOverride = CVarOculusDynamicPixelDensity != nullptr ? CVarOculusDynamicPixelDensity->GetValueOnAnyThread() : 0.0f;
@@ -177,21 +185,6 @@ namespace OculusXR
 			}
 		}
 	}
-
-#if defined(WITH_OCULUS_BRANCH) || defined(WITH_OPENXR_BRANCH)
-	float FLayerExtensionPlugin::GetMaxPixelDensity()
-	{
-		check(IsInGameThread() || IsInRenderingThread());
-
-		float PixelDensity = 0.0f;
-		if (bPixelDensityAdaptive)
-		{
-			// Engine allows this call to happen on game or rendering thread.
-			PixelDensity = IsInRenderingThread() ? MaxPixelDensity_RenderThread : Settings_GameThread->GetPixelDensityMax();
-		}
-		return PixelDensity;
-	}
-#endif
 
 	const void* FLayerExtensionPlugin::OnEndFrame(XrSession InSession, XrTime DisplayTime, const void* InNext)
 	{

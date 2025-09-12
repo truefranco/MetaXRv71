@@ -104,6 +104,8 @@ struct OCULUSXRANCHORS_API FOculusXRUUID
 {
 	GENERATED_BODY()
 
+	static FOculusXRUUID Zero;
+
 	FOculusXRUUID();
 	FOculusXRUUID(const UuidArray& In);
 

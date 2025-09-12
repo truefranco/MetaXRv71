@@ -135,8 +135,9 @@ private:
 	// Latest bone container serial number
 	uint16 LastBoneContainerSerialNumber;
 
+	// Compact pose indices per bone id
+	//TStaticArray<FCompactPoseBoneIndex, static_cast<uint8>(EOculusXRBoneID::COUNT)> LastSkeletonBoneRemapping{ InPlace, FCompactPoseBoneIndex(INDEX_NONE) };
 	TArray<FCompactPoseBoneIndex> LastSkeletonBoneRemapping;
-
 	// Recalculate skeleton dependent mappings
 	void OnBoneContainerChanged(const FBoneContainer& BoneContainer);
 };

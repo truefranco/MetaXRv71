@@ -1782,6 +1782,7 @@ namespace OculusXRHMD
 
 		OculusXRTelemetry::SendEvent(TEXT("MobileTonemap"), IsMobileTonemapSubpassEnabled(Settings->CurrentShaderPlatform));
 		OculusXRTelemetry::SendEvent(TEXT("MobileHDR"), RendererSettings->bMobilePostProcessing != 0);
+		OculusXRTelemetry::SendEvent(TEXT("GPUScene"), RendererSettings->bMobileSupportGPUScene != 0);
 		OculusXRTelemetry::SendEvent(TEXT("XrApi"), Settings->XrApi == EOculusXRXrApi::OVRPluginOpenXR ? TEXT("OVRPluginOpenXR") : TEXT("NativeOpenXR"));
 	}
 
@@ -1918,7 +1919,6 @@ namespace OculusXRHMD
 
 		if (SpectatorScreenController)
 		{
-
 			SpectatorScreenController->RenderSpectatorScreen_RenderThread(GraphBuilder, BackBuffer, SrcTexture, nullptr, WindowSize);
 		}
 	}
@@ -2544,7 +2544,7 @@ namespace OculusXRHMD
 	IStereoLayers::FLayerDesc FOculusXRHMD::GetDebugCanvasLayerDesc(UTextureRenderTarget2D* Texture)
 	{
 		IStereoLayers::FLayerDesc StereoLayerDesc;
-		
+
 		ovrpBool cylinderSupported = ovrpBool_False;
 		ovrpResult result = FOculusXRHMDModule::GetPluginWrapper().GetInitialized() ? FOculusXRHMDModule::GetPluginWrapper().IsLayerShapeSupported(ovrpShape_Cylinder, &cylinderSupported) : ovrpFailure;
 		if (OVRP_SUCCESS(result) && cylinderSupported)
@@ -2556,7 +2556,7 @@ namespace OculusXRHMD
 		{
 			StereoLayerDesc.Transform = FTransform(FVector(100.f, 0, 0));
 		}
-		
+
 		StereoLayerDesc.QuadSize = FVector2D(180.f, 180.f);
 		StereoLayerDesc.PositionType = IStereoLayers::ELayerType::FaceLocked;
 		StereoLayerDesc.LayerSize = StereoLayerDesc.LayerSize = FIntPoint(Texture->SizeX, Texture->SizeY);
@@ -3159,15 +3159,23 @@ namespace OculusXRHMD
 		FOculusXRHMDModule::GetPluginWrapper().SetupDistortionWindow3(flag);
 		FOculusXRHMDModule::GetPluginWrapper().SetSuggestedCpuPerformanceLevel((ovrpProcessorPerformanceLevel)Settings->SuggestedCpuPerfLevel);
 		FOculusXRHMDModule::GetPluginWrapper().SetSuggestedGpuPerformanceLevel((ovrpProcessorPerformanceLevel)Settings->SuggestedGpuPerfLevel);
-		FOculusXRHMDModule::GetPluginWrapper().SetFoveationEyeTracked(FoveatedRenderingMethod == EOculusXRFoveatedRenderingMethod::EyeTrackedFoveatedRendering);
-		FOculusXRHMDModule::GetPluginWrapper().SetTiledMultiResLevel((ovrpTiledMultiResLevel)FoveatedRenderingLevel.load());
-		FOculusXRHMDModule::GetPluginWrapper().SetTiledMultiResDynamic(bDynamicFoveatedRendering.load());
 		FOculusXRHMDModule::GetPluginWrapper().SetAppCPUPriority2(((ovrpBool)CVarOculusIncreaseThreadPrio.GetValueOnAnyThread()));
 		FOculusXRHMDModule::GetPluginWrapper().SetLocalDimming(ovrpBool_True);
 
 		OCFlags.NeedSetTrackingOrigin = true;
 
 		FOculusXRHMDModule::GetPluginWrapper().SetClientColorDesc((ovrpColorSpace)Settings->ColorSpace);
+
+		// Foveation related features need swapchain whose lifecycle ends in RHIThread normally.
+		// These features should be run in RHIThread to avoid potential racing conditions.
+		ExecuteOnRenderThread([this]() {
+			ExecuteOnRHIThread([this]() {
+				// Allow CVars to override the app's foveated rendering settings (set -1 to restore app's setting)
+				FOculusXRHMDModule::GetPluginWrapper().SetFoveationEyeTracked(GetFoveatedRenderingMethod() == EOculusXRFoveatedRenderingMethod::EyeTrackedFoveatedRendering);
+				FOculusXRHMDModule::GetPluginWrapper().SetTiledMultiResLevel((ovrpTiledMultiResLevel)GetFoveatedRenderingLevel());
+				FOculusXRHMDModule::GetPluginWrapper().SetTiledMultiResDynamic(GetDynamicFoveatedRendering());
+			});
+		});
 
 		return true;
 	}
@@ -3792,7 +3800,6 @@ namespace OculusXRHMD
 	ESpectatorScreenMode FOculusXRHMD::GetSpectatorScreenMode_RenderThread() const
 	{
 		CheckInRenderThread();
-
 		if (IsInGameThread())
 		{
 			return ESpectatorScreenMode::SingleEyeCroppedToFill;
@@ -4673,6 +4680,21 @@ namespace OculusXRHMD
 		return Result;
 	}
 
+	EOculusXRFoveatedRenderingMethod FOculusXRHMD::GetFoveatedRenderingMethod() const
+	{
+		return CVarOculusFoveatedRenderingMethod.GetValueOnAnyThread() >= 0 ? (EOculusXRFoveatedRenderingMethod)CVarOculusFoveatedRenderingMethod.GetValueOnAnyThread() : FoveatedRenderingMethod.load();
+	}
+
+	EOculusXRFoveatedRenderingLevel FOculusXRHMD::GetFoveatedRenderingLevel() const
+	{
+		return CVarOculusFoveatedRenderingLevel.GetValueOnAnyThread() >= 0 ? (EOculusXRFoveatedRenderingLevel)CVarOculusFoveatedRenderingLevel.GetValueOnAnyThread() : FoveatedRenderingLevel.load();
+	}
+
+	bool FOculusXRHMD::GetDynamicFoveatedRendering() const
+	{
+		return CVarOculusDynamicFoveatedRendering.GetValueOnAnyThread() >= 0 ? (bool)CVarOculusDynamicFoveatedRendering.GetValueOnAnyThread() : bDynamicFoveatedRendering.load();
+	}
+
 	FGameFramePtr FOculusXRHMD::CreateNewGameFrame() const
 	{
 		FGameFramePtr Result(MakeShareable(new FGameFrame()));
@@ -4681,9 +4703,9 @@ namespace OculusXRHMD
 		Result->WorldToMetersScale = CachedWorldToMetersScale;
 		Result->NearClippingPlane = GNearClippingPlane;
 		// Allow CVars to override the app's foveated rendering settings (set -1 to restore app's setting)
-		Result->FoveatedRenderingMethod = CVarOculusFoveatedRenderingMethod.GetValueOnAnyThread() >= 0 ? (EOculusXRFoveatedRenderingMethod)CVarOculusFoveatedRenderingMethod.GetValueOnAnyThread() : FoveatedRenderingMethod.load();
-		Result->FoveatedRenderingLevel = CVarOculusFoveatedRenderingLevel.GetValueOnAnyThread() >= 0 ? (EOculusXRFoveatedRenderingLevel)CVarOculusFoveatedRenderingLevel.GetValueOnAnyThread() : FoveatedRenderingLevel.load();
-		Result->bDynamicFoveatedRendering = CVarOculusDynamicFoveatedRendering.GetValueOnAnyThread() >= 0 ? (bool)CVarOculusDynamicFoveatedRendering.GetValueOnAnyThread() : bDynamicFoveatedRendering.load();
+		Result->FoveatedRenderingMethod = GetFoveatedRenderingMethod();
+		Result->FoveatedRenderingLevel = GetFoveatedRenderingLevel();
+		Result->bDynamicFoveatedRendering = GetDynamicFoveatedRendering();
 		Result->Flags.bSplashIsShown = Splash->IsShown();
 		return Result;
 	}
@@ -5124,8 +5146,9 @@ namespace OculusXRHMD
 		UE_LOG(LogHMD, Log, TEXT("DynamicResolution: %s. PixelDensityMin: %f, PixelDensityMax: %f"),
 			Settings->bDynamicFoveatedRendering ? TEXT("Enabled") : TEXT("Disabled"),
 			Settings->GetPixelDensityMin(),
-
 			Settings->GetPixelDensityMax());
+		const URendererSettings* RendererSettings = GetMutableDefault<URendererSettings>();
+		UE_LOG(LogHMD, Log, TEXT("GPUScene: %s"), RendererSettings->bMobileSupportGPUScene ? TEXT("Enabled") : TEXT("Disabled"));
 	}
 	/// @endcond
 

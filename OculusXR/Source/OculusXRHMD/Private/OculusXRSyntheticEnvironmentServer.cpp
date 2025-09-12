@@ -30,7 +30,7 @@ void FMetaXRSES::LaunchEnvironment(int32 EnvironmentIndex)
 	const FString EnvironmentName = SynthEnvRooms[EnvironmentIndex].SynthName;
 	const FString SESPath = SynthEnvRooms[EnvironmentIndex].Executable;
 
-	if (FMetaXRSimulator::GetPackagePath().IsEmpty() || SESPath.IsEmpty() || EnvironmentName.IsEmpty())
+	if (FMetaXRSimulator::Get().GetPackagePath().IsEmpty() || SESPath.IsEmpty() || EnvironmentName.IsEmpty())
 	{
 		return;
 	}
@@ -134,7 +134,7 @@ TArray<FMetaXRSES::ServerInfo>& FMetaXRSES::GetSynthEnvRooms()
 
 	SynthEnvRooms = {};
 
-	FString dirPath = FMetaXRSimulator::GetPackagePath();
+	FString dirPath = FMetaXRSimulator::Get().GetPackagePath();
 	if (dirPath.IsEmpty())
 	{
 		return SynthEnvRooms;
@@ -157,12 +157,12 @@ TArray<FMetaXRSES::ServerInfo>& FMetaXRSES::GetSynthEnvRooms()
 
 FString FMetaXRSES::GetLocalSharingServerPath()
 {
-	FString Path = FMetaXRSimulator::GetPackagePath() + "/local_sharing_server~/local_sharing_server.exe";
+	FString Path = FMetaXRSimulator::Get().GetPackagePath() + "/local_sharing_server~/local_sharing_server.exe";
 
 	if (!IFileManager::Get().FileExists(*Path))
 	{
 		UE_LOG(LogMetaXRSES, Warning, TEXT("Failed to find %s, trying the previous version"), *Path);
-		Path = FMetaXRSimulator::GetPackagePath() + "/.local_sharing_server/local_sharing_server.exe";
+		Path = FMetaXRSimulator::Get().GetPackagePath() + "/.local_sharing_server/local_sharing_server.exe";
 
 		if (!IFileManager::Get().FileExists(*Path))
 		{

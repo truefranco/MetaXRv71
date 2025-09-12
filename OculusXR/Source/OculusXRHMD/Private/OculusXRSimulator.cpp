@@ -3,6 +3,12 @@
 
 #include "OculusXRSimulator.h"
 
+#include <sstream>
+
+#include "JsonObjectConverter.h"
+//#include "MaterialHLSLGenerator.h"
+#include "Algo/MaxElement.h"
+
 #if PLATFORM_WINDOWS
 #include "HttpModule.h"
 #include "Interfaces/IHttpResponse.h"
@@ -310,12 +316,57 @@ namespace
 		}
 		return true;
 	}
+
+	int CompareVersionStrings(const FString& Version1, const FString& Version2)
+	{
+		// Discard everything after '-'
+		int32 Inx1 = Version1.Find(TEXT("-"));
+		FString V1 = Inx1 == INDEX_NONE ? Version1 : Version1.Left(Inx1);
+		int32 Inx2 = Version2.Find(TEXT("-"));
+		FString V2 = Inx2 == INDEX_NONE ? Version2 : Version2.Left(Inx2);
+		// Split the version strings into parts
+		TArray<FString> V1Parts;
+		V1.ParseIntoArray(V1Parts, TEXT("."));
+		TArray<FString> V2Parts;
+		V2.ParseIntoArray(V2Parts, TEXT("."));
+		// Determine the maximum length of the version parts
+		int32 MaxLength = FMath::Max(V1Parts.Num(), V2Parts.Num());
+		// Compare each part of the version strings
+		for (int32 i = 0; i < MaxLength; i++)
+		{
+			// Get the current part of each version, defaulting to 0 if not present
+			int32 V1Part = 0;
+			if (i < V1Parts.Num())
+			{
+				V1Part = FCString::Atoi(*V1Parts[i]);
+			}
+			int32 V2Part = 0;
+			if (i < V2Parts.Num())
+			{
+				V2Part = FCString::Atoi(*V2Parts[i]);
+			}
+			if (V1Part == V2Part)
+			{
+				continue;
+			}
+			return V1Part < V2Part ? -1 : 1;
+		}
+		// If all parts are equal, the versions are the same
+		return 0;
+	}
+
 } // namespace
+
+FMetaXRSimulator::FMetaXRSimulator()
+	: InstallationPath(FPaths::Combine(FPlatformMisc::GetEnvironmentVariable(TEXT("LOCALAPPDATA")), TEXT("MetaXR"), TEXT("MetaXRSimulator")))
+{
+}
+
 bool FMetaXRSimulator::IsSimulatorActivated()
 {
 	FString MetaXRSimPath = GetSimulatorJsonPath();
 	FString CurRuntimePath = FWindowsPlatformMisc::GetEnvironmentVariable(*OpenXrRuntimeEnvKey);
-	return (!MetaXRSimPath.IsEmpty() && MetaXRSimPath == CurRuntimePath);
+	return !MetaXRSimPath.IsEmpty() && MetaXRSimPath == CurRuntimePath;
 }
 
 void FMetaXRSimulator::ToggleOpenXRRuntime()
@@ -324,8 +375,14 @@ void FMetaXRSimulator::ToggleOpenXRRuntime()
 	FString MetaXRSimPath = GetSimulatorJsonPath();
 	if (!IFileManager::Get().FileExists(*MetaXRSimPath))
 	{
-		InstallSimulator(ToggleOpenXRRuntime);
-		UE_LOG(LogMetaXRSim, Log, TEXT("Meta XR Simulator Not Installed.\nInstalling Meta XR Simulator."));
+		if (!MaxAvailableVersion.IsSet())
+		{
+			UE_LOG(LogMetaXRSim, Error, TEXT("Could not find available version. Try following installation steps from https://developers.meta.com/horizon/documentation/unreal/xrsim-intro manually."));
+			return;
+		}
+
+		InstallSimulator(MaxAvailableVersion->DownloadUrl, MaxAvailableVersion->Version, [&]() { ToggleOpenXRRuntime(); });
+		UE_LOG(LogMetaXRSim, Log, TEXT("Meta XR Simulator Not Installed.\nInstalling Meta XR Simulator %s."), *(MaxAvailableVersion->Version));
 		return;
 	}
 
@@ -386,28 +443,52 @@ bool FMetaXRSimulator::IsSimulatorInstalled()
 	return FPaths::FileExists(GetSimulatorJsonPath());
 }
 
-void FMetaXRSimulator::TryActivateOnStartup()
+TArray<FString> FMetaXRSimulator::GetInstalledVersions() const
 {
-#if OCULUS_HMD_SUPPORTED_PLATFORMS && WITH_EDITOR
-	// If -HMDSimulator is used as the command option to launch UE, use simulator runtime instead of the physical HMD runtime (like PC-Link).
-	if (FParse::Param(FCommandLine::Get(), TEXT("HMDSimulator")))
+	if (!FPaths::DirectoryExists(InstallationPath))
 	{
-		if (IsSimulatorActivated())
-		{
-			return;
-		}
-
-		ToggleOpenXRRuntime();
+		return {};
 	}
-#endif // OCULUS_HMD_SUPPORTED_PLATFORMS && WITH_EDITOR
+
+	TArray<FString> Versions;
+	IPlatformFile& PlatformFile = FPlatformFileManager::Get().GetPlatformFile();
+	if (!PlatformFile.IterateDirectory(*InstallationPath, [&Versions](const TCHAR* InFilenameOrDirectory, const bool InIsDirectory) {
+			if (InIsDirectory)
+			{
+				FStringView BaseName = FPathViews::GetCleanFilename(InFilenameOrDirectory);
+				Versions.AddUnique(FString(BaseName));
+			}
+			return true;
+		}))
+	{
+		return {};
+	}
+
+	return Versions;
 }
 
-FString FMetaXRSimulator::GetPackagePath()
+FString FMetaXRSimulator::GetPackagePath() const
 {
-	return FPaths::Combine(FPlatformMisc::GetEnvironmentVariable(TEXT("LOCALAPPDATA")), TEXT("MetaXR"), TEXT("MetaXRSimulator"), GetVersion());
+	auto Settings = GetMutableDefault<UOculusXRHMDRuntimeSettings>();
+	auto PreferredVersion = Settings->OculusXRSimulatorPreferredVersion;
+	if (PreferredVersion.IsEmpty())
+	{
+		auto InstalledVersions = GetInstalledVersions();
+		auto MaxVersion = Algo::MaxElement(
+			InstalledVersions,
+			[](const FString& InVersion, const FString& InBaseVersion) {
+				return CompareVersionStrings(InVersion, InBaseVersion);
+			});
+		PreferredVersion = MaxVersion ? *MaxVersion : GetPluginVersion();
+
+		Settings->OculusXRSimulatorPreferredVersion = PreferredVersion;
+		Settings->TryUpdateDefaultConfigFile();
+	}
+
+	return FPaths::Combine(InstallationPath, PreferredVersion);
 }
 
-void FMetaXRSimulator::InstallSimulator(const TFunction<void()>& OnSuccess)
+void FMetaXRSimulator::InstallSimulator(const FString& URL, const FString& Version, const TFunction<void()>& OnSuccess)
 {
 	FNotificationInfo Progress(FText::FromString("Installing Meta XR Simulator..."));
 	Progress.bFireAndForget = false;
@@ -423,18 +504,29 @@ void FMetaXRSimulator::InstallSimulator(const TFunction<void()>& OnSuccess)
 		NotificationItem->SetCompletionState(SNotificationItem::CS_Pending);
 	}
 
-	auto DestinationFolder = GetPackagePath();
-	auto DownloadPath = FPaths::Combine(FPaths::EngineSavedDir(), TEXT("Downloads"), TEXT("MetaXRSimulator"), GetVersion(), TEXT("MetaXRSimulator.zip"));
+	auto DestinationFolder = FPaths::Combine(InstallationPath, Version);
+	auto DownloadPath = FPaths::Combine(FPaths::EngineSavedDir(), TEXT("Downloads"), TEXT("MetaXRSimulator"), Version, TEXT("MetaXRSimulator.zip"));
+
+	auto OnSuccessCallback = [OnSuccess, Version]() {
+		auto Settings = GetMutableDefault<UOculusXRHMDRuntimeSettings>();
+		Settings->OculusXRSimulatorPreferredVersion = Version;
+		Settings->TryUpdateDefaultConfigFile();
+
+		if (OnSuccess)
+		{
+			OnSuccess();
+		}
+	};
 
 	if (FPaths::FileExists(DownloadPath))
 	{
-		UnzipSimulator(DownloadPath, DestinationFolder, NotificationItem, OnSuccess);
+		UnzipSimulator(DownloadPath, DestinationFolder, NotificationItem, OnSuccessCallback);
 		return;
 	}
 
 	TSharedPtr<IHttpRequest, ESPMode::ThreadSafe> Request = FHttpModule::Get().CreateRequest();
 
-	Request->OnProcessRequestComplete().BindLambda([DownloadPath, DestinationFolder, NotificationItem, OnSuccess](FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful) {
+	Request->OnProcessRequestComplete().BindLambda([DownloadPath, NotificationItem, DestinationFolder, OnSuccessCallback, Version, this](FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful) {
 		Request->OnRequestProgress64().Unbind();
 		if (Response.IsValid() && EHttpResponseCodes::IsOk(Response->GetResponseCode()))
 		{
@@ -445,7 +537,11 @@ void FMetaXRSimulator::InstallSimulator(const TFunction<void()>& OnSuccess)
 				NotificationItem->SetText(FText::FromString("Unzipping ... "));
 			}
 
-			UnzipSimulator(DownloadPath, DestinationFolder, NotificationItem, OnSuccess);
+			UnzipSimulator(DownloadPath, DestinationFolder, NotificationItem, OnSuccessCallback);
+
+			auto Settings = GetMutableDefault<UOculusXRHMDRuntimeSettings>();
+			Settings->OculusXRSimulatorPreferredVersion = Version;
+			Settings->TryUpdateDefaultConfigFile();
 			return;
 		}
 
@@ -466,12 +562,12 @@ void FMetaXRSimulator::InstallSimulator(const TFunction<void()>& OnSuccess)
 		}
 	});
 
-	Request->SetURL("https://www.facebook.com/horizon_devcenter_download?app_id=28549923061320041&sdk_version=" + GetVersion());
+	Request->SetURL(URL);
 	Request->SetVerb(TEXT("GET"));
 	Request->ProcessRequest();
 }
 
-FString FMetaXRSimulator::GetVersion()
+FString FMetaXRSimulator::GetPluginVersion()
 {
 	TSharedPtr<IPlugin> Plugin = IPluginManager::Get().FindPlugin(TEXT("OculusXR"));
 	if (Plugin.IsValid())
@@ -487,9 +583,8 @@ FString FMetaXRSimulator::GetVersion()
 void FMetaXRSimulator::UnzipSimulator(const FString& Path, const FString& TargetPath, const TSharedPtr<SNotificationItem>& Notification,
 	const TFunction<void()>& OnSuccess)
 {
-	bool bSuccess = Unzip(Path, TargetPath, Notification);
 
-	if (!bSuccess || !IsSimulatorInstalled())
+	if (!Unzip(Path, TargetPath, Notification))
 	{
 		UE_LOG(LogMetaXRSim, Error, TEXT("Failed to unzip the file."));
 		if (Notification.IsValid())
@@ -512,4 +607,164 @@ void FMetaXRSimulator::UnzipSimulator(const FString& Path, const FString& Target
 		OnSuccess();
 	}
 }
+
+void FMetaXRSimulator::FetchAvailableVersions()
+{
+	TSharedPtr<IHttpRequest, ESPMode::ThreadSafe> Request = FHttpModule::Get().CreateRequest();
+
+	Request->OnProcessRequestComplete().BindLambda([&](FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful) {
+		Request->OnRequestProgress64().Unbind();
+		if (Response.IsValid() && EHttpResponseCodes::IsOk(Response->GetResponseCode()))
+		{
+			AvailableVersions.Empty();
+			MaxAvailableVersion.Reset();
+			auto ResponseStr = Response->GetContentAsString();
+			TSharedPtr<FJsonObject> JsonObject;
+			TSharedRef<TJsonReader<>> JsonReader = TJsonReaderFactory<>::Create(ResponseStr);
+			if (!FJsonSerializer::Deserialize(JsonReader, JsonObject))
+			{
+				return;
+			}
+			const TArray<TSharedPtr<FJsonValue>> Binaries = JsonObject->GetArrayField(TEXT("binaries"));
+			for (auto& Binary : Binaries)
+			{
+				auto& BinaryObject = Binary->AsObject();
+				if (!BinaryObject.IsValid())
+				{
+					continue;
+				}
+				FMetaXRSimulatorVersion Version;
+				if (!BinaryObject->TryGetStringField(TEXT("version"), Version.Version))
+				{
+					continue;
+				}
+				if (!BinaryObject->TryGetStringField(TEXT("download_url"), Version.DownloadUrl))
+				{
+					continue;
+				}
+				if (!BinaryObject->TryGetNumberField(TEXT("url_validity"), Version.UrlValidity))
+				{
+					continue;
+				}
+
+				AvailableVersions.Add(Version);
+			}
+
+			auto Maximum = Algo::MaxElement(
+				AvailableVersions,
+				[](const FMetaXRSimulatorVersion& InVersion, const FMetaXRSimulatorVersion& InBaseVersion) {
+					return CompareVersionStrings(InVersion.Version, InBaseVersion.Version) < 0;
+				});
+
+			if (Maximum != nullptr)
+			{
+				MaxAvailableVersion.Emplace(*Maximum);
+			}
+
+			SpawnNotificationToUpdateIfAvailable();
+		}
+	});
+
+
+	Request->SetURL("https://www.facebook.com/horizon_devcenter_download?app_id=28549923061320041&sdk_version=" + GetPluginVersion());
+	Request->SetVerb(TEXT("GET"));
+	Request->ProcessRequest();
+}
+
+void FMetaXRSimulator::InstallLatestVersion()
+{
+	if (!MaxAvailableVersion.IsSet())
+	{
+		return;
+	}
+
+	if (IsLatestVersionInstalled())
+	{
+		return;
+	}
+
+	InstallSimulator(MaxAvailableVersion->DownloadUrl, MaxAvailableVersion->Version, nullptr);
+}
+
+bool FMetaXRSimulator::IsLatestVersionInstalled()
+{
+	if (!MaxAvailableVersion.IsSet())
+	{
+		return true;
+	}
+
+	auto InstalledVersions = GetInstalledVersions();
+	if (InstalledVersions.Find(MaxAvailableVersion->Version) != INDEX_NONE)
+	{
+		// Already installed
+		return true;
+	}
+
+	return false;
+}
+
+void FMetaXRSimulator::SpawnNotificationToUpdateIfAvailable()
+{
+	if (!FModuleManager::Get().IsModuleLoaded("MainFrame"))
+	{
+		return;
+	}
+
+	if (!GetMutableDefault<UOculusXRHMDRuntimeSettings>()->bNotifyWhenNewVersionIsAvailable)
+	{
+		return;
+	}
+
+	if (!MaxAvailableVersion.IsSet())
+	{
+		return;
+	}
+
+	auto InstalledVersions = GetInstalledVersions();
+	const auto& MaxInstalledVersion = Algo::MaxElement(
+		InstalledVersions,
+		[](const FString& InVersion, const FString& InBaseVersion) {
+			return CompareVersionStrings(InVersion, InBaseVersion) <= 0;
+		});
+
+	if (MaxInstalledVersion == nullptr || CompareVersionStrings(*MaxInstalledVersion, MaxAvailableVersion->Version) < 0)
+	{
+		FNotificationInfo UpdateSim(FText::FromString("Meta XR Simulator Update Available"));
+		UpdateSim.bFireAndForget = false;
+		UpdateSim.FadeInDuration = 0.5f;
+		UpdateSim.FadeOutDuration = 0.5f;
+		UpdateSim.ExpireDuration = 5.0f;
+		UpdateSim.bUseThrobber = false;
+		UpdateSim.bUseSuccessFailIcons = true;
+		UpdateSim.SubText = FText::FromString("New version includes improvements and bug fixes.");
+		TPromise<TSharedPtr<SNotificationItem>> BtnNotificationPromise;
+		const auto ButtonClicked = [&, NotificationFuture = BtnNotificationPromise.GetFuture().Share()](bool bUpdate) {
+			NotificationFuture.Get()->Fadeout();
+			if (!bUpdate)
+			{
+				return;
+			}
+			InstallSimulator(MaxAvailableVersion->DownloadUrl, MaxAvailableVersion->Version, nullptr);
+		};
+
+		UpdateSim.ButtonDetails.Add(FNotificationButtonInfo(
+			FText::FromString("Skip"),
+			FText::FromString("Skip update"),
+			FSimpleDelegate::CreateLambda(ButtonClicked, false),
+			SNotificationItem::CS_Pending));
+
+		UpdateSim.ButtonDetails.Add(FNotificationButtonInfo(
+			FText::FromString("Update"),
+			FText::FromString("Update Meta XR Simulator to" + MaxAvailableVersion->Version),
+			FSimpleDelegate::CreateLambda(ButtonClicked, true),
+			SNotificationItem::CS_Pending));
+		TSharedPtr<SNotificationItem> NotificationItem = FSlateNotificationManager::Get().AddNotification(UpdateSim);
+		if (NotificationItem.IsValid())
+		{
+			NotificationItem->SetCompletionState(SNotificationItem::CS_Pending);
+			BtnNotificationPromise.SetValue(NotificationItem);
+		}
+	}
+}
+
 #endif // PLATFORM_WINDOWS

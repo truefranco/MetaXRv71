@@ -3,8 +3,9 @@
 #pragma once
 
 #include "OculusXRQPL.h"
-#include "Containers/StringConv.h"
-#include "Templates/Function.h"
+#include <Containers/StringConv.h>
+#include <Templates/Function.h>
+#include <Templates/Tuple.h>
 
 namespace OculusXRTelemetry
 {
@@ -19,7 +20,7 @@ namespace OculusXRTelemetry
 	OCULUSXRHMD_API void IfActiveThen(TUniqueFunction<void()> Function);
 	OCULUSXRHMD_API void PropagateTelemetryConsent();
 
-	OCULUSXRHMD_API FString GetProjectId();
+	OCULUSXRHMD_API TTuple<FString, FString> GetProjectIdAndName();
 
 	OCULUSXRHMD_API bool IsConsentGiven();
 
@@ -133,8 +134,9 @@ namespace OculusXRTelemetry
 					const auto& Self = Start();
 				}
 
-				const FString ProjectIdString = GetProjectId();
-				const auto& AnnotatedWithProjectId = AddAnnotation("project_hash", StringCast<ANSICHAR>(*ProjectIdString).Get(), EAnnotationType::Optional);
+				const TTuple<FString, FString> ProjectIdAndName = GetProjectIdAndName();
+				const auto& AnnotatedWithProjectHash = AddAnnotation("project_hash", StringCast<ANSICHAR>(*ProjectIdAndName.Get<0>()).Get(), EAnnotationType::Optional);
+				const auto& AnnotatedWithProjectName = AddAnnotation("project_name", StringCast<ANSICHAR>(*ProjectIdAndName.Get<1>()).Get(), EAnnotationType::Optional);
 
 			}
 		}

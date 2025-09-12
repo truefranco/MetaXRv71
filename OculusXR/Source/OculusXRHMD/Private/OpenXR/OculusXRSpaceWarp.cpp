@@ -259,7 +259,9 @@ namespace OculusXR
 						static_cast<uint32>(bIsMobileMultiViewEnabled ? 2 : 1),
 						1,
 						1,
+#if defined(WITH_OCULUS_BRANCH) || defined(WITH_OPENXR_BRANCH)
 						(bIsMobileMultiViewEnabled) ? ETextureDimension::Texture2DArray : ETextureDimension::Texture2D,
+#endif // defined(WITH_OCULUS_BRANCH)
 						TexCreate_RenderTargetable | TexCreate_ResolveTargetable | TexCreate_ShaderResource | TexCreate_InputAttachmentRead | TexCreate_Dynamic,
 						FClearValueBinding::Transparent,
 						TexCreate_None
@@ -278,7 +280,9 @@ namespace OculusXR
 						static_cast<uint32>(bIsMobileMultiViewEnabled ? 2 : 1),
 						1,
 						1,
+#if defined(WITH_OCULUS_BRANCH) || defined(WITH_OPENXR_BRANCH)
 						(bIsMobileMultiViewEnabled) ? ETextureDimension::Texture2DArray : ETextureDimension::Texture2D,
+#endif // defined(WITH_OCULUS_BRANCH)
 						TexCreate_DepthStencilTargetable | TexCreate_ShaderResource | TexCreate_InputAttachmentRead | TexCreate_Dynamic,
 						FClearValueBinding::DepthZero,
 						TexCreate_None

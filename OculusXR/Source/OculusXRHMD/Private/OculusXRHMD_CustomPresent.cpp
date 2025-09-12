@@ -589,7 +589,7 @@ namespace OculusXRHMD
 			{
 				FRHIRenderPassInfo RPInfo(DstTexture, ERenderTargetActions::Load_Store);
 
-#if defined(WITH_OCULUS_BRANCH)
+#if defined(WITH_OCULUS_BRANCH) || defined(WITH_OPENXR_BRANCH)
 				static const FMatrix44f FaceToSampleMatrix[6] = {
 					FMatrix44f(
 						FVector3f(0, 0, 1),
@@ -652,7 +652,7 @@ namespace OculusXRHMD
 
 					RHICmdList.ApplyCachedRenderTargets(GraphicsPSOInit);
 
-#if defined(WITH_OCULUS_BRANCH)
+#if defined(WITH_OCULUS_BRANCH) || defined(WITH_OPENXR_BRANCH)
 					TShaderMapRef<FOculusOpenXRCubemapPS> PixelShader(ShaderMap);
 #else
 					TShaderMapRef<FOculusCubemapPS> PixelShader(ShaderMap);
@@ -666,7 +666,7 @@ namespace OculusXRHMD
 #else
 					FRHIBatchedShaderParameters& BatchedParameters = RHICmdList.GetScratchShaderParameters();
 
-#if defined(WITH_OCULUS_BRANCH)
+#if defined(WITH_OCULUS_BRANCH) || defined(WITH_OPENXR_BRANCH)
 					check(FaceIndex < UE_ARRAY_COUNT(FaceToSampleMatrix));
 					PixelShader->SetParameters(BatchedParameters, SamplerState, SrcTextureRHI, FaceToSampleMatrix[FaceIndex]);
 #else

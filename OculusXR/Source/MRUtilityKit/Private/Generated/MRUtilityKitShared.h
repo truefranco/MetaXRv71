@@ -84,11 +84,23 @@ struct MRUKShared
         MRUK_LABEL_WALL_ART = 8192,
         MRUK_LABEL_SCENE_MESH = 16384,
         MRUK_LABEL_INVISIBLE_WALL_FACE = 32768,
-        MRUK_LABEL_CHAIR = 65536,
         MRUK_LABEL_UNKNOWN = 131072,
         MRUK_LABEL_INNER_WALL_FACE = 262144,
-        MRUK_LABEL_OTHER_ROOM_FACE = 524288,
-        MRUK_LABEL_OPENING = 1048576,
+        MRUK_LABEL_TABLETOP = 524288,
+        MRUK_LABEL_SITTING_AREA = 1048576,
+        MRUK_LABEL_SLEEPING_AREA = 2097152,
+        MRUK_LABEL_STORAGE_TOP = 4194304,
+    };
+
+    enum MrukEnvironmentRaycastStatus
+    {
+        MRUK_ENVIRONMENT_RAYCAST_STATUS_HIT = 1,
+        MRUK_ENVIRONMENT_RAYCAST_STATUS_NO_HIT = 2,
+        MRUK_ENVIRONMENT_RAYCAST_STATUS_HIT_POINT_OCCLUDED = 3,
+        MRUK_ENVIRONMENT_RAYCAST_STATUS_HIT_POINT_OUTSIDE_FOV = 4,
+        MRUK_ENVIRONMENT_RAYCAST_STATUS_RAY_OCCLUDED = 5,
+        MRUK_ENVIRONMENT_RAYCAST_STATUS_INVALID_ORIENTATION = 6,
+        MRUK_ENVIRONMENT_RAYCAST_STATUS_MAX = 2147483647,
     };
 
     typedef void (*LogPrinter)(MrukLogLevel logLevel, const char* message, uint32_t length);
@@ -108,6 +120,8 @@ struct MRUKShared
     typedef void (*MrukOnSceneAnchorRemoved)(const MrukSceneAnchor* sceneAnchor, void* userContext);
 
     typedef void (*MrukOnDiscoveryFinished)(MrukResult result, void* userContext);
+
+    typedef void (*MrukOnEnvironmentRaycasterCreated)(MrukResult result, void* userContext);
 
     typedef struct MrukPosef (*TrackingSpacePoseGetter)(MrukPosef MrukPosef);
 
@@ -211,6 +225,7 @@ struct MRUKShared
         MrukOnSceneAnchorUpdated onSceneAnchorUpdated;
         MrukOnSceneAnchorRemoved onSceneAnchorRemoved;
         MrukOnDiscoveryFinished onDiscoveryFinished;
+        MrukOnEnvironmentRaycasterCreated onEnvironmentRaycasterCreated;
         void* userContext;
     };
 
@@ -238,6 +253,22 @@ struct MRUKShared
         MrukUuid uuid;
     };
 
+    struct MrukEnvironmentRaycastHitPointGetInfo
+    {
+        FVector3f startPoint;
+        FVector3f direction;
+        uint32_t filterCount;
+        float maxDistance;
+    };
+
+    struct MrukEnvironmentRaycastHitPoint
+    {
+        MrukEnvironmentRaycastStatus status;
+        FVector3f point;
+        MrukQuatf orientation;
+        FVector3f normal;
+    };
+
 
     /**
      * This allows the engine to intercept the logs from the shared library and print them using the
@@ -253,7 +284,7 @@ struct MRUKShared
      * If the context is not needed anymore it should be destroyed with ContextDestroy() to free
      * resources.
      */
-    MrukResult (*AnchorStoreCreate)(uint64_t xrInstance, uint64_t xrSession, void* xrInstanceProcAddrFunc, uint64_t baseSpace);
+    MrukResult (*AnchorStoreCreate)(uint64_t xrInstance, uint64_t xrSession, void* xrInstanceProcAddrFunc, uint64_t baseSpace, const char** availableOpenXrExtensions, uint32_t availableOpenXrExtensionsCount);
     MrukResult (*AnchorStoreCreateWithoutOpenXr)();
 
     /**
@@ -353,6 +384,12 @@ struct MRUKShared
     bool (*AnchorStoreIsDiscoveryRunning)();
 
     /**
+     * Get the world lock offset for a given room. This is the difference between the room's initial
+     * pose when it was created and the current pose.
+     */
+    bool (*AnchorStoreGetWorldLockOffset)(MrukUuid roomUuid, MrukPosef* offset);
+
+    /**
      * Add two vectors together. This is implemented as a test to ensure the native shared
      * library is working correctly.
      *
@@ -424,6 +461,25 @@ struct MRUKShared
      * @return The converted MrukLabel.
      */
     MrukLabel (*StringToMrukLabel)(const char* label);
+
+    /**
+     * Creates the enviornment raycaster and fires the onEnvironmentRaycasterCreated event when the
+     * creation is complete.
+     */
+    void (*CreateEnvironmentRaycaster)();
+
+    /**
+     * Destroys the enviornment raycaster.
+     */
+    void (*DestroyEnvironmentRaycaster)();
+
+    /**
+     * Performs an environment raycast.
+     * Ensure that the environment raycaster is created before calling this function.
+     * @param[in] info The raycast info.
+     * @param[out] hitPoint The hit point.
+     */
+    void (*PerformEnvironmentRaycast)(const MrukEnvironmentRaycastHitPointGetInfo* info, MrukEnvironmentRaycastHitPoint* hitPoint);
     void (*SetTrackingSpacePoseGetter)(TrackingSpacePoseGetter getter);
     void (*SetTrackingSpacePoseSetter)(TrackingSpacePoseSetter setter);
 
@@ -453,6 +509,7 @@ private:
         AnchorStoreRaycastAnchor = reinterpret_cast<decltype(AnchorStoreRaycastAnchor)>(LoadFunction(TEXT("AnchorStoreRaycastAnchor")));
         AnchorStoreRaycastAnchorAll = reinterpret_cast<decltype(AnchorStoreRaycastAnchorAll)>(LoadFunction(TEXT("AnchorStoreRaycastAnchorAll")));
         AnchorStoreIsDiscoveryRunning = reinterpret_cast<decltype(AnchorStoreIsDiscoveryRunning)>(LoadFunction(TEXT("AnchorStoreIsDiscoveryRunning")));
+        AnchorStoreGetWorldLockOffset = reinterpret_cast<decltype(AnchorStoreGetWorldLockOffset)>(LoadFunction(TEXT("AnchorStoreGetWorldLockOffset")));
         AddVectors = reinterpret_cast<decltype(AddVectors)>(LoadFunction(TEXT("AddVectors")));
         TriangulatePolygon = reinterpret_cast<decltype(TriangulatePolygon)>(LoadFunction(TEXT("TriangulatePolygon")));
         FreeMesh = reinterpret_cast<decltype(FreeMesh)>(LoadFunction(TEXT("FreeMesh")));
@@ -460,6 +517,9 @@ private:
         FreeMeshSegmentation = reinterpret_cast<decltype(FreeMeshSegmentation)>(LoadFunction(TEXT("FreeMeshSegmentation")));
         _TestUuidMarshalling = reinterpret_cast<decltype(_TestUuidMarshalling)>(LoadFunction(TEXT("_TestUuidMarshalling")));
         StringToMrukLabel = reinterpret_cast<decltype(StringToMrukLabel)>(LoadFunction(TEXT("StringToMrukLabel")));
+        CreateEnvironmentRaycaster = reinterpret_cast<decltype(CreateEnvironmentRaycaster)>(LoadFunction(TEXT("CreateEnvironmentRaycaster")));
+        DestroyEnvironmentRaycaster = reinterpret_cast<decltype(DestroyEnvironmentRaycaster)>(LoadFunction(TEXT("DestroyEnvironmentRaycaster")));
+        PerformEnvironmentRaycast = reinterpret_cast<decltype(PerformEnvironmentRaycast)>(LoadFunction(TEXT("PerformEnvironmentRaycast")));
         SetTrackingSpacePoseGetter = reinterpret_cast<decltype(SetTrackingSpacePoseGetter)>(LoadFunction(TEXT("SetTrackingSpacePoseGetter")));
         SetTrackingSpacePoseSetter = reinterpret_cast<decltype(SetTrackingSpacePoseSetter)>(LoadFunction(TEXT("SetTrackingSpacePoseSetter")));
     }
@@ -488,6 +548,7 @@ private:
         AnchorStoreRaycastAnchor = nullptr;
         AnchorStoreRaycastAnchorAll = nullptr;
         AnchorStoreIsDiscoveryRunning = nullptr;
+        AnchorStoreGetWorldLockOffset = nullptr;
         AddVectors = nullptr;
         TriangulatePolygon = nullptr;
         FreeMesh = nullptr;
@@ -495,6 +556,9 @@ private:
         FreeMeshSegmentation = nullptr;
         _TestUuidMarshalling = nullptr;
         StringToMrukLabel = nullptr;
+        CreateEnvironmentRaycaster = nullptr;
+        DestroyEnvironmentRaycaster = nullptr;
+        PerformEnvironmentRaycast = nullptr;
         SetTrackingSpacePoseGetter = nullptr;
         SetTrackingSpacePoseSetter = nullptr;
     }

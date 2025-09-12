@@ -33,14 +33,17 @@ public:
 
 	void PluginOpenSetupToolWindow();
 	FReply PluginClickFn(bool text);
+	void OpenPluginSettings() const;
 
 	void PluginOpenPlatWindow();
 
+	/** Meta XR Simulator */
 	void ToggleOpenXRRuntime();
-
+	void CheckForXRSimUpdate();
+	void UpdateXRSimToLatest();
+	bool CanUpdatedToLatest();
 	void CreateSESSubMenus(FMenuBuilder& MenuBuilder);
 	void StopSESServer();
-
 	void LaunchRoom(int32 roomIndex);
 
 public:

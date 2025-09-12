@@ -528,13 +528,19 @@ namespace OculusXR
 
 	void FEnvironmentDepthExtensionPlugin::OnBeginRendering_GameThread(XrSession InSession)
 	{
+		StageSpace = OculusXR::GetOpenXRTrackingSystem()->GetIOpenXRHMD()->GetTrackingSpace();
+		XrSpace CurrentStageSpace = StageSpace;
 		ENQUEUE_RENDER_COMMAND(TransferFrameStateToRenderingThread)
-		([this](FRHICommandListImmediate& RHICmdList) mutable {
+		([this, CurrentStageSpace](FRHICommandListImmediate& RHICmdList) mutable {
 			EyeViews_RenderThread = EyeViews;
 			WorldToMeters_RenderThread = WorldToMeters;
 			TrackingToWorld_RenderThread = TrackingToWorld;
 			HeadOrientation_RenderThread = HeadOrientation;
 			BaseOrientation_RenderThread = BaseOrientation;
+
+			RHICmdList.EnqueueLambda([this, CurrentStageSpace](FRHICommandListImmediate& InRHICmdList) {
+				StageSpace_RHIThread = CurrentStageSpace;
+			});
 		});
 	}
 
@@ -1007,8 +1013,6 @@ namespace OculusXR
 
 		bEnvironmentDepthRunning = true;
 
-		StageSpace = OculusXR::GetOpenXRTrackingSystem()->GetIOpenXRHMD()->GetTrackingSpace();
-
 		return true;
 	}
 
@@ -1034,7 +1038,7 @@ namespace OculusXR
 		}
 
 		XrEnvironmentDepthImageAcquireInfoMETA AcquireInfo{ XR_TYPE_ENVIRONMENT_DEPTH_IMAGE_ACQUIRE_INFO_META };
-		AcquireInfo.space = StageSpace;
+		AcquireInfo.space = StageSpace_RHIThread;
 
 		const XrTime PredictedDisplayTime = predictedDisplayTime;
 		AcquireInfo.displayTime = PredictedDisplayTime ? PredictedDisplayTime : 0;

@@ -14,6 +14,8 @@ bool FOculusXRUInt64::operator!=(const FOculusXRUInt64& Right) const
 	return !IsEqual(Right);
 }
 
+FOculusXRUUID FOculusXRUUID::Zero = FOculusXRUUID({ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
+
 FOculusXRUUID::FOculusXRUUID()
 {
 	FMemory::Memzero(&UUIDBytes, OCULUSXR_UUID_SIZE);

@@ -83,6 +83,7 @@ namespace OculusXR
 	private:
 		XrSession Session = XR_NULL_HANDLE;
 		XrSpace StageSpace = XR_NULL_HANDLE;
+		XrSpace StageSpace_RHIThread = XR_NULL_HANDLE;
 
 		XrEnvironmentDepthProviderMETA EnvironmentDepthProviderMeta = XR_NULL_HANDLE;
 		XrEnvironmentDepthSwapchainMETA EnvironmentDepthSwapchainMeta = XR_NULL_HANDLE;

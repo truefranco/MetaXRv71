@@ -179,10 +179,9 @@ void UOculusXRAnchorComponent::UpdateAnchorTransform() const
 
 bool UOculusXRAnchorComponent::ToWorldSpacePose(FTransform CameraTransform, FTransform& OutTrackingSpaceTransform) const
 {
-	OculusXRHMD::FOculusXRHMD* OculusXRHMD = OculusXRHMD::FOculusXRHMD::GetOculusXRHMD();
-	if (!OculusXRHMD)
+	if (!GEngine || !GEngine->XRSystem)
 	{
-		UE_LOG(LogOculusXRAnchors, Warning, TEXT("Unable to retrieve OculusXRHMD, cannot calculate anchor world space pose."));
+		UE_LOG(LogOculusXRAnchors, Warning, TEXT("Unable to retrieve xr device, cannot calculate anchor world space pose."));
 		return false;
 	}
 
@@ -191,12 +190,12 @@ bool UOculusXRAnchorComponent::ToWorldSpacePose(FTransform CameraTransform, FTra
 
 	FVector OutHeadPosition;
 	FQuat OutHeadOrientation;
-	const bool bGetPose = OculusXRHMD->GetCurrentPose(OculusXRHMD->HMDDeviceId, OutHeadOrientation, OutHeadPosition);
-	if (!bGetPose)
+	if (!GEngine->XRSystem->GetCurrentPose(0, OutHeadOrientation, OutHeadPosition))
+	{
 		return false;
+	}
 
 	OculusXRHMD::FPose HeadPose(OutHeadOrientation, OutHeadPosition);
-
 	OculusXRHMD::FPose poseInHeadSpace = HeadPose.Inverse() * TrackingSpacePose;
 
 	// To world space pose

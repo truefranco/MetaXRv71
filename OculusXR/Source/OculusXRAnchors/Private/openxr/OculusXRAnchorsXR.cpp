@@ -1092,6 +1092,15 @@ namespace XRAnchors
 			return XR_ERROR_VALIDATION_FAILURE;
 		}
 
+		for (auto& it : Groups)
+		{
+			if (it == FOculusXRUUID::Zero)
+			{
+				UE_LOG(LogOculusXRAnchors, Error, TEXT("Anchor sharing failed. One or more group targets provided had a UUID value of zero."));
+				return XR_ERROR_VALIDATION_FAILURE;
+			}
+		}
+
 		XrShareSpacesInfoMETA xrInfo = { XR_TYPE_SHARE_SPACES_INFO_META, nullptr };
 		xrInfo.spaces = (XrSpace*)AnchorHandles.GetData();
 		xrInfo.spaceCount = AnchorHandles.Num();
