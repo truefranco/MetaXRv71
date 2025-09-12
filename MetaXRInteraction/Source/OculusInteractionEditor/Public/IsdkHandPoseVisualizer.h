@@ -24,6 +24,8 @@
 #include "Interaction/Grabbable/IsdkHandGrabPose.h"
 #include "ComponentVisualizer.h"
 #include "ScopedTransaction.h"
+#include "EditorViewportClient.h"
+#include "UnrealWidgetFwd.h"
 
 #define LOCTEXT_NAMESPACE "HandPoseVisualizerTool"
 
@@ -66,7 +68,7 @@ class FIsdkHandPoseVisualizer : public FComponentVisualizer
 {
  public:
   // Begin FComponentVisualizer interface
-  virtual bool ShowWhenSelected() override
+  virtual bool ShowWhenSelected()
   {
     return false;
   }

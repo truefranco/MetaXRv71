@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  * All rights reserved.
  *
@@ -25,7 +25,6 @@ public class IsdkDataSourcesOpenXR : ModuleRules
 {
     public IsdkDataSourcesOpenXR(ReadOnlyTargetRules Target) : base(Target)
     {
-        IncludeOrderVersion = EngineIncludeOrderVersion.Unreal5_4;
         PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
         PublicDependencyModuleNames.AddRange(

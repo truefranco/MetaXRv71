@@ -26,7 +26,6 @@ public class OculusInteractionPrebuilts : ModuleRules
 {
 	public OculusInteractionPrebuilts(ReadOnlyTargetRules Target) : base(Target)
 	{
-		IncludeOrderVersion = EngineIncludeOrderVersion.Unreal5_4;
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
 		PublicIncludePaths.AddRange(
