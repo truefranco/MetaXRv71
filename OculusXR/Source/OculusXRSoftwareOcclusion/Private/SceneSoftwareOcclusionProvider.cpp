@@ -4,11 +4,12 @@
 	SceneSoftwareOcclusion.cpp
 =============================================================================*/
 
+#ifdef WITH_OCULUS_BRANCH
+
 #include "SceneSoftwareOcclusionProvider.h"
 #include "SceneSoftwareOcclusion.h"
 
 #include "ScenePrivate.h"
-#ifdef WITH_OCULUS_BRANCH
 
 TSharedPtr<FSceneSoftwareOcclusionProvider> FSceneSoftwareOcclusionProvider::Instance = NULL;
 

@@ -68,6 +68,7 @@ namespace UnrealBuildTool.Rules
             PublicIncludePaths.AddRange(
                 new string[] {
                     Path.Combine(EngineDir, "Plugins/Runtime/OpenXR/Source/OpenXRHMD/Private"),
+                    Path.Combine(EngineDir, "Plugins/Runtime/OpenXR/Source/OpenXRHMD/Internal"),
                 });
 
             if (Target.Version.MajorVersion > 5 || (Target.Version.MajorVersion == 5 && Target.Version.MinorVersion >= 3))
