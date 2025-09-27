@@ -20,19 +20,18 @@ namespace OculusXRRenderingRules
 	{
 		FPreviewPlatformInfo GetAndroidPreviewPlatformInfo()
 		{
-			const FName AndroidPlatformName(TEXT("AndroidVulkan_Preview"));
+			const FName AndroidPlatformName(TEXT("Android_Preview_Vulkan"));
 
 			const EShaderPlatform ShaderPlatform = FDataDrivenShaderPlatformInfo::GetShaderPlatformFromName(AndroidPlatformName);
 
-			const ERHIFeatureLevel::Type FeatureLevel = GetMaxSupportedFeatureLevel(ShaderPlatform);
 
-			const auto& AllPreviewPlatforms = FDataDrivenPlatformInfoRegistry::GetAllPreviewPlatformMenuItems();
+			const TArray<FPreviewPlatformMenuItem>& AllPreviewPlatforms = FDataDrivenPlatformInfoRegistry::GetAllPreviewPlatformMenuItems();
 
 			for (const auto& Platform : AllPreviewPlatforms)
 			{
 				if (Platform.PreviewShaderPlatformName == AndroidPlatformName)
 				{
-					return FPreviewPlatformInfo(FeatureLevel, ShaderPlatform, Platform.PlatformName, Platform.ShaderFormat, Platform.DeviceProfileName,
+					return FPreviewPlatformInfo(GMaxRHIFeatureLevel, ShaderPlatform, Platform.PlatformName, Platform.ShaderFormat, Platform.DeviceProfileName,
 						true, Platform.PreviewShaderPlatformName);
 				}
 			}
