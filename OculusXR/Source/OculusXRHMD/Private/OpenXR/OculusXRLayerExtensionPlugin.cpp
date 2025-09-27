@@ -93,7 +93,7 @@ namespace OculusXR
 			bPixelDensityAdaptive = HMDSettings->bDynamicResolution && bRecommendedResolutionExtensionAvailable;
 #endif
 
-			if (IConsoleVariable* MobileDynamicResCVar = IConsoleManager::Get().FindConsoleVariable(TEXT("xr.MobileLDRDynamicResolution")))
+			if (IConsoleVariable* MobileDynamicResCVar = IConsoleManager::Get().FindConsoleVariable(TEXT("xr.MobilePrimaryScalingMode")))
 			{
 				MobileDynamicResCVar->Set(bPixelDensityAdaptive);
 			}

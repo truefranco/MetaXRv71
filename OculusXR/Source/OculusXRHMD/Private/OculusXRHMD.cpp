@@ -3196,7 +3196,7 @@ namespace OculusXRHMD
 
 		FOculusXRHMDModule::GetPluginWrapper().Update3(ovrpStep_Render, 0, 0.0);
 
-		if (IConsoleVariable* MobileDynamicResCVar = IConsoleManager::Get().FindConsoleVariable(TEXT("xr.MobileLDRDynamicResolution")))
+		if (IConsoleVariable* MobileDynamicResCVar = IConsoleManager::Get().FindConsoleVariable(TEXT("xr.MobilePrimaryScalingMode")))
 		{
 			MobileDynamicResCVar->Set(static_cast<bool>(Settings->Flags.bPixelDensityAdaptive));
 		}
