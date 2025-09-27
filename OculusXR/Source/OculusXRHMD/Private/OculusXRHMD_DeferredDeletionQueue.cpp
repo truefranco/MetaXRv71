@@ -58,7 +58,9 @@ namespace OculusXRHMD
 			{
 				if (bDeleteImmediately || GOculusXRHMDLayerDeletionFrameNumber > Entry->FrameEnqueued + NUM_FRAMES_TO_WAIT_FOR_OVRP_LAYER_DELETE)
 				{
-					ExecuteOnRHIThread_DoNotWait([OvrpLayerId = Entry->OvrpLayerId]() {
+					ENQUEUE_RENDER_COMMAND()(
+						[OvrpLayerId = Entry->OvrpLayerId](FRHICommandListImmediate& RHICmdList) 
+						{
 						UE_LOG(LogHMD, Warning, TEXT("Destroying layer %d"), OvrpLayerId);
 						FOculusXRHMDModule::GetPluginWrapper().DestroyLayer(OvrpLayerId);
 					});

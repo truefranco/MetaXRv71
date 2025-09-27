@@ -89,7 +89,7 @@ FString UOculusXRTelemetryPrivacySettings::GetAdditionalInfoUrl() const
 {
 	if (Links.Num() > 0)
 	{
-		return Links.begin().Value();
+		return Links.begin()->Value;
 	}
 	return FString();
 }
@@ -98,7 +98,7 @@ FText UOculusXRTelemetryPrivacySettings::GetAdditionalInfoUrlLabel() const
 {
 	if (Links.Num() > 0)
 	{
-		return FText::FromString(Links.begin().Key());
+		return FText::FromString(Links.begin()->Key);
 	}
 	return FText();
 }

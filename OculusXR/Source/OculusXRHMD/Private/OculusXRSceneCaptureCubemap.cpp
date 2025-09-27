@@ -8,6 +8,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/PlayerController.h"
 #include "Components/SceneCaptureComponent2D.h"
+#include "TickableObjectRenderThread.h"
 #include "Engine/World.h"
 #include "Engine/StaticMeshActor.h"
 #include "Engine/TextureRenderTarget2D.h"
@@ -102,9 +103,11 @@ void UOculusXRSceneCaptureCubemap::StartCapture(UWorld* World, uint32 InCaptureB
 
 void UOculusXRSceneCaptureCubemap::Tick(float DeltaTime)
 {
-	ExecuteOnRenderThread([]() {
-		TickRenderingTickables();
-	});
+	ENQUEUE_RENDER_COMMAND(OculusXRSceneCapturer_HeartbeatTickTickables)(
+		[](FRHICommandListImmediate& RHICmdList)
+		{
+			TickRenderingTickables(RHICmdList);
+		});
 
 	if (Stage == SettingPos)
 	{

@@ -259,7 +259,6 @@ namespace OculusXRHMD
 		virtual float GetPixelDenity() const override;
 		virtual void SetPixelDensity(const float NewPixelDensity) override;
 		virtual FIntPoint GetIdealRenderTargetSize() const override;
-		virtual void GetMotionControllerData(UObject* WorldContext, const EControllerHand Hand, FXRMotionControllerData& MotionControllerData) override;
 #if !UE_VERSION_OLDER_THAN(5, 5, 0)
 		virtual void GetMotionControllerState(UObject* WorldContext, const EXRSpaceType XRSpaceType, const EControllerHand Hand, const EXRControllerPoseType XRControllerPoseType, FXRMotionControllerState& MotionControllerState) override;
 #endif

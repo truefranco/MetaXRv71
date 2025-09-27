@@ -54,7 +54,8 @@ namespace OculusXRHMD
 		{
 			TRefCountPtr<ID3D11Device> D3D11Device;
 
-			ExecuteOnRenderThread([&D3D11Device]() {
+			ENQUEUE_RENDER_COMMAND()([&D3D11Device](FRHICommandListImmediate& RHICmdList) 
+				{
 				D3D11Device = (ID3D11Device*)RHIGetNativeDevice();
 			});
 
@@ -83,7 +84,7 @@ namespace OculusXRHMD
 	FTextureRHIRef FD3D11CustomPresent::CreateTexture_RenderThread(uint32 InSizeX, uint32 InSizeY, EPixelFormat InFormat, FClearValueBinding InBinding, uint32 InNumMips, uint32 InNumSamples, uint32 InNumSamplesTileMem, ERHIResourceType InResourceType, ovrpTextureHandle InTexture, ETextureCreateFlags InTexCreateFlags)
 	{
 		CheckInRenderThread();
-
+PRAGMA_DISABLE_DEPRECATION_WARNINGS
 		switch (InResourceType)
 		{
 			case RRT_Texture2D:
@@ -99,7 +100,7 @@ namespace OculusXRHMD
 				return nullptr;
 		}
 	}
-
+PRAGMA_ENABLE_DEPRECATION_WARNINGS
 	//-------------------------------------------------------------------------------------------------
 	// APIs
 	//-------------------------------------------------------------------------------------------------

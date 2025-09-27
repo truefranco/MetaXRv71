@@ -40,7 +40,7 @@ namespace OculusXRHMD
 
 		// FXRRenderBridge/FRHICustomPresent
 		virtual bool NeedsNativePresent() override;
-		virtual bool Present(int32& SyncInterval) override;
+		virtual bool Present(IRHICommandContext& RHICmdContext, int32& SyncInterval) override;
 		virtual void FinishRendering_RHIThread();
 
 		ovrpRenderAPIType GetRenderAPI() const { return RenderAPI; }

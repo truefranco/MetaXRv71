@@ -122,7 +122,7 @@ namespace OculusXRHMD
 		{
 			VulkanRHI->RHISetImageLayout((VkImage)InTexture, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_FRAGMENT_DENSITY_MAP_OPTIMAL_EXT, SubresourceRangeAll);
 		}
-
+PRAGMA_DISABLE_DEPRECATION_WARNINGS
 		switch (InResourceType)
 		{
 			case RRT_Texture2D:
@@ -138,7 +138,7 @@ namespace OculusXRHMD
 				return nullptr;
 		}
 	}
-
+PRAGMA_ENABLE_DEPRECATION_WARNINGS
 	// This is a hack to turn force FSR off when we allocate our FDM to avoid a crash on Quest 3
 	// TODO: Remove this for UE 5.3 after there's an engine-side fix
 	void FVulkanCustomPresent::UseFragmentDensityMapOverShadingRate_RHIThread()

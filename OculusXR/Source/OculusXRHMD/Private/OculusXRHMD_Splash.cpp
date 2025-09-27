@@ -181,7 +181,8 @@ namespace OculusXRHMD
 
 		if (!bIsShown)
 		{
-			ExecuteOnRenderThread([this]() {
+			ENQUEUE_RENDER_COMMAND()([this](FRHICommandListImmediate& RHICmdList) 
+				{
 				if (Ticker.IsValid())
 				{
 					Ticker->Unregister();
@@ -200,7 +201,9 @@ namespace OculusXRHMD
 		{
 			Ticker = MakeShareable(new FTicker(this));
 
-			ExecuteOnRenderThread([this]() {
+			ENQUEUE_RENDER_COMMAND()(
+				[this](FRHICommandListImmediate& RHICmdList) 
+				{
 				LastTimeInSeconds = FPlatformTime::Seconds();
 				Ticker->Register();
 			});
@@ -394,7 +397,9 @@ namespace OculusXRHMD
 
 		if (bInitialized)
 		{
-			ExecuteOnRenderThread([this]() {
+			ENQUEUE_RENDER_COMMAND()(
+				[this](FRHICommandListImmediate& RHICmdList)
+				{
 				if (Ticker)
 				{
 					Ticker->Unregister();

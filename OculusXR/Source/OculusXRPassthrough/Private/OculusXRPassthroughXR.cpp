@@ -31,7 +31,9 @@ namespace XRPassthrough
 
 	FPassthroughXRSceneViewExtension::~FPassthroughXRSceneViewExtension()
 	{
-		ExecuteOnRenderThread([this]() {
+		ENQUEUE_RENDER_COMMAND()(
+			[this](FRHICommandListImmediate& RHICmdList) 
+			{
 			InvAlphaTexture.SafeRelease();
 		});
 	}
@@ -41,7 +43,9 @@ namespace XRPassthrough
 		TSharedPtr<FPassthroughXR> Instance = FPassthroughXR::GetInstance().Pin();
 		check(Instance);
 		bool bShouldInvertAlpha = !Instance->GetSettings()->bExtInvertedAlphaAvailable;
-		ExecuteOnRenderThread_DoNotWait([this, bShouldInvertAlpha](FRHICommandListImmediate& RHICmdList) {
+		ENQUEUE_RENDER_COMMAND()(
+			[this, bShouldInvertAlpha](FRHICommandListImmediate& RHICmdList) 
+			{
 			bShouldInvertAlpha_RenderThread = bShouldInvertAlpha;
 		});
 	}
@@ -194,7 +198,9 @@ namespace XRPassthrough
 	{
 		if (Settings->bPassthroughEnabled)
 		{
-			ExecuteOnRenderThread([this, InSession](FRHICommandListImmediate& RHICmdList) {
+			ENQUEUE_RENDER_COMMAND()(
+				[this, InSession](FRHICommandListImmediate& RHICmdList)
+			{
 				InitializePassthrough(InSession);
 			});
 		}
@@ -206,7 +212,9 @@ namespace XRPassthrough
 	void FPassthroughXR::OnDestroySession(XrSession InSession)
 	{
 		// Release resources
-		ExecuteOnRenderThread([this, InSession]() {
+		ENQUEUE_RENDER_COMMAND()(
+			[this, InSession](FRHICommandListImmediate& RHICmdList)
+			{
 			Layers_RenderThread.Reset();
 
 			DeferredDeletion.HandleLayerDeferredDeletionQueue_RenderThread(true);
@@ -593,7 +601,9 @@ namespace XRPassthrough
 		check(Settings != nullptr);
 		const bool bPassthroughEnabled = Settings->bPassthroughEnabled;
 
-		ExecuteOnRenderThread_DoNotWait([this, InSession, bPassthroughEnabled](FRHICommandListImmediate& RHICmdList) {
+		ENQUEUE_RENDER_COMMAND()(
+			[this, InSession, bPassthroughEnabled](FRHICommandListImmediate& RHICmdList) 
+			{
 			if (bPassthroughEnabled && !bPassthroughInitialized)
 			{
 				InitializePassthrough(InSession);

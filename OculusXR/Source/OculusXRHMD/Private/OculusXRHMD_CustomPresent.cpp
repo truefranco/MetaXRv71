@@ -150,7 +150,9 @@ namespace OculusXRHMD
 
 		// OculusXRHMD is going away, but this object can live on until viewport is destroyed
 		ExecuteOnRenderThread([this]() {
-			ExecuteOnRHIThread([this]() {
+			ENQUEUE_RENDER_COMMAND()(
+				[this](FRHICommandListImmediate& RHICmdList) 
+				{
 				OculusXRHMD = nullptr;
 			});
 		});
@@ -161,7 +163,7 @@ namespace OculusXRHMD
 		return !bIsStandaloneStereoDevice;
 	}
 
-	bool FCustomPresent::Present(int32& SyncInterval)
+	bool FCustomPresent::Present(IRHICommandContext& RHICmdContext, int32& SyncInterval)
 	{
 		CheckInRHIThread();
 
@@ -219,7 +221,7 @@ namespace OculusXRHMD
 
 				ETextureCreateFlags TexCreateFlags = TexCreate_ShaderResource | TexCreate_RenderTargetable;
 
-				MirrorTextureRHI = CreateTexture_RenderThread(Width, Height, GetDefaultPixelFormat(), FClearValueBinding::None, 1, 1, 1, RRT_Texture2D, TextureHandle, TexCreateFlags)->GetTexture2D();
+				MirrorTextureRHI = CreateTexture_RenderThread(Width, Height, GetDefaultPixelFormat(), FClearValueBinding::None, 1, 1, 1, RRT_TextureReference, TextureHandle, TexCreateFlags)->GetTexture2D();
 			}
 		}
 	}

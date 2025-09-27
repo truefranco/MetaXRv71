@@ -79,7 +79,7 @@ namespace OculusXRHMD
 		CheckInRenderThread();
 
 		ID3D12DynamicRHI* DynamicRHI = GetID3D12DynamicRHI();
-
+PRAGMA_DISABLE_DEPRECATION_WARNINGS
 		switch (InResourceType)
 		{
 			case RRT_Texture2D:
@@ -95,7 +95,7 @@ namespace OculusXRHMD
 				return nullptr;
 		}
 	}
-
+PRAGMA_ENABLE_DEPRECATION_WARNINGS
 	//-------------------------------------------------------------------------------------------------
 	// APIs
 	//-------------------------------------------------------------------------------------------------

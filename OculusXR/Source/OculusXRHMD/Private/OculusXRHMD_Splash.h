@@ -15,9 +15,11 @@
 #include "TickableObjectRenderThread.h"
 #include "OculusXRHMDTypes.h"
 
+
+class FRHICommandListImmediate;
 namespace OculusXRHMD
 {
-
+	
 	class FOculusXRHMD;
 
 	//-------------------------------------------------------------------------------------------------
@@ -49,7 +51,7 @@ namespace OculusXRHMD
 			FTicker(FSplash* InSplash)
 				: FTickableObjectRenderThread(false, true), pSplash(InSplash) {}
 
-			virtual void Tick(float DeltaTime) override { pSplash->Tick_RenderThread(DeltaTime); }
+			virtual void Tick(FRHICommandListImmediate& RHICmdList, float DeltaTime) override { pSplash->Tick_RenderThread(DeltaTime); }
 			virtual TStatId GetStatId() const override { RETURN_QUICK_DECLARE_CYCLE_STAT(FSplash, STATGROUP_Tickables); }
 			virtual bool IsTickable() const override { return true; }
 

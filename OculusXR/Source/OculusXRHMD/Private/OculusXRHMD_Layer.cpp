@@ -42,7 +42,9 @@ namespace OculusXRHMD
 	{
 		if (IsInGameThread())
 		{
-			ExecuteOnRenderThread([OvrpLayerId = this->OvrpLayerId, DeferredDeletion = this->DeferredDeletion]() {
+			ENQUEUE_RENDER_COMMAND()(
+				[OvrpLayerId = this->OvrpLayerId, DeferredDeletion = this->DeferredDeletion](FRHICommandListImmediate& RHICmdList) 
+				{
 				DeferredDeletion->AddOVRPLayerToDeferredDeletionQueue(OvrpLayerId);
 			});
 		}
@@ -738,7 +740,7 @@ namespace OculusXRHMD
 						static const auto CVarMobileMSAA = IConsoleManager::Get().FindTConsoleVariableDataInt(TEXT("r.MobileMSAA"));
 						NumSamplesTileMem = (CVarMobileMSAA ? CVarMobileMSAA->GetValueOnAnyThread() : 1);
 					}
-
+					PRAGMA_DISABLE_DEPRECATION_WARNINGS
 					ERHIResourceType ResourceType;
 					if (OvrpLayerDesc.Shape == ovrpShape_Cubemap || OvrpLayerDesc.Shape == ovrpShape_OffcenterCubemap)
 					{
@@ -752,7 +754,7 @@ namespace OculusXRHMD
 					{
 						ResourceType = RRT_Texture2D;
 					}
-
+					PRAGMA_ENABLE_DEPRECATION_WARNINGS
 					const bool bNeedsSRGBFlag = bNeedsTexSrgbCreate || CustomPresent->IsSRGB(OvrpLayerDesc.Format);
 
 					ETextureCreateFlags ColorTexCreateFlags = TexCreate_ShaderResource | TexCreate_RenderTargetable | TexCreate_ResolveTargetable | (bNeedsSRGBFlag ? TexCreate_SRGB : TexCreate_None);

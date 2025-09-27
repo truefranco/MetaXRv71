@@ -183,7 +183,7 @@ struct MRUTILITYKIT_API FMRUKLabelFilter
 	/**
 	 * Enum flags representing component types to include, by default include all component types.
 	 */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MR Utility Kit", meta = (Bitmask, BitmaskEnum = "EMRUKComponentType"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MR Utility Kit", meta = (Bitmask, BitmaskEnum = "/Script/OculusXRMRUtility.EMRUKComponentType"))
 	int32 ComponentTypes = static_cast<int32>(EMRUKComponentType::All);
 
 	/**
